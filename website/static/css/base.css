@@ -1,0 +1,24 @@
+/********** nav bar styling ***********/
+nav{
+    border: 2px solid black;
+}
+ul{
+    margin: 5px;
+}
+li{
+    display: inline-block;
+    list-style: none;
+    padding-right: 10px;
+
+    cursor: pointer;
+}
+
+#password_change_box{
+    display: none;
+}
+
+#acc_delete_box{
+    display: none;
+}
+
+/* *********************************** */

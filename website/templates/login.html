@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+<form action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <label for="username">User Name:</label>
+    <input type="text" name='username' autocomplete="off"><br><br>
+
+    <label for="password">Password:</label>
+    <input type="password" name='password' autocomplete="off"><br><br>
+
+    <button type="submit">Login</button><br><br>
+    <p>Don't have an account ? <a href="{% url 'signup' %}">Create</a></p><br>
+    <p>Forgot Password ? <span>Click</span></p>
+  </form>
+
+  <!-- <form action="delete_account" method="POST">
+    <input type="password" name='confirm_pass' autocomplete="off"><br><br>
+  </form> -->
+
+{% endblock %}

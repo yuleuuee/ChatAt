@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Public Page{% endblock %}
+
+{% block content %}
+    <h1>Welcome {{user.username|title}}!</h1>
+    <h1>Public Page</h1>
+    <!-- <li><a href="{% url 'logout' %}">Logout</a></li> -->
+    <h2>Your Informations : </h2>
+    <ul>
+        User ID : <li>{{user.id}}</li><br>
+        Email : <li>{{user.email}}</li><br>
+        Username : <li>{{user.username}}</li><br>
+        Date Joined : <li>{{user.date_joined}}</li><br>
+        Last Login : <li>{{user.last_login}}</li><br>
+        Superuser : {% if user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %}
+    </ul>
+
+{% endblock %}

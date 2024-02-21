@@ -1,0 +1,35 @@
+<nav>
+    <ul>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a href="#">Your Profile</a></li>
+            <li onclick="confirm_box2()">CCCChange Password</li>
+            <li onclick="confirm_box()">Delete Account</li><br>
+
+            <!-- password change box -->
+            <div id="password_change_box">
+                <h3>Modify Your Password</h3>
+                <form action="{% url 'change_password' %}" method="POST">
+                    {% csrf_token %}
+                    <input type='password' name="old_password" autocomplete="off" placeholder="old_password"><br><br>
+                    <input type='password' name="new_password1" autocomplete="off" placeholder="new password"><br><br>
+                    <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password"><br><br>
+                    <button type='submit'>Submit</button>
+                </form>
+            </div>
+
+            <!-- Account delete box -->
+            <div id='acc_delete_box'>
+                <h3>Write your password first</h3>
+                <form action="{% url 'delete_account' %}" method="POST">
+                    {% csrf_token %}
+                    <input type='password' name="confirm_pass" autocomplete="off">
+                    <button type='submit'>Submit</button>
+                </form>
+            </div>
+
+        {% else %}
+            <li><a href="{% url 'home' %}">Home</a></li> 
+        {% endif %}
+    </ul>
+</nav>

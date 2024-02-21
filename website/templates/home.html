@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'image/chat_app.png' %}"/>
+</head>
+<body>
+    <h1>Home Page</h1>
+    {% if user.is_authenticated %}
+        <h4>Hey {{user.username|title}}! Last time you didn't logged out</h4>
+        <a href="{% url 'profile' %}">Go to Your Profile</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login/Signup</a> <!-- name : name in the urls -->
+    {% endif %}
+</body>
+</html>
