@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 # from .forms import CustomUserCreationForm
 
 from django.contrib.auth.models import User
+from .models import UserProfile
 
 # from django.contrib.auth.hashers import check_password,make_password
 
@@ -33,7 +34,7 @@ def user_login(request):
             if user is not None: # if there is user with  provided password matches the stored password
                 login(request, user)
                 messages.success(request, "Successfully logged in!")
-                return redirect('profile')
+                return redirect('public')
             else:
                 messages.error(request, "Password Incorrect!")
                 return redirect('login')
@@ -110,9 +111,9 @@ def user_signup(request):
 # ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
-def user_profile(request):
+def public_page(request):
     user = request.user
-    return render(request, 'profile.html', {'user': user})
+    return render(request, 'public.html', {'user': user})
 
 # ------------------------------------------------------------------------------------------------------
 @login_required(login_url='login')
@@ -138,10 +139,10 @@ def delete_account(request):
             return redirect('login')
         else:
             messages.error(request, "Password dosn't match!")
-            return redirect('profile')
+            return redirect('public')
     else:    
         # will never be this
-        return redirect('profile')
+        return redirect('public')
 
 @login_required(login_url='login')
 def change_password(request):
@@ -159,14 +160,42 @@ def change_password(request):
                 user.set_password(new_password1)
                 user.save()
                 messages.success(request, "Password Successfully Changed")
-                return redirect('profile')
+                return redirect('public')
             else:
                 messages.error(request, "New Passwords dosn't match!")
-                return redirect('profile')
+                return redirect('public')
         else:
             messages.error(request,'Old Password was Incorrect!, go to "Forgot password"')
-            return redirect('profile')
+            return redirect('public')
     else:    
         # will never be this
+        return redirect('public')
+    
+
+@login_required(login_url='login')
+def edit_profile(request):
+    if request.method == 'POST':
+        phone_no = request.POST['phone_no']
+        uploaded_profile_pic = request.FILES['uploaded_profile_pic']
+        
+        current_user, created = UserProfile.objects.get_or_create(user=request.user)
+
+        current_user.phone = phone_no
+        current_user.profile_picture = uploaded_profile_pic
+        current_user.save()  # Save the UserProfile
+
+        messages.success(request, " Saved Chnage Success! ")
         return redirect('profile')
+    else:
+        messages.error(request, "No chaange were made")
+        return redirect('public')
+
+
+@login_required(login_url='login')    
+def user_profile(request):
+    current_user = request.user
+    if request.method == 'POST':
+        return render(request, 'profile.html', {'current_user': current_user})
+    else:
+        return render(request, 'profile.html', {'current_user': current_user})
     

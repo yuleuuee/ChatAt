@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 
+# this is for the image to reference the urls
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('', include('website.urls')),
 ]
 
+# to view the image in the pagge by using the link:
 urlpatterns = urlpatterns+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 # Serve static files during development
 if settings.DEBUG:

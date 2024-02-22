@@ -1,19 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Public Page{% endblock %}
+{% block title %}Profile Page{% endblock %}
 
 {% block content %}
-    <h1>Welcome {{user.username|title}}!</h1>
-    <h1>Public Page</h1>
-    <!-- <li><a href="{% url 'logout' %}">Logout</a></li> -->
-    <h2>Your Informations : </h2>
+<h1>Hello {{current_user.username|title}},This is your profile page </h1>
+<h2>Your Informations : </h2>
     <ul>
-        User ID : <li>{{user.id}}</li><br>
-        Email : <li>{{user.email}}</li><br>
-        Username : <li>{{user.username}}</li><br>
-        Date Joined : <li>{{user.date_joined}}</li><br>
-        Last Login : <li>{{user.last_login}}</li><br>
-        Superuser : {% if user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %}
+        User ID : <li>{{current_user.id}}</li><br>
+        Email : <li>{{current_user.email}}</li><br>
+        Username : <li>{{current_user.username}}</li><br>
+        Date Joined : <li>{{current_user.date_joined}}</li><br>
+        Last Login : <li>{{current_user.last_login}}</li><br>
+        Superuser : {% if current_user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %} <br>
+        Phone No : <li>{{current_user.userprofile.phone}}</li><br>
+        <p>Your Profile pic : </p>
+        <div> 
+            {% if user.userprofile.profile_picture %}
+                <img src="{{ current_user.userprofile.profile_picture.url }}" alt="" style="width: 150px; height: 180px">
+            {% else %}
+                {% load static %}
+                <img src="{% static 'image/dum_pic.png' %}" alt="Dummy Image" style="width: 150px; height: 150px">
+            {% endif %}        
+        </div>
     </ul>
+
+    <div>
+        <h3>Edit profile</h3>
+        <form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="phone_no">Contact no : </label>
+            <input type='number' name="phone_no" autocomplete="off" maxlength="15"><br><br>
+
+            <label for="file">Choose a Profile_Picture : </label>
+            <input type="file" id="file" name="uploaded_profile_pic" ><br><br>
+
+            <button type='submit'>Save Change </button>
+        </form>
+
+    </div>
 
 {% endblock %}

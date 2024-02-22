@@ -11,7 +11,7 @@
     <h1>Home Page</h1>
     {% if user.is_authenticated %}
         <h4>Hey {{user.username|title}}! Last time you didn't logged out</h4>
-        <a href="{% url 'profile' %}">Go to Your Profile</a>
+        <a href="{% url 'public' %}">Enter to the Page</a>
     {% else %}
         <a href="{% url 'login' %}">Login/Signup</a> <!-- name : name in the urls -->
     {% endif %}
