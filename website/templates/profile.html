@@ -2,41 +2,69 @@
 
 {% block title %}Profile Page{% endblock %}
 
+{% block head %}
+
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}"> 
+{% endblock %}
+
 {% block content %}
-<h1>Hello {{current_user.username|title}},This is your profile page </h1>
+<h1>Hello {{user.username|title}}, This is your profile page </h1>
 <h2>Your Informations : </h2>
     <ul>
-        User ID : <li>{{current_user.id}}</li><br>
-        Email : <li>{{current_user.email}}</li><br>
-        Username : <li>{{current_user.username}}</li><br>
-        Date Joined : <li>{{current_user.date_joined}}</li><br>
-        Last Login : <li>{{current_user.last_login}}</li><br>
-        Superuser : {% if current_user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %} <br>
-        Phone No : <li>{{current_user.userprofile.phone}}</li><br>
-        <p>Your Profile pic : </p>
-        <div> 
-            {% if user.userprofile.profile_picture %}
-                <img src="{{ current_user.userprofile.profile_picture.url }}" alt="" style="width: 150px; height: 180px">
-            {% else %}
-                {% load static %}
-                <img src="{% static 'image/dum_pic.png' %}" alt="Dummy Image" style="width: 150px; height: 150px">
-            {% endif %}        
+        Email : <li>{{user.email}}</li><br>
+        Date Joined : <li>{{user.date_joined}}</li><br>
+        Last Login : <li>{{user.last_login}}</li><br>
+        Superuser : {% if user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %} <br>
+        
+        <div id="profile_pic_div" > 
+
+            <div class="info">
+                <p>Your Profile pic : </p>
+                <!-- current_user.userprofile.profile_picture.url  -->
+                <!-- user_profile.profile_picture.url -->
+                
+                {% if user.userprofile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+                {% else %}
+                    {% load static %}
+                    <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
+                {% endif %}        
+            </div>
+            
+            <div class="info">
+                <p>Your Bio : {{user_profile.bio}}</p>
+            </div>
+                
+            <div class="info">
+                <!-- current_user.userprofile.phone -->
+                <p>Your Contact No : {{user_profile.phone}}</p>
+            </div>
         </div>
     </ul>
 
     <div>
-        <h3>Edit profile</h3>
-        <form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data">
+        <h2>Edit profile</h2>
+        <form action="{% url 'profile_page' %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+
+            <label for="file" >Upload Profile Picture : </label>
+            <input type="file" id="file" name="new_profile_pic" >
+            
+            <br><br>
+
+            <label for="new_bio" >Bio : </label>
+            <textarea name="new_bio" id="" cols="20" rows="3"></textarea>
+
+            <br><br>
+
             <label for="phone_no">Contact no : </label>
-            <input type='number' name="phone_no" autocomplete="off" maxlength="15"><br><br>
+            <input type='tel' name="new_phone_no" autocomplete="off" maxlength="15">
 
-            <label for="file">Choose a Profile_Picture : </label>
-            <input type="file" id="file" name="uploaded_profile_pic" ><br><br>
+            <br><br>
 
-            <button type='submit'>Save Change </button>
+            <button type='submit'>Save Changes</button>
         </form>
-
     </div>
 
 {% endblock %}

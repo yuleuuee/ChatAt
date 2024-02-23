@@ -2,9 +2,38 @@
 
 {% block title %}Public Page{% endblock %}
 
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/public.css' %}"> 
+{% endblock %}
+
 {% block content %}
-    <h1>Welcome {{user.username|title}}!</h1>
-    <h1>Public Page</h1>
-    <div>POST</div>
-    <div>CHAT</div>
+    <span>Current Time : {{current_time}}</span><br>
+    <span>Today's Date : {{today_date}}</span>
+    <h1>{{greeting}} {{current_user.username|title}}!</h1>
+    
+    <h2>Public Page</h2>
+    <div class="add_post">
+        <div class="status-field">
+            <!-- <form action="" method="POST">
+                {% csrf_token %}
+                <textarea name="note" id="note" cols="40" rows="2" placeholder="Write Your Status Here..."></textarea>
+                <button class="btn area" type="submit">Submit</button>
+            </form> -->
+        </div>
+        <div class="img-vid-field">
+            <!-- <form action=" " method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="file">Upload Image : </label>
+                <input type="file" id="file" name="uploaded_post_img" >
+    
+                <br><br>
+                <button type='submit'>Save Changes</button>
+            </form> -->
+        </div>
+    </div>
+
+    <div class="all_posts_list">
+        <li><img src="{{ current_user.post.image.url }}" alt="" style="width: 100px; height: 100px"></li>
+    </div>
 {% endblock %}

@@ -7,7 +7,11 @@ from django.contrib.auth.decorators import login_required
 # from .forms import CustomUserCreationForm
 
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile,Post
+
+from datetime import datetime
+
+from django.utils.datastructures import MultiValueDictKeyError
 
 # from django.contrib.auth.hashers import check_password,make_password
 
@@ -18,7 +22,7 @@ from .models import UserProfile
 def home(request):
     return render(request,'home.html',{})
 
-# # ------------------------------------------------------------------------------------------------------
+# # ------------------------------ LOGIN -----------------------------------------------------------------------
 
 def user_login(request):
     
@@ -45,9 +49,7 @@ def user_login(request):
         return render(request, 'login.html', {})
     
 
-# ------------------------------------------------------------------------------------------------------
-
-# Using Own form :
+# ----------------------------------- SIGNUP -------------------------------------------------------------------
     
 def user_signup(request):
 
@@ -66,6 +68,13 @@ def user_signup(request):
         elif pass1 == pass2:
             user = User.objects.create_user(username=username,email=email,password=pass1)
             user.save()
+
+            #creating a UserProfile object for the New User: 
+            # this means a row will be created for the 'New_user' in the 'UserProfile' table
+            user_model = User.objects.get(username=username)
+            new_UserProfile = UserProfile.objects.create(user =user_model) 
+            new_UserProfile.save()
+
             messages.success(request, "Successfully registered")
             return redirect('login')
         else:
@@ -73,55 +82,50 @@ def user_signup(request):
             return redirect('signup')
     else:
         return render(request, 'signup.html') 
-    
-    
-# Using Django "UserCreationForm" and overriding it  as "CustomUserCreationForm":
-    
-# def user_signup(request):  
-
-#     if request.method == 'POST':
-#         form = CustomUserCreationForm(request.POST)
-
-#         if form.is_valid():
-#             # creating a user
-#             # user =form.save(commit=False)
-#             form.save()
-#             #authenticate and logging in the user
-#             u_name = form.cleaned_data['username']
-#             p_word = form.cleaned_data['password1']
-
-#             user = authenticate(request, username=u_name,password =p_word)
-
-#             if user is not None:
-#                 login(request,user)
-#                 messages.success(request, "Successfully registered")
-#                 return redirect('profile')
-#             else:
-#                 messages.error(request, "There was an error")
-#                 return redirect('signup')
-#         else:
-#              messages.error(request, "Form was not valid,try again")
-#              return redirect('signup')
-#     else:
-#         form = CustomUserCreationForm()
-#         context={'form':form}
-#         return render(request, 'signup.html',context)
             
-
-# ------------------------------------------------------------------------------------------------------
-
-@login_required(login_url='login')
-def public_page(request):
-    user = request.user
-    return render(request, 'public.html', {'user': user})
-
-# ------------------------------------------------------------------------------------------------------
+# ----------------------------------- LOGOUT -------------------------------------------------------------------
 @login_required(login_url='login')
 def user_logout(request):
     logout(request)
     messages.success(request,'Succesfully logged out!')
     return redirect('login')
 
+# ------------------------------------------
+@login_required(login_url='login')
+def public_page(request):
+    current_user = request.user
+    today_date = datetime.now().date()
+    current_time = datetime.now().time()
+
+    if current_time.hour < 12:
+        greeting = "Good morning"
+    elif current_time.hour < 18:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+    return render(request, 'public.html', {'current_user': current_user, 'greeting': greeting ,'current_time': current_time,'today_date':today_date})
+
+# ------------------------------------------------------------------------------------------------------
+
+# @login_required(login_url='login')    
+# def user_profile(request):
+#     current_user = request.user
+#     # {'current_user': current_user}
+#     # user_profile = UserProfile.objects.get(user=request.user)
+#     if request.method == 'POST':
+#        return render(request, 'profile.html',{'current_user': current_user})
+#     else:
+#         if request.user.is_authenticated:
+#             return render(request, 'profile.html',{'current_user': current_user})
+#         else:
+#             messages.error(request, "You must log in before visiting that page.")
+#             return redirect('login')
+
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ----------------------------------------: FUNCTIONS :-------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
@@ -143,6 +147,10 @@ def delete_account(request):
     else:    
         # will never be this
         return redirect('public')
+    
+
+# ------------------------------------------------------------------------------------------------------
+
 
 @login_required(login_url='login')
 def change_password(request):
@@ -171,31 +179,96 @@ def change_password(request):
         # will never be this
         return redirect('public')
     
+# ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
-def edit_profile(request):
-    if request.method == 'POST':
-        phone_no = request.POST['phone_no']
-        uploaded_profile_pic = request.FILES['uploaded_profile_pic']
-        
-        current_user, created = UserProfile.objects.get_or_create(user=request.user)
-
-        current_user.phone = phone_no
-        current_user.profile_picture = uploaded_profile_pic
-        current_user.save()  # Save the UserProfile
-
-        messages.success(request, " Saved Chnage Success! ")
-        return redirect('profile')
-    else:
-        messages.error(request, "No chaange were made")
-        return redirect('public')
-
-
-@login_required(login_url='login')    
-def user_profile(request):
+def profile_page(request):
     current_user = request.user
+
+    # this is the UserProfile Object, we can now assign value to the object's entities
+    # object's entities includes : profile_picture,bio,phone
+    user_profile = UserProfile.objects.get(user=request.user)
+
     if request.method == 'POST':
-        return render(request, 'profile.html', {'current_user': current_user})
-    else:
-        return render(request, 'profile.html', {'current_user': current_user})
+        if request.FILES.get('new_profile_pic') == None:
+            new_profile_pic =user_profile.profile_picture #getting the default profile pic from the media
+        else:
+            new_profile_pic =request.FILES.get('new_profile_pic') #getting from the uploaded file
+
+        
+        new_phone_no = request.POST['new_phone_no']
+        new_bio = request.POST['new_bio']
     
+        user_profile.profile_picture = new_profile_pic
+        user_profile.phone = new_phone_no
+        user_profile.bio = new_bio
+
+        user_profile.save()  # Save the UserProfile
+
+        messages.success(request, " Save Change Success! ")
+        return render(request,'profile.html',{'user_profile':user_profile})
+        # return render(request, 'profile.html',{'current_user': current_user})
+    else:
+        return render(request, 'profile.html',{'user_profile':user_profile})
+
+
+
+    # if request.method == 'POST':
+
+    #     current_user, created = UserProfile.objects.get_or_create(user=request.user)
+
+    #     try:
+    #         uploaded_profile_pic = request.FILES['uploaded_profile_pic']
+    #         current_user.profile_picture = uploaded_profile_pic
+    #     except MultiValueDictKeyError: # if there is a error in getting profile_pic :
+    #         phone_no = request.POST['phone_no']
+    #         if len(phone_no) == 0:
+    #             messages.error(request, "Phone no. Can't be Blank ! ")
+    #             return redirect('profile')
+    #         else:
+    #             current_user.phone = phone_no
+       
+    #     current_user.save()  # Save the UserProfile
+
+    #     messages.success(request, " Save Change Success! ")
+    #     return redirect('profile')
+    # else:
+    #     messages.error(request, "No chaange were made")
+    #     return redirect('public')
+
+
+    
+# ------------------------------------------------------------------------------------------------------
+# @login_required(login_url='login')
+# def add_post(request):
+
+#     if request.method == 'POST':
+#         current_user, created = Post.objects.get_or_create(user=request.user)
+#         try:
+#             uploaded_post_img = request.FILES['uploaded_post_img']
+#             current_user.image = uploaded_post_img
+#         except MultiValueDictKeyError:
+#             content = request.POST['content']
+#             if  content :
+#                 current_user.content = content
+#             else:
+#                 current_user.content = 'Null'
+
+#         current_user.save()     
+#         # current_user.image = uploaded_post_img
+
+#          # Create a new Post instance
+#         # new_post = Post(user=request.user,content=content)
+
+#         # if uploaded_post_img:
+#         #     new_post.image = uploaded_post_img
+#         # else:
+#         #     new_post.content = content
+        
+
+#         # new_post.save()  # Save the UserProfile
+
+#         messages.success(request, "New Post Added! ")
+#         return redirect('public')
+#     else:
+#         return redirect('public')

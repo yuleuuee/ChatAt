@@ -8,17 +8,21 @@ from django.db import models
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
-    bio = models.TextField(blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True) # must install : pip3 install Pillow
+    bio = models.TextField(blank=True,max_length=100)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='dummy.png' ,blank=True, null=True) # must install : pip3 install Pillow
 
+    # helps to see the username in the admin pannel insted of object 1 or object2
     def __str__(self):
-        return self.user.username # if only 'User' is used to get data then it will only display the username 
+        return self.user.username 
 
 class Post(models.Model):
+    # 'id' primary key will get generated automatically
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.TextField(max_length=1000)
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # because we have a ForeignKey field named 'user', 
+    # Django will create a column named 'user_id' in database table.
     
     def __str__(self):
         return f"Post by {self.user.username}"

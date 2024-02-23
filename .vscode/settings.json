@@ -2,7 +2,8 @@
 
 {
     "emmet.includeLanguages": {
-        "django-html": "html"
+        "django-html": "html",
+        "django-jinga2": "jinga2"
     }
 }
 

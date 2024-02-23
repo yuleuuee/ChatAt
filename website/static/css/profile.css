@@ -1,0 +1,22 @@
+#profile_pic_div{
+    border: 2px solid red;
+    padding: 10px;
+}
+
+#profile_pic_div img{
+    border-radius: 50%;
+}
+
+.info{
+    border: 2px solid green;
+    padding: 10px;
+    margin: 5px;
+}
+
+input[type="file"] {
+    background-color: #74ab76;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}

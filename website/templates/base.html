@@ -8,6 +8,7 @@
     {% load static %}
     <link rel="shortcut icon" type="image/png" href="{% static 'image/chat_app.png' %}"/>
     <link rel="stylesheet" href="{% static 'css/base.css' %}"> 
+    {% block head %}{% endblock %}
 </head>
 <body>
     {% include "nav_bar.html" %}
