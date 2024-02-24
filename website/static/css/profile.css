@@ -1,6 +1,13 @@
 #profile_pic_div{
     border: 2px solid red;
     padding: 10px;
+    margin: 5px;
+}
+
+.edit-profile{
+    border: 2px solid red;
+    padding: 10px;
+    margin: 5px;
 }
 
 #profile_pic_div img{
@@ -14,9 +21,10 @@
 }
 
 input[type="file"] {
-    background-color: #74ab76;
+    border: 2px solid brown;
     color: white;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
 }
+

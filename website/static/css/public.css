@@ -4,7 +4,7 @@
     margin: 10px;
 }
 
-.all_posts_list{
+.post_box{
     border: 2px solid blue;
     padding: 10px;
     margin: 10px;
@@ -14,9 +14,37 @@
     align-items: center;
     flex-direction: column;
     
+}
+
+.single_post{
+    border: 2px dotted black;
+    margin: 5px;
+    width: 60%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.single_post div{
+    border: 2px solid pink;
+    width: 60%;
+    
+    margin: 5px;
+    padding: 5px;
 
 }
 
-.all_posts_list li img{
-    width: 50%;
+.image-post-div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+}
+
+.post_box div img{
+    width: 100%; 
+
 }

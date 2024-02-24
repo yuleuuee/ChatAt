@@ -2,9 +2,12 @@
 nav{
     border: 2px solid black;
 }
+
 ul{
-    margin: 5px;
+    
+    padding-left: 10px;
 }
+
 li{
     display: inline-block;
     list-style: none;

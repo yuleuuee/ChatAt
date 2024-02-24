@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import UserProfile
 from .models import Post
-from .models import Like
-from .models import Comment
+# from .models import Like
+# from .models import Comment
 
 # Register your models here.
 
@@ -12,5 +12,5 @@ from .models import Comment
 admin.site.register(UserProfile)
 
 admin.site.register(Post)
-admin.site.register(Like)
-admin.site.register(Comment)
+# admin.site.register(Like)
+# admin.site.register(Comment)

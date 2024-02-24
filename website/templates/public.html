@@ -8,32 +8,49 @@
 {% endblock %}
 
 {% block content %}
-    <span>Current Time : {{current_time}}</span><br>
-    <span>Today's Date : {{today_date}}</span>
-    <h1>{{greeting}} {{current_user.username|title}}!</h1>
+    <!-- <span>Current Time : {{current_time}}</span><br>
+    <span>Today's Date : {{today_date}}</span> -->
+    <h1>{% if greeting %}{{greeting}} {% else %} Hello {% endif %} {{user.username|title}}!</h1>
     
     <h2>Public Page</h2>
+    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px">
     <div class="add_post">
-        <div class="status-field">
-            <!-- <form action="" method="POST">
-                {% csrf_token %}
-                <textarea name="note" id="note" cols="40" rows="2" placeholder="Write Your Status Here..."></textarea>
-                <button class="btn area" type="submit">Submit</button>
-            </form> -->
-        </div>
-        <div class="img-vid-field">
-            <!-- <form action=" " method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+        <form action="{% url 'add_post' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
                 <label for="file">Upload Image : </label>
-                <input type="file" id="file" name="uploaded_post_img" >
-    
+                <input type="file" id="file" name="post_img" >
                 <br><br>
-                <button type='submit'>Save Changes</button>
-            </form> -->
-        </div>
+                <label for="post_caption">Add Status : </label>
+                <textarea name="post_caption" id="post_caption" cols="40" rows="2" placeholder="Write Your Captions Here..."></textarea>
+                <br><br>
+                <button type='submit'>POST</button>
+        </form>
     </div>
 
-    <div class="all_posts_list">
-        <li><img src="{{ current_user.post.image.url }}" alt="" style="width: 100px; height: 100px"></li>
+    <div class="post_box">
+        {% for single_post in posts reversed %}
+            <div class="single_post">
+
+                <div>
+                    <a href="#">
+                        <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                        <span >@{{ single_post.user.username }}</span>
+                    </a>
+                    <p>Posted at : <span>{{ single_post.created_at }}</span></p>
+                </div>
+                <div class="image-post-div">
+                    <img src="{{ single_post.image.url }}" alt="" >
+                    <br>
+                    <div style="border: 1px solid green; width: 98%;">{{ single_post.caption }}</div>
+                </div>
+                <div>
+                    <li>{{single_post.no_of_likes}} Like</li>
+                    <li>0 Comment</li>
+                </div>
+            </div>
+        {% endfor %}
     </div>
+    {% load static %}
+    <script src="{% static 'js/public.js' %}"></script>
+    
 {% endblock %}

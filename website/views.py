@@ -22,9 +22,13 @@ from django.utils.datastructures import MultiValueDictKeyError
 def home(request):
     return render(request,'home.html',{})
 
-# # ------------------------------ LOGIN -----------------------------------------------------------------------
+# # --------------------------------- LOGIN -----------------------------------------------------------------------
 
 def user_login(request):
+
+    # user_profile = UserProfile.objects.get(user=request.user)
+    # user_profile = UserProfile.objects.get(user=request.user)  # Access id to fetch
+
     
     if request.method == 'POST':
         u_name = request.POST['username']
@@ -38,7 +42,7 @@ def user_login(request):
             if user is not None: # if there is user with  provided password matches the stored password
                 login(request, user)
                 messages.success(request, "Successfully logged in!")
-                return redirect('public')
+                return redirect('public') #,{'user_profile':user_profile}
             else:
                 messages.error(request, "Password Incorrect!")
                 return redirect('login')
@@ -46,9 +50,8 @@ def user_login(request):
             messages.error(request, "User Doesn't Exist")
             return redirect('login')
     else:
-        return render(request, 'login.html', {})
+        return render(request, 'login.html')
     
-
 # ----------------------------------- SIGNUP -------------------------------------------------------------------
     
 def user_signup(request):
@@ -89,38 +92,6 @@ def user_logout(request):
     logout(request)
     messages.success(request,'Succesfully logged out!')
     return redirect('login')
-
-# ------------------------------------------
-@login_required(login_url='login')
-def public_page(request):
-    current_user = request.user
-    today_date = datetime.now().date()
-    current_time = datetime.now().time()
-
-    if current_time.hour < 12:
-        greeting = "Good morning"
-    elif current_time.hour < 18:
-        greeting = "Good afternoon"
-    else:
-        greeting = "Good evening"
-
-    return render(request, 'public.html', {'current_user': current_user, 'greeting': greeting ,'current_time': current_time,'today_date':today_date})
-
-# ------------------------------------------------------------------------------------------------------
-
-# @login_required(login_url='login')    
-# def user_profile(request):
-#     current_user = request.user
-#     # {'current_user': current_user}
-#     # user_profile = UserProfile.objects.get(user=request.user)
-#     if request.method == 'POST':
-#        return render(request, 'profile.html',{'current_user': current_user})
-#     else:
-#         if request.user.is_authenticated:
-#             return render(request, 'profile.html',{'current_user': current_user})
-#         else:
-#             messages.error(request, "You must log in before visiting that page.")
-#             return redirect('login')
 
 # ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
@@ -180,6 +151,33 @@ def change_password(request):
         return redirect('public')
     
 # ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+
+@login_required(login_url='login')
+def public_page(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    # user_post, created = Post.objects.get_or_create(user=request.user)
+
+    posts = Post.objects.all()
+
+    current_user = request.user
+   
+    current_time = datetime.now().time()
+    #  today_date = datetime.now().date()
+    # 'current_time': current_time,'today_date':today_date ,
+
+
+    if current_time.hour < 12:
+        greeting = "Good morning"
+    elif current_time.hour < 18:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+    return render(request, 'public.html', {'current_user': current_user, 'greeting': greeting ,'user_profile':user_profile,'posts': posts})
+
+# ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
 def profile_page(request):
@@ -190,85 +188,71 @@ def profile_page(request):
     user_profile = UserProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
-        if request.FILES.get('new_profile_pic') == None:
-            new_profile_pic =user_profile.profile_picture #getting the default profile pic from the media
-        else:
-            new_profile_pic =request.FILES.get('new_profile_pic') #getting from the uploaded file
+        if request.FILES.get('new_profile_pic') == None: # if the user is'nt submitting profile picture, #getting the default profile pic from the media
+            new_profile_pic =user_profile.profile_picture 
+        else: # if the user is submitting a profile picture ,# getting from the uploaded file
+            new_profile_pic =request.FILES.get('new_profile_pic') 
 
+        if len(request.POST['new_phone_no']) == 0:
+            new_phone_no = user_profile.phone
+        else:
+            new_phone_no = request.POST['new_phone_no']
         
-        new_phone_no = request.POST['new_phone_no']
-        new_bio = request.POST['new_bio']
+        if len(request.POST['new_bio']) == 0:
+            new_bio = user_profile.bio
+        else:
+            new_bio = request.POST['new_bio']
+
+        # new_phone_no = request.POST['new_phone_no']
+        # new_bio = request.POST['new_bio']
     
         user_profile.profile_picture = new_profile_pic
         user_profile.phone = new_phone_no
         user_profile.bio = new_bio
 
-        user_profile.save()  # Save the UserProfile
+        user_profile.save()  # Saving the changes in UserProfile
 
         messages.success(request, " Save Change Success! ")
         return render(request,'profile.html',{'user_profile':user_profile})
-        # return render(request, 'profile.html',{'current_user': current_user})
     else:
-        return render(request, 'profile.html',{'user_profile':user_profile})
-
-
-
-    # if request.method == 'POST':
-
-    #     current_user, created = UserProfile.objects.get_or_create(user=request.user)
-
-    #     try:
-    #         uploaded_profile_pic = request.FILES['uploaded_profile_pic']
-    #         current_user.profile_picture = uploaded_profile_pic
-    #     except MultiValueDictKeyError: # if there is a error in getting profile_pic :
-    #         phone_no = request.POST['phone_no']
-    #         if len(phone_no) == 0:
-    #             messages.error(request, "Phone no. Can't be Blank ! ")
-    #             return redirect('profile')
-    #         else:
-    #             current_user.phone = phone_no
-       
-    #     current_user.save()  # Save the UserProfile
-
-    #     messages.success(request, " Save Change Success! ")
-    #     return redirect('profile')
-    # else:
-    #     messages.error(request, "No chaange were made")
-    #     return redirect('public')
-
+        return render(request,'profile.html',{'user_profile':user_profile})
 
     
 # ------------------------------------------------------------------------------------------------------
-# @login_required(login_url='login')
-# def add_post(request):
+    
 
-#     if request.method == 'POST':
-#         current_user, created = Post.objects.get_or_create(user=request.user)
-#         try:
-#             uploaded_post_img = request.FILES['uploaded_post_img']
-#             current_user.image = uploaded_post_img
-#         except MultiValueDictKeyError:
-#             content = request.POST['content']
-#             if  content :
-#                 current_user.content = content
-#             else:
-#                 current_user.content = 'Null'
+@login_required(login_url='login')
+def add_post(request):
 
-#         current_user.save()     
-#         # current_user.image = uploaded_post_img
+    # user_post, created = Post.objects.get_or_create(user=request.user)
 
-#          # Create a new Post instance
-#         # new_post = Post(user=request.user,content=content)
+    if request.method == 'POST':
+        user = request.user
+        # post_img =request.FILES.get('post_img')
+        # post_caption = request.POST['post_caption']
 
-#         # if uploaded_post_img:
-#         #     new_post.image = uploaded_post_img
-#         # else:
-#         #     new_post.content = content
+        if request.FILES.get('post_img') == None:
+            messages.error(request, "Must select an Image before posting")
+            return redirect('public')
+        else:
+           post_img =request.FILES.get('post_img')
+
+        if len(request.POST['post_caption']) == 0:
+            post_caption = 'No Caption'
+        else:
+            post_caption = request.POST['post_caption']
+
+        new_post = Post.objects.create(user = user, image = post_img, caption = post_caption)
         
+        # user_post.image = post_img
+        # user_post.caption = post_caption
 
-#         # new_post.save()  # Save the UserProfile
+        new_post.save()
+        messages.success(request, "Post Added Succesfully!")
+        return redirect('public')
 
-#         messages.success(request, "New Post Added! ")
-#         return redirect('public')
-#     else:
-#         return redirect('public')
+    else:    
+        return redirect('public') # this helps to go the the view public_page ,as it is using the name of the url
+
+
+

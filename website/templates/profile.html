@@ -11,25 +11,27 @@
 {% block content %}
 <h1>Hello {{user.username|title}}, This is your profile page </h1>
 <h2>Your Informations : </h2>
-    <ul>
-        Email : <li>{{user.email}}</li><br>
-        Date Joined : <li>{{user.date_joined}}</li><br>
-        Last Login : <li>{{user.last_login}}</li><br>
-        Superuser : {% if user.is_superuser  %} <li>Yes</li>{% else %}<li>No</li> {% endif %} <br>
+<ul>
+    Email : <li>{{user.email}}</li><br>
+    Date Joined : <li>{{user.date_joined}}</li><br>
+    Last Login : <li>{{user.last_login}}</li><br>
+</ul>
         
         <div id="profile_pic_div" > 
 
             <div class="info">
                 <p>Your Profile pic : </p>
-                <!-- current_user.userprofile.profile_picture.url  -->
-                <!-- user_profile.profile_picture.url -->
+                <!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
                 
-                {% if user.userprofile.profile_picture %}
+                <!-- {% if user_profile.profile_picture %} -->
+                <a href="{{ user_profile.profile_picture.url }}">
                     <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
-                {% else %}
+                </a>
+
+                <!-- {% else %}
                     {% load static %}
                     <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
-                {% endif %}        
+                {% endif %}         -->
             </div>
             
             <div class="info">
@@ -41,11 +43,10 @@
                 <p>Your Contact No : {{user_profile.phone}}</p>
             </div>
         </div>
-    </ul>
 
-    <div>
+    <div class="edit-profile">
         <h2>Edit profile</h2>
-        <form action="{% url 'profile_page' %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'profile_page' %}" method="POST" enctype="multipart/form-data"> 
             {% csrf_token %}
 
             <label for="file" >Upload Profile Picture : </label>
@@ -54,12 +55,12 @@
             <br><br>
 
             <label for="new_bio" >Bio : </label>
-            <textarea name="new_bio" id="" cols="20" rows="3"></textarea>
+            <textarea name="new_bio" id="" cols="45" rows="3">{{user_profile.bio}}</textarea>
 
             <br><br>
 
             <label for="phone_no">Contact no : </label>
-            <input type='tel' name="new_phone_no" autocomplete="off" maxlength="15">
+            <input type='tel' name="new_phone_no" autocomplete="off" maxlength="15" value=" {{user_profile.phone}}">
 
             <br><br>
 

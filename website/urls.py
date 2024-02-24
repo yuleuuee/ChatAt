@@ -9,9 +9,8 @@ urlpatterns = [
     path('logout/',views.user_logout,name ='logout'),
     path('delete_account/',views.delete_account,name ='delete_account'),
     path('change_password/',views.change_password,name ='change_password'),
-    # path('edit_profile/',views.edit_profile,name ='edit_profile'),
 
     path('profile_page/',views.profile_page,name ='profile_page'),
-    # path('add_post/',views.add_post,name ='add_post'),
+    path('add_post/',views.add_post,name ='add_post'),
 ]
 
