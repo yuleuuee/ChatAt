@@ -10,39 +10,45 @@
 
 {% block content %}
 <h1>Hello {{user.username|title}}, This is your profile page </h1>
-<h2>Your Informations : </h2>
-<ul>
-    Email : <li>{{user.email}}</li><br>
-    Date Joined : <li>{{user.date_joined}}</li><br>
-    Last Login : <li>{{user.last_login}}</li><br>
-</ul>
-        
-        <div id="profile_pic_div" > 
-
-            <div class="info">
-                <p>Your Profile pic : </p>
-                <!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
-                
-                <!-- {% if user_profile.profile_picture %} -->
-                <a href="{{ user_profile.profile_picture.url }}">
-                    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
-                </a>
-
-                <!-- {% else %}
-                    {% load static %}
-                    <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
-                {% endif %}         -->
-            </div>
+<h2>Your Informations : @{{user.username}}</h2>
+<div class="big-container">
+    <div class="follow-following-div">
+        <div>0 Post</div>
+        <div>0 Followers</div>
+        <div>0 following</div>
+        <div>Follow</div>
+    </div>
+    <div class="other-info">
+        Email : <span>{{user.email}}</span><br>
+        Date Joined : <span>{{user.date_joined}}</span><br>
+        Last Login : <span>{{user.last_login}}</span><br>
+    </div>
+    
+    <div id="profile_pic_div" >
+        <div class="info">
+            <p>Your Profile pic : </p>
+            <!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
             
-            <div class="info">
-                <p>Your Bio : {{user_profile.bio}}</p>
-            </div>
-                
-            <div class="info">
-                <!-- current_user.userprofile.phone -->
-                <p>Your Contact No : {{user_profile.phone}}</p>
-            </div>
+            <!-- {% if user_profile.profile_picture %} -->
+            <a href="{{ user_profile.profile_picture.url }}">
+                <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+            </a>
+
+            <!-- {% else %}
+                {% load static %}
+                <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
+            {% endif %}         -->
         </div>
+        
+        <div class="info">
+            <p>Your Bio : {{user_profile.bio}}</p>
+        </div>
+            
+        <div class="info">
+            <!-- current_user.userprofile.phone -->
+            <p>Your Contact No : {{user_profile.phone}}</p>
+        </div>
+    </div>
 
     <div class="edit-profile">
         <h2>Edit profile</h2>
@@ -67,5 +73,5 @@
             <button type='submit'>Save Changes</button>
         </form>
     </div>
-
+</div>
 {% endblock %}

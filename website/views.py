@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 # from .forms import CustomUserCreationForm
 
 from django.contrib.auth.models import User
-from .models import UserProfile,Post
+from .models import UserProfile,Post,Like,FollowersCount
 
 from datetime import datetime
 
@@ -175,7 +175,14 @@ def public_page(request):
     else:
         greeting = "Good evening"
 
-    return render(request, 'public.html', {'current_user': current_user, 'greeting': greeting ,'user_profile':user_profile,'posts': posts})
+    # context={
+    #     'current_user': current_user, 
+    #     'greeting': greeting ,
+    #     'user_profile':user_profile,
+    #     'posts': posts,
+    # }
+
+    return render(request, 'public.html', {'current_user': current_user,'greeting': greeting ,'user_profile':user_profile,'posts': posts})
 
 # ------------------------------------------------------------------------------------------------------
 
@@ -219,7 +226,42 @@ def profile_page(request):
 
     
 # ------------------------------------------------------------------------------------------------------
-    
+@login_required(login_url='login')
+def other_profile(request,pk):
+    user_object = User.objects.get(username =pk)
+    user_profile = UserProfile.objects.get(user=user_object)
+    user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
+    user_post_no = len(user_posts)
+
+
+    follower = request.user.username
+    user =pk
+
+    # if the user was already followed then 
+    if FollowersCount.objects.filter(follower=follower,user=user).first():
+        button_text ='Unfollow'
+    else:
+        button_text ='Follow'
+
+    # no. of followers and no. following
+    user_followers = len(FollowersCount.objects.filter(user=pk)) # here the 'user : view' is the person that has been followed
+    user_following = len(FollowersCount.objects.filter(follower=pk)) # here the 'follower : viewer' is the person that has been followed
+
+    context={
+        'user_object':user_object,
+        'user_profile':user_profile,
+        'user_posts':user_posts,
+        'user_post_no' : user_post_no,
+        'button_text':button_text,
+        'user_followers':user_followers,
+        'user_following':user_following,
+
+    }
+
+    return render(request,'other_profile.html',context)
+
+
+# ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
 def add_post(request):
@@ -254,5 +296,46 @@ def add_post(request):
     else:    
         return redirect('public') # this helps to go the the view public_page ,as it is using the name of the url
 
+# ------------------------------------------------------------------------------------------------------
+    
+@login_required(login_url='login')
+def like_post(request):
+    user = request.user
+    post_id = request.GET.get('post_id') # getting the post id which was just  liked 
 
+    post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
 
+    like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
+
+    if like_filter == None:
+        new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+        new_like.save()
+        post.no_of_likes=post.no_of_likes +1
+        post.save()
+        return redirect('public')
+    else:
+        like_filter.delete()
+        post.no_of_likes=post.no_of_likes -1
+        post.save()
+        return redirect('public')
+    
+@login_required(login_url='login')
+def follow(request):
+    if request.method =='POST':
+        #getting the information from the 'form'
+        follower = request.POST['follower'] # Viewer : currently logged in user
+        user = request.POST['user'] # view : user which the viewer is viewing
+
+        # checking whether or not the currerently logged in user is already followeing this user
+        # if already followed case :
+        if FollowersCount.objects.filter(follower=follower,user=user).first():
+            delete_follower = FollowersCount.objects.get(follower=follower,user=user)
+            delete_follower.delete()
+            return redirect('/other_profile/'+user) #going to the profile of the same user whch the viewer was viewing
+        else: 
+             # if already not followed case :
+            new_follower = FollowersCount.objects.create(follower=follower,user=user)
+            new_follower.save()
+            return redirect('/other_profile/'+user) 
+    else:
+        return redirect('public')

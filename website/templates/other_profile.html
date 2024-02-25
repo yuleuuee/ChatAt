@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Page{% endblock %}
+
+
+{% block head %}
+
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/other_profile.css' %}"> 
+{% endblock %}
+
+{% block content %}
+
+<h1>Profile page of : {{user_object.username|title}} </h1>
+<h2>Informations :</h2>
+<div class="big-container">
+    <div class="follow-following-div">
+
+        <!--Dynamic follower and following Part  -->
+        <div>{{user_post_no}} Post</div>
+        {% if user_followers == 0 or user_followers == 1 %}
+            <div>{{user_followers}} Follower</div>
+        {% else %}
+            <div>{{user_followers}} Followers</div>
+        {% endif %}
+        <div>{{user_following}} following</div>
+
+        <form action="{% url 'follow' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" value="{{user.username}}" name="follower"> <!-- Viewer : the username of the 'user who is currently viewing' the other's profile page  -->
+            <input type="hidden" value="{{user_object.username}}" name="user">  <!-- View : username of the 'user whose profile is currently being viewed -->
+            
+            {% if user_object.username == user.username %} <!--  if the 'view page' is of the 'user who is viewing'  -->
+                <a href="#"> Profile Settings</a>
+            {% else %}
+                <div><button type="submit">{{button_text}}</button></div>
+            {% endif %}
+            
+            
+        </form>
+       
+    </div>
+    
+    <div id="profile_pic_div" >
+        <div class="info">
+            <p>Profile pic : </p>
+            <!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
+            
+            <!-- {% if user_profile.profile_picture %} -->
+            <a href="{{ user_profile.profile_picture.url }}">
+                <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+            </a>
+
+            <!-- {% else %}
+                {% load static %}
+                <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
+            {% endif %}         -->
+        </div>
+        
+        <div class="info">
+            <p>Bio : {{user_profile.bio}}</p>
+            <!-- current_user.userprofile.phone -->
+            <p>Contact No : {{user_profile.phone}}</p>
+            <p>Email : {{user_object.email}}</p>
+            <p>Date Joined : {{user_object.date_joined}}</p>
+            <p>Last Login : {{user_object.last_login}}</p>
+        </div>
+        <div class="user-posts-div">
+            <h2>All posts : </h2>
+            <div>
+                {% for post in user_posts %}
+                    <img src="{{ post.image.url }}" alt="" style="width: 180px; height: 200px; border-radius: 20px" >
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

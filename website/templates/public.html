@@ -28,25 +28,27 @@
     </div>
 
     <div class="post_box">
-        {% for single_post in posts reversed %}
+        {% for post in posts reversed %}
             <div class="single_post">
 
                 <div>
-                    <a href="#">
-                        <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
-                        <span >@{{ single_post.user.username }}</span>
+                    <a href={% url 'other_profile' pk=post.user %}>
+                        <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                        <span >@{{ post.user.username }}</span>
                     </a>
-                    <p>Posted at : <span>{{ single_post.created_at }}</span></p>
+                    <p>Posted at : <span>{{ post.created_at }}</span></p>
                 </div>
                 <div class="image-post-div">
-                    <img src="{{ single_post.image.url }}" alt="" >
+                    <img src="{{ post.image.url }}" alt="" >
                     <br>
-                    <div style="border: 1px solid green; width: 98%;">{{ single_post.caption }}</div>
+                    <div style="border: 1px solid green; width: 98%;">{{ post.caption }}</div>
                 </div>
                 <div>
-                    <li>{{single_post.no_of_likes}} Like</li>
+                    <!-- <i class="fa fa-heart"></i> -->
+                    <li>{{post.no_of_likes}} <a href="/like_post?post_id={{post.id}}">Like</a></li> 
                     <li>0 Comment</li>
                 </div>
+                
             </div>
         {% endfor %}
     </div>

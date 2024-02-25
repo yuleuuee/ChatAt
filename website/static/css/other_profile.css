@@ -1,0 +1,42 @@
+.follow-following-div,.edit-profile,#profile_pic_div{
+    border: 2px solid brown;
+    padding: 10px;
+    margin: 5px;
+}
+
+.follow-following-div{
+    display: flex;
+    justify-content: baseline;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+
+}
+
+#profile_pic_div img{
+    border-radius: 50%;
+}
+
+.info,.user-posts-div{
+    border: 2px solid green;
+    padding: 10px;
+    margin: 5px;
+}
+
+.user-posts-div{
+    border: 2px solid green;
+}
+
+.user-posts-div div{
+    border: 2px solid red;
+    padding: 5px;
+    display:flex;
+    justify-content:first baseline;
+    align-items:first baseline;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    gap: 20px;
+}
+
+
