@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Page{% endblock %}
+
+{% block head %}
+
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}"> 
+{% endblock %}
+
+{% block content %}
+<h1>Hello {{user.username|title}}, This is your Account Setting page </h1>
+<h2>Edit Your profile : @{{user.username}}</h2>
+<div class="big-container">
+    <div class="edit-profile">
+        <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data"> 
+            {% csrf_token %}
+
+            <div>
+                <a href="{{ user_profile.profile_picture.url }}">
+                    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+                </a>
+            </div>
+            
+            <label for="file" >Upload Profile Picture : </label>
+            <input type="file" id="file" name="new_profile_pic" >
+            
+            
+            <br><br>
+
+            <label for="new_bio" >Bio : </label>
+            <textarea name="new_bio" id="" cols="45" rows="3">{{user_profile.bio}}</textarea>
+
+            <br><br>
+
+            <label for="phone_no">Contact no : </label>
+            <input type='tel' name="new_phone_no" autocomplete="off" maxlength="15" value=" {{user_profile.phone}}">
+
+            <br><br>
+
+            <button type='submit'>Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

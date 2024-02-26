@@ -11,7 +11,12 @@
 
 {% block content %}
 
-<h1>Profile page of : {{user_object.username|title}} </h1>
+
+{% if user_object.username == user.username %}
+    <h1>@{{user_object.username}} ,This is Your Profile Page</h1>
+{% else %}
+    <h1> Profile Page of @{{user_object.username}} </h1>
+{% endif %}
 <h2>Informations :</h2>
 <div class="big-container">
     <div class="follow-following-div">
@@ -31,7 +36,7 @@
             <input type="hidden" value="{{user_object.username}}" name="user">  <!-- View : username of the 'user whose profile is currently being viewed -->
             
             {% if user_object.username == user.username %} <!--  if the 'view page' is of the 'user who is viewing'  -->
-                <a href="#"> Profile Settings</a>
+                <a href="{% url 'settings' %}"> Profile Settings</a>
             {% else %}
                 <div><button type="submit">{{button_text}}</button></div>
             {% endif %}

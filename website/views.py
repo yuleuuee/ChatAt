@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 # from django.contrib.auth.forms import UserCreationForm
 # from .forms import CustomUserCreationForm
@@ -11,7 +12,8 @@ from .models import UserProfile,Post,Like,FollowersCount
 
 from datetime import datetime
 
-from django.utils.datastructures import MultiValueDictKeyError
+
+from itertools import chain
 
 # from django.contrib.auth.hashers import check_password,make_password
 
@@ -156,10 +158,11 @@ def change_password(request):
 
 @login_required(login_url='login')
 def public_page(request):
+
     user_profile = UserProfile.objects.get(user=request.user)
     # user_post, created = Post.objects.get_or_create(user=request.user)
 
-    posts = Post.objects.all()
+    # posts = Post.objects.all()
 
     current_user = request.user
    
@@ -168,6 +171,52 @@ def public_page(request):
     # 'current_time': current_time,'today_date':today_date ,
 
 
+    # ************ Show feeds of only following users and current user ***************
+
+    user_following_list = []
+    feed = []
+
+    # Retrieve all posts of the current user
+    my_posts = Post.objects.filter(user=request.user)
+
+    # Include the posts of the current user in the feed
+    feed.extend(my_posts)
+
+    user_following = FollowersCount.objects.filter(follower=request.user.username)
+
+    # Retrieve User objects corresponding to the usernames
+    for user_follow in user_following:
+        user = get_object_or_404(User, username=user_follow.user)
+        user_following_list.append(user)
+
+    # Filter posts by the retrieved User objects
+    for user in user_following_list:
+        feed_lists = Post.objects.filter(user=user)
+        feed.extend(feed_lists)
+
+
+    # ****************************  User suggestions *********************************
+    import random 
+
+      # Get all users except the current user and the admin user
+    all_users = User.objects.exclude(username=request.user.username).exclude(is_superuser=True)
+
+    # Get the usernames of users whom the current user is following
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+
+    # Exclude the users whom the current user is already following
+    suggested_users = all_users.exclude(username__in=following_usernames)
+
+    
+    
+     # Shuffle the suggested users and limiting the number of users shown
+    suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 5))
+
+
+
+    #**************************** greeting for the users *********************************
+        
+
     if current_time.hour < 12:
         greeting = "Good morning"
     elif current_time.hour < 18:
@@ -175,20 +224,39 @@ def public_page(request):
     else:
         greeting = "Good evening"
 
-    # context={
-    #     'current_user': current_user, 
-    #     'greeting': greeting ,
-    #     'user_profile':user_profile,
-    #     'posts': posts,
-    # }
+    
+    context={
+        'current_user': current_user, 
+        'greeting': greeting ,
+        'user_profile':user_profile,
+        'posts': feed,
+        'suggested_users': suggested_users_subset,
+        
+    }
 
-    return render(request, 'public.html', {'current_user': current_user,'greeting': greeting ,'user_profile':user_profile,'posts': posts})
+    # ****************************** Searching Users *******************************
+    
+
+    query = request.GET.get('query')
+
+    if query:
+        search_results = User.objects.filter(username__icontains=query)
+        if search_results.exists():
+            # messages.success(request, 'Username was found successfully!')
+            pass
+        else:
+            messages.error(request, 'Username does not match any existing user.')
+    else:
+        search_results = None
+
+    context['search_results'] = search_results
+    return render(request, 'public.html', context)
 
 # ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
-def profile_page(request):
-    current_user = request.user
+def settings(request):
+    # current_user = request.user
 
     # this is the UserProfile Object, we can now assign value to the object's entities
     # object's entities includes : profile_picture,bio,phone
@@ -220,9 +288,11 @@ def profile_page(request):
         user_profile.save()  # Saving the changes in UserProfile
 
         messages.success(request, " Save Change Success! ")
-        return render(request,'profile.html',{'user_profile':user_profile})
+        # return render(request,'other_profile.html',{'user_profile':user_profile})
+
+        return redirect('other_profile', pk=user_profile.user)
     else:
-        return render(request,'profile.html',{'user_profile':user_profile})
+        return render(request,'settings.html',{'user_profile':user_profile})
 
     
 # ------------------------------------------------------------------------------------------------------
@@ -274,7 +344,7 @@ def add_post(request):
         # post_caption = request.POST['post_caption']
 
         if request.FILES.get('post_img') == None:
-            messages.error(request, "Must select an Image before posting")
+            messages.error(request, "Before posting, please make sure to upload an image!")
             return redirect('public')
         else:
            post_img =request.FILES.get('post_img')
@@ -339,3 +409,9 @@ def follow(request):
             return redirect('/other_profile/'+user) 
     else:
         return redirect('public')
+    
+# @login_required(login_url='login')
+# def search_users(request):
+
+#     pass
+    

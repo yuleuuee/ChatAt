@@ -19,3 +19,5 @@ function confirm_box() {
   acc_delete_box.style.display="block";
   password_change_box.style.display="none";
 }
+
+

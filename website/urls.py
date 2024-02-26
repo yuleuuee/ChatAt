@@ -10,11 +10,13 @@ urlpatterns = [
     path('delete_account/',views.delete_account,name ='delete_account'),
     path('change_password/',views.change_password,name ='change_password'),
 
-    path('profile_page',views.profile_page,name ='profile_page'),
+    path('settings',views.settings,name ='settings'),
     path('other_profile/<str:pk>/',views.other_profile,name ='other_profile'),
     path('add_post/',views.add_post,name ='add_post'),
     path('like_post/',views.like_post,name ='like_post'),
-     path('follow/',views.follow,name ='follow'),
+    path('follow/',views.follow,name ='follow'),
+     path('search_users/',views.public_page,name ='search_users'),
+
 
 ]
 

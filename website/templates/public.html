@@ -8,51 +8,111 @@
 {% endblock %}
 
 {% block content %}
+<!-- stopping the scrolling btn -->
+<a href="#" id="stop"></a>
     <!-- <span>Current Time : {{current_time}}</span><br>
     <span>Today's Date : {{today_date}}</span> -->
-    <h1>{% if greeting %}{{greeting}} {% else %} Hello {% endif %} {{user.username|title}}!</h1>
+    <h1>
+        {% if greeting %}
+            {{greeting}} 
+        {% else %} 
+        Hello 
+        {% endif %} 
+            {{user.username|title}}!
+    </h1>
+    <img class="current_user_img" src="{{ user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px">
     
     <h2>Public Page</h2>
-    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px">
-    <div class="add_post">
-        <form action="{% url 'add_post' %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-                <label for="file">Upload Image : </label>
-                <input type="file" id="file" name="post_img" >
-                <br><br>
-                <label for="post_caption">Add Status : </label>
-                <textarea name="post_caption" id="post_caption" cols="40" rows="2" placeholder="Write Your Captions Here..."></textarea>
-                <br><br>
-                <button type='submit'>POST</button>
+    
+    
+    <div class="addpost-box">
+        <div>
+            <h2>Add a post :</h2>
+            <form action="{% url 'add_post' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                    <label for="file">Upload Image : </label>
+                    <input type="file" id="file" name="post_img" >
+                    <br><br>
+                    <label for="post_caption">Add Status : </label>
+                    <textarea name="post_caption" id="post_caption" cols="40" rows="2" placeholder="Write Your Captions Here..."></textarea>
+                    <br><br>
+                    <button type='submit'>POST</button>
+            </form>
+         </div>
+        
+    </div>
+
+     <!-- seaarch users div -->
+     <div class="search-div">
+        <h2>Search Users : </h2>
+        <form action="{% url 'search_users' %}" method="GET">
+            <input type="text" name="query" placeholder="Search by username.." autocomplete="off">
+            <button type="submit">Search</button>
         </form>
+        
+        <div>
+            {% if search_results %}
+            <h2>Search Results</h2>
+                {% for user in search_results %}
+                    <div class="search-result">
+                        <img src="{{ user.userprofile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 20px;">
+                        <span>@{{user.username }}</span>
+                        <a href="{% url 'other_profile' pk=user.username %}">View Profile </a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 
+    <!-- user suggestions div -->
+    <div class="user-suggestion">
+        <h3>People you May know : </h3>
+        <div>
+            
+            {% for sug_user in suggested_users %}
+                <div>
+                    <img src="{{ sug_user.userprofile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 20px;">
+                    <span>@{{sug_user.username }}</span>
+                    <a href="{% url 'other_profile' pk=sug_user.username %}">View Profile </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    
+
+    <!-- all feeds of the following users -->
     <div class="post_box">
-        {% for post in posts reversed %}
-            <div class="single_post">
+       
+            {% for post in posts reversed %}  <!-- making the latest post on the top  -->
+                <div class="single_post">
 
-                <div>
-                    <a href={% url 'other_profile' pk=post.user %}>
-                        <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
-                        <span >@{{ post.user.username }}</span>
-                    </a>
-                    <p>Posted at : <span>{{ post.created_at }}</span></p>
+                    <div>
+                        <a href="{% url 'other_profile' pk=post.user %}">
+                            <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                            <span >@{{ post.user.username }}</span>
+                        </a>
+                        <p>Posted at : <span>{{ post.created_at }}</span></p>
+                    </div>
+                    <div class="image-post-div">
+                        <img src="{{ post.image.url }}" alt="" >
+                        <br>
+                        <div style="border: 1px solid green; width: 98%;">{{ post.caption }}</div>
+                    </div>
+                    <div>
+                        <li>{{post.no_of_likes}} <a href="/like_post?post_id={{post.id}} ">Like</a></li> 
+                        <li>0 Comment</li>
+                        <a href="{{ post.image.url }}" download ><li>Save</li></a>
+                    </div>
+                    
                 </div>
-                <div class="image-post-div">
-                    <img src="{{ post.image.url }}" alt="" >
-                    <br>
-                    <div style="border: 1px solid green; width: 98%;">{{ post.caption }}</div>
-                </div>
-                <div>
-                    <!-- <i class="fa fa-heart"></i> -->
-                    <li>{{post.no_of_likes}} <a href="/like_post?post_id={{post.id}}">Like</a></li> 
-                    <li>0 Comment</li>
-                </div>
-                
-            </div>
-        {% endfor %}
+            {% endfor %}
+        
     </div>
-    {% load static %}
+    <div id="scrlUpBOx" style="cursor: pointer;">
+        <span id="goTop"><i class="fa-solid fa-arrow-turn-up"></i>Go Up</span>
+    </div>
+    <!-- scrolling up btn  -->
     <script src="{% static 'js/public.js' %}"></script>
     
 {% endblock %}
