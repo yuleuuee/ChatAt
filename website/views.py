@@ -8,14 +8,10 @@ from django.shortcuts import get_object_or_404
 # from .forms import CustomUserCreationForm
 
 from django.contrib.auth.models import User
-from .models import UserProfile,Post,Like,FollowersCount
+from .models import UserProfile,Post,Like,FollowersCount,Comment
 
 from datetime import datetime
 
-
-from itertools import chain
-
-# from django.contrib.auth.hashers import check_password,make_password
 
 # Create your views here.
 
@@ -162,7 +158,8 @@ def public_page(request):
     user_profile = UserProfile.objects.get(user=request.user)
     # user_post, created = Post.objects.get_or_create(user=request.user)
 
-    # posts = Post.objects.all()
+    # getting all comments object
+    comments = Comment.objects.all()
 
     current_user = request.user
    
@@ -231,6 +228,7 @@ def public_page(request):
         'user_profile':user_profile,
         'posts': feed,
         'suggested_users': suggested_users_subset,
+        'comments':comments,
         
     }
 
@@ -240,7 +238,7 @@ def public_page(request):
     query = request.GET.get('query')
 
     if query:
-        search_results = User.objects.filter(username__icontains=query)
+        search_results = User.objects.filter(username__icontains=query).exclude(is_superuser=True)
         if search_results.exists():
             # messages.success(request, 'Username was found successfully!')
             pass
@@ -297,7 +295,7 @@ def settings(request):
     
 # ------------------------------------------------------------------------------------------------------
 @login_required(login_url='login')
-def other_profile(request,pk):
+def profile(request,pk):
     user_object = User.objects.get(username =pk)
     user_profile = UserProfile.objects.get(user=user_object)
     user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
@@ -328,7 +326,7 @@ def other_profile(request,pk):
 
     }
 
-    return render(request,'other_profile.html',context)
+    return render(request,'profile.html',context)
 
 
 # ------------------------------------------------------------------------------------------------------
@@ -401,17 +399,47 @@ def follow(request):
         if FollowersCount.objects.filter(follower=follower,user=user).first():
             delete_follower = FollowersCount.objects.get(follower=follower,user=user)
             delete_follower.delete()
-            return redirect('/other_profile/'+user) #going to the profile of the same user whch the viewer was viewing
+            return redirect('/profile/'+user) #going to the profile of the same user whch the viewer was viewing
         else: 
              # if already not followed case :
             new_follower = FollowersCount.objects.create(follower=follower,user=user)
             new_follower.save()
-            return redirect('/other_profile/'+user) 
+            return redirect('/profile/'+user) 
     else:
         return redirect('public')
     
-# @login_required(login_url='login')
-# def search_users(request):
+@login_required(login_url='login')
+def delete_post(request):
+    user = request.user
+    post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
 
-#     pass
+    post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
+
+    post_to_delete = Post.objects.get(id=post_id, user=user)
+    post_to_delete.delete()
+    messages.success(request, 'Your Post Was deleted successfully.')
+    return redirect('public')
+
+@login_required(login_url='login')
+def comment(request,usr):
+    if request.method == 'POST':
+        
+        # usr --> whose post was commented
+        commentor = request.user # who just wrote a comment
+        content = request.POST.get('cmt_content')  # this is the comment text
+
+        # Retrieve the Post instance using the username
+        # post = Post.objects.filter(user=commentor.id)
+
+        if content:
+            # new_comment = Comment.objects.create(post=post, user=usr, content=content)
+            # new_comment.save()
+            messages.success(request, 'Comment posted successfully.')
+        else:
+            messages.error(request, 'Comment content cannot be empty.')
+
+        return redirect('public')
+    else:
+        return redirect('public')  # Redirect to public page if not a POST request
+
     

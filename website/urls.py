@@ -11,11 +11,19 @@ urlpatterns = [
     path('change_password/',views.change_password,name ='change_password'),
 
     path('settings',views.settings,name ='settings'),
-    path('other_profile/<str:pk>/',views.other_profile,name ='other_profile'),
+
+    path('profile/<str:pk>/',views.profile,name ='profile'),
     path('add_post/',views.add_post,name ='add_post'),
+   
     path('like_post/',views.like_post,name ='like_post'),
+    
     path('follow/',views.follow,name ='follow'),
-     path('search_users/',views.public_page,name ='search_users'),
+    
+    path('search_users/',views.public_page,name ='search_users'),
+    
+    path('delete_post/',views.delete_post,name ='delete_post'),
+
+     path('comment/<str:usr>/',views.comment,name ='comment'),
 
 
 ]

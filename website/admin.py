@@ -3,7 +3,7 @@ from .models import UserProfile
 from .models import Post
 from .models import Like
 from .models import FollowersCount
-# from .models import Comment
+from .models import Comment
 
 # Register your models here.
 
@@ -15,4 +15,4 @@ admin.site.register(UserProfile)
 admin.site.register(Post)
 admin.site.register(Like)
 admin.site.register(FollowersCount)
-# admin.site.register(Comment)
+admin.site.register(Comment)

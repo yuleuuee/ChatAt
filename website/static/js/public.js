@@ -13,6 +13,25 @@
          );
  };
 
+
+//  let  cmt_btn = document.querySelector('#cmt_btn')
+//  let  cmt_box = document.querySelector('#cmt_box')
+
+// ///*********** comment part ***************///
+
+
+//  let  cmt_btn = document.getElementById('cmt_btn')
+//  let  cmt_box = document.getElementById('cmt_box')
+
+//  cmt_btn.addEventListener('click',()=>{
+//     if (cmt_box.style.display=='none'){
+//         cmt_box.style.display='block'
+//     }else{
+//         cmt_box.style.display='none'
+//     }
+//  });
+
+
 // ///*********** Sound part ***************///
 
 // const audio1 = new Audio();

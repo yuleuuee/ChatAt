@@ -57,7 +57,7 @@
                     <div class="search-result">
                         <img src="{{ user.userprofile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 20px;">
                         <span>@{{user.username }}</span>
-                        <a href="{% url 'other_profile' pk=user.username %}">View Profile </a>
+                        <a href="{% url 'profile' pk=user.username %}">View Profile </a>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -73,7 +73,7 @@
                 <div>
                     <img src="{{ sug_user.userprofile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 20px;">
                     <span>@{{sug_user.username }}</span>
-                    <a href="{% url 'other_profile' pk=sug_user.username %}">View Profile </a>
+                    <a href="{% url 'profile' pk=sug_user.username %}">View Profile </a>
                 </div>
             {% endfor %}
         </div>
@@ -88,10 +88,17 @@
                 <div class="single_post">
 
                     <div>
-                        <a href="{% url 'other_profile' pk=post.user %}">
-                            <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
-                            <span >@{{ post.user.username }}</span>
-                        </a>
+                        <div class="profile_img_del-div">
+                            <a href="{% url 'profile' pk=post.user %}">
+                                <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                                <span >@{{ post.user.username }}</span>
+                            </a>
+                            {% if post.user == user_profile.user %}
+                                <a href="/delete_post?post_id={{post.id}} ">Delete</a>
+                            {% endif %}
+                            
+                        </div>
+
                         <p>Posted at : <span>{{ post.created_at }}</span></p>
                     </div>
                     <div class="image-post-div">
@@ -101,8 +108,29 @@
                     </div>
                     <div>
                         <li>{{post.no_of_likes}} <a href="/like_post?post_id={{post.id}} ">Like</a></li> 
-                        <li>0 Comment</li>
+                        <li id="cmt_btn">0 Comment</li>
                         <a href="{{ post.image.url }}" download ><li>Save</li></a>
+                    </div>
+                    <div id="cmt_box">
+                        <form action="{% url 'comment' usr=post.user %}" method="POST">
+                            {% csrf_token %}
+                            <label for=""><img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px; border-radius: 50%;"></label>
+                            <input type="text" name="cmt_content" placeholder="Write your comments...">
+                            <button>post</button>
+                        </form>
+                        <ul>
+                            {% for comment in comments %}
+                                <!-- {% if comment.user == post.user %} -->
+                                <li>
+                                    <p>{{ comment.content }}</p>
+                                    <p>By: {{ comment.user.username }},</p>
+                                    <p>At: {{ comment.commented_at }}</p>
+                                    
+                                </li>
+                                <!-- {% endif %} -->
+                                
+                            {% endfor %}
+                        </ul>
                     </div>
                     
                 </div>

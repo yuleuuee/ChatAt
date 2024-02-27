@@ -15,7 +15,7 @@
     <div class="edit-profile">
         <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data"> 
             {% csrf_token %}
-
+            
             <div>
                 <a href="{{ user_profile.profile_picture.url }}">
                     <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">

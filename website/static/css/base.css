@@ -3,6 +3,23 @@ body{
     
 }
 
+/* @import url('https://fonts.googleapis.com/css2?family=Rancho&display=swap');
+font-family: "Rancho", cursive; */
+
+/* li a{
+    border: 2px solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
+#ChatAt_logo img{
+    width: 140px;
+    height: 40px;
+
+}
+
+
 
 /********** nav bar styling ***********/
 

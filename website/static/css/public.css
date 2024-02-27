@@ -112,7 +112,7 @@ h1{
     flex-direction: column;
 }
 
-.single_post div{
+.single_post>div{
     border: 2px solid pink;
     width: 60%;
     
@@ -133,3 +133,19 @@ h1{
     width: 100%; 
 
 }
+
+.profile_img_del-div{
+
+    display: flex;
+    justify-content: space-between;
+
+
+    margin: 5px;
+    padding: 5px;
+}
+
+/* comment box part */
+
+/* #cmt_box{
+    display: none;
+} */
