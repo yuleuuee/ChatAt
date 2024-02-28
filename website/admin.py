@@ -4,6 +4,7 @@ from .models import Post
 from .models import Like
 from .models import FollowersCount
 from .models import Comment
+from .models import OTPModel
 
 # Register your models here.
 
@@ -16,3 +17,4 @@ admin.site.register(Post)
 admin.site.register(Like)
 admin.site.register(FollowersCount)
 admin.site.register(Comment)
+admin.site.register(OTPModel)

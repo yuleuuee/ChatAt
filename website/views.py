@@ -4,13 +4,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
-# from django.contrib.auth.forms import UserCreationForm
-# from .forms import CustomUserCreationForm
-
 from django.contrib.auth.models import User
 from .models import UserProfile,Post,Like,FollowersCount,Comment
 
 from datetime import datetime
+
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+from .models import OTPModel
+from chat_app.settings import EMAIL_HOST_USER
 
 
 # Create your views here.
@@ -76,8 +78,10 @@ def user_signup(request):
             new_UserProfile = UserProfile.objects.create(user =user_model) 
             new_UserProfile.save()
 
+            login(request, user) # making the user logged in 
+
             messages.success(request, "Successfully registered")
-            return redirect('login')
+            return redirect('settings') # after succesful account creation users are sent to account settings page
         else:
             messages.error(request, "Password dosn't match!")
             return redirect('signup')
@@ -147,6 +151,7 @@ def change_password(request):
     else:    
         # will never be this
         return redirect('public')
+
     
 # ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
@@ -207,7 +212,7 @@ def public_page(request):
     
     
      # Shuffle the suggested users and limiting the number of users shown
-    suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 5))
+    suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 4))
 
 
 
@@ -288,7 +293,7 @@ def settings(request):
         messages.success(request, " Save Change Success! ")
         # return render(request,'other_profile.html',{'user_profile':user_profile})
 
-        return redirect('other_profile', pk=user_profile.user)
+        return redirect('profile', pk=user_profile.user)
     else:
         return render(request,'settings.html',{'user_profile':user_profile})
 
@@ -420,6 +425,9 @@ def delete_post(request):
     messages.success(request, 'Your Post Was deleted successfully.')
     return redirect('public')
 
+
+# comment part
+
 @login_required(login_url='login')
 def comment(request,usr):
     if request.method == 'POST':
@@ -443,3 +451,92 @@ def comment(request,usr):
         return redirect('public')  # Redirect to public page if not a POST request
 
     
+#********************************* generating and sending otp in gmail ****************************************************
+    
+def forgot_pas(request):
+    if request.method == 'POST':
+
+        email = request.POST.get('email')
+
+        if len(email) != 0: # this prevents the empty email box sending
+            
+            user = User.objects.filter(email=email).first() # check there is a user with that email
+
+            if user:
+                # Check if an OTPModel instance already exists for the user
+                otp_instance = OTPModel.objects.filter(user=user).first()
+
+                if otp_instance:
+                    # Update the existing OTPModel instance with a new OTP
+                    otp_instance.otp = get_random_string(length=6, allowed_chars='1234567890')
+                    otp_instance.save()
+                else:
+                    # Create a new OTPModel instance for the user
+                    otp_instance = OTPModel.objects.create(user=user, otp=get_random_string(length=6, allowed_chars='1234567890'))
+
+                
+                subject ='Your Password Reset OTP'                               # title of email
+                message =f'Your OTP for resetting password is : {otp_instance}'  # message of email
+                #  EMAIL_HOST_USER is the sender's' gmail
+                receiver_email = [email]                                         # we can also pass list of receiver email
+
+                send_mail(subject, message, EMAIL_HOST_USER,receiver_email, fail_silently=False)
+                messages.success(request, 'OTP was just send to your email.')
+                return render(request, 'forgot_pas.html',{'email':email})
+            else:
+                messages.error(request, 'That email does not have an account.')
+                return redirect('forgot_pas')
+        else:
+            messages.error(request, 'Must enter email before sending')
+            return redirect('forgot_pas')
+    else:
+        return render(request, 'forgot_pas.html')
+
+def verify_otp(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        otp_entered = request.POST.get('otp')
+        otp_obj = OTPModel.objects.filter(user__email=email, otp=otp_entered).first()
+        if otp_obj:
+            can_change_password = 'ok'
+            messages.success(request, 'You can now Recover your password')
+            return render(request, 'forgot_pas.html',{'can_change_password':can_change_password,'email_for_identity':email})
+        else:
+            messages.error(request, 'OTP Dose not match')
+            return render(request, 'login.html')
+    return render(request, 'forgot_pas.html')
+
+
+# chnanging the forgot password part :
+
+def change_forgot_password(request):
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        new_password1 = request.POST['new_password1']
+        new_password2 = request.POST['new_password2']
+
+
+        user = User.objects.filter(email=email).first() # if email field is empty then this will give admin 
+        if user.username != 'admin':
+            if new_password1 == new_password2:
+                user.set_password(new_password1)
+                user.save()
+                messages.success(request, "Password Was Succesfully Changed!")
+                return redirect('login')
+            else:
+                messages.error(request, "New Passwords dosn't match!")
+                return redirect('forgot_pas')
+        else:
+            messages.error(request, "User name doesnt exists!")
+            return redirect('forgot_pas')
+    else:
+        return redirect('login')
+    
+        
+
+
+        
+
+
+

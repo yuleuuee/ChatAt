@@ -23,7 +23,12 @@ urlpatterns = [
     
     path('delete_post/',views.delete_post,name ='delete_post'),
 
-     path('comment/<str:usr>/',views.comment,name ='comment'),
+    path('comment/<str:usr>/',views.comment,name ='comment'),
+
+    path('forgot_pas/',views.forgot_pas,name ='forgot_pas'),
+    path('verify_otp/',views.verify_otp,name ='verify_otp'),
+
+    path('change_forgot_password/',views.change_forgot_password,name ='change_forgot_password'),
 
 
 ]

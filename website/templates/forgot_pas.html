@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Forgot Password{% endblock %}
+
+
+{% block content %}
+<h1>Forgot Password</h1>
+<div>
+    <!-- send otp to email -->
+    <form action="{% url 'forgot_pas' %}"  method="POST">
+        {% csrf_token %}
+        <!--  -->
+        {% if email %} <!-- at first no email is avialiable  -->
+            <input type="text" placeholder="Enter your Email" value="{{email}}" name="email">
+        {% else %}
+            <input type="text" placeholder="Enter your Email" name="email">  <!-- at 1st this input works , in which we have to emter email for sending otp -->
+        {% endif %}
+        <button>SEND OTP</button>
+    </form>
+
+    <br><br>
+
+    <!-- verify otp -->
+
+    <form action="{% url 'verify_otp' %}"  method="POST">
+        {% csrf_token %}
+
+        <!--  -->
+        {% if email %}
+            <input type="hidden" name="email" value="{{email}}" >
+        {% else %}
+            <input type="hidden" name="email" >
+        {% endif %}
+
+        <input type="text" placeholder="Enter OTP code" name="otp" maxlength="6">
+        
+        <!-- showmomg the verify buttton only when the otp got send  -->  
+        {% if email  %}
+            <button>Verify</button>   
+        {% endif %}
+    </form>
+
+    <br><br>
+
+    <!-- change_forgot_password_box -->
+    {% if can_change_password %}
+        <div>
+            <h3>Modify Your Password</h3>
+            <form action="{% url 'change_forgot_password' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="email" value="{{email_for_identity}}"> <!-- this email is just for identification in the 'change_forgot_password' function-->
+                <input type='password' name="new_password1" autocomplete="off" placeholder="new password"><br><br>
+                <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password"><br><br>
+                <button type='submit'>Submit</button>
+            </form>
+        </div>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

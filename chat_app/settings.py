@@ -149,3 +149,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website/media')
+
+
+# Email part :
+
+# DEBUG=True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'prabhav.gautum@gmail.com'  # Your Gmail address (senders email)
+EMAIL_HOST_PASSWORD = 'zitm vcpt onrf mqhk'  # Your Gmail password or App Password
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'prabhav.gautum@gmail.com' 
