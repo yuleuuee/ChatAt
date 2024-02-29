@@ -160,17 +160,23 @@ def change_password(request):
 @login_required(login_url='login')
 def public_page(request):
 
+
+    #  object of the curreltly logged in user :
     user_profile = UserProfile.objects.get(user=request.user)
-    # user_post, created = Post.objects.get_or_create(user=request.user)
+
 
     # getting all comments object
     comments = Comment.objects.all()
 
-    current_user = request.user
+    likes = Like.objects.all()
+
+
+    current_user = request.user # i dont theink this is necessary , you can delete 
    
     current_time = datetime.now().time()
     #  today_date = datetime.now().date()
     # 'current_time': current_time,'today_date':today_date ,
+
 
 
     # ************ Show feeds of only following users and current user ***************
@@ -234,10 +240,11 @@ def public_page(request):
         'posts': feed,
         'suggested_users': suggested_users_subset,
         'comments':comments,
+        'likes':likes,
         
     }
 
-    # ****************************** Searching Users *******************************
+    # ****************************** Searching Users :*******************************
     
 
     query = request.GET.get('query')
@@ -373,24 +380,36 @@ def add_post(request):
     
 @login_required(login_url='login')
 def like_post(request):
-    user = request.user
-    post_id = request.GET.get('post_id') # getting the post id which was just  liked 
 
-    post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
+        post_id = request.GET.get('post_id') ; # if only GET request , using <a></a>
+    # if request.method =='POST':
+        user = request.user
+        # user_id = request.POST['user_id']
+        # post_id = request.POST['post_id'] # getting the post id which was just  liked 
 
-    like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
+        post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
 
-    if like_filter == None:
-        new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-        new_like.save()
-        post.no_of_likes=post.no_of_likes +1
-        post.save()
-        return redirect('public')
-    else:
-        like_filter.delete()
-        post.no_of_likes=post.no_of_likes -1
-        post.save()
-        return redirect('public')
+        like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
+
+        if like_filter == None:
+            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+            new_like.save()
+            post.no_of_likes=post.no_of_likes +1
+            post.save()
+            # like_text='UnLike'
+            # return render(request, 'public.html', {'like_text':like_text})
+            return redirect('public')
+        else:
+            like_filter.delete()
+            post.no_of_likes=post.no_of_likes -1
+            post.save()
+            # like_text='Like'
+            # return render(request, 'public.html', {'like_text':like_text})
+            return redirect('public')
+
+    
+# ------------------------------------------------------------------------------------------------------
+
     
 @login_required(login_url='login')
 def follow(request):
@@ -414,11 +433,11 @@ def follow(request):
         return redirect('public')
     
 @login_required(login_url='login')
-def delete_post(request):
+def delete_post(request,post_id):
     user = request.user
-    post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
+    # post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
 
-    post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
+    # post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
 
     post_to_delete = Post.objects.get(id=post_id, user=user)
     post_to_delete.delete()
@@ -429,28 +448,56 @@ def delete_post(request):
 # comment part
 
 @login_required(login_url='login')
-def comment(request,usr):
+def comment(request):
     if request.method == 'POST':
-        
-        # usr --> whose post was commented
+
         commentor = request.user # who just wrote a comment
-        content = request.POST.get('cmt_content')  # this is the comment text
+
+        po_usr = request.POST.get('po_usr')  #  --> whose post was commented
+        po_id = request.POST.get('po_id')    #  -->  id of post that was commented
+
+        content = request.POST.get('cmt_content')  # comment text
 
         # Retrieve the Post instance using the username
-        # post = Post.objects.filter(user=commentor.id)
+        # post = get_object_or_404(Post, id=po_id)
 
-        if content:
-            # new_comment = Comment.objects.create(post=post, user=usr, content=content)
-            # new_comment.save()
+        # getting the post object which was commented by comparing the id
+        post = Post.objects.get(id=po_id)
+
+        print(f'commenter: {commentor}')
+        print('Post of : '+ po_usr)
+        print('Post id : '+ po_id)
+        if len(content) !=0 :
+            new_comment = Comment.objects.create(post_id=po_id, user_id=commentor.id, content=content)
+            post.no_of_comments=post.no_of_comments +1 # increasing the "no_of_comments" every time post with the particular id is commented
+            post.save() # Save the updated Post object
+            new_comment.save()
             messages.success(request, 'Comment posted successfully.')
         else:
             messages.error(request, 'Comment content cannot be empty.')
 
-        return redirect('public')
+        return redirect('public') # as 'public view' gives all containts required for the 'public page'
     else:
         return redirect('public')  # Redirect to public page if not a POST request
 
+#  Deketing comment part :
     
+@login_required(login_url='login')
+def delete_comment(request, comment_id):
+    if request.method == 'POST':
+        comment = get_object_or_404(Comment, id=comment_id)
+        if comment.user == request.user:  # Check if the current user is the owner of the comment
+            post = comment.post  # Get the associated post
+            comment.delete()  # Delete the comment
+            post.no_of_comments -= 1  # Decrement the number of comments of the post
+            post.save()  # Save the updated Post object
+            messages.success(request, 'Comment deleted successfully.')
+        else:
+            messages.error(request, 'You are not authorized to delete this comment.')
+    return redirect('public')  # Redirect to the public page after deletion
+
+
+
 #********************************* generating and sending otp in gmail ****************************************************
     
 def forgot_pas(request):
@@ -532,11 +579,4 @@ def change_forgot_password(request):
             return redirect('forgot_pas')
     else:
         return redirect('login')
-    
-        
-
-
-        
-
-
-
+     

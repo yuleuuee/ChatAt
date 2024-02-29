@@ -144,8 +144,17 @@ h1{
     padding: 5px;
 }
 
-/* comment box part */
+/**** comment box part ****/
 
 /* #cmt_box{
     display: none;
 } */
+
+.cmt-li{
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+
+    flex-direction: row;
+}
+

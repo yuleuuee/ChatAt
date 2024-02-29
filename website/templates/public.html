@@ -45,7 +45,7 @@
      <!-- seaarch users div -->
      <div class="search-div">
         <h2>Search Users : </h2>
-        <form action="{% url 'search_users' %}" method="GET">
+        <form action="{% url 'search_users' %}" method="GET">   <!-- this goes to public_page -->
             <input type="text" name="query" placeholder="Search by username.." autocomplete="off">
             <button type="submit">Search</button>
         </form>
@@ -83,59 +83,89 @@
 
     <!-- all feeds of the following users -->
     <div class="post_box">
+        
        
             {% for post in posts reversed %}  <!-- making the latest post on the top  -->
                 <div class="single_post">
-
                     <div>
                         <div class="profile_img_del-div">
                             <a href="{% url 'profile' pk=post.user %}">
-                                <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                                <img src="{{ post.user.userprofile.profile_picture.url }}" alt="" style="width: 35px; height: 35px; border-radius: 50%;border: 1px double black;">
                                 <span >@{{ post.user.username }}</span>
                             </a>
+
+                            <!-- deleting post -->
                             {% if post.user == user_profile.user %}
-                                <a href="/delete_post?post_id={{post.id}} ">Delete</a>
+                            <form action="{% url 'delete_post' post.id %}" onsubmit="return confirm('Are you sure you want to delete your Post ?')" >
+                                {% csrf_token %}
+                                <button type="submit">Delete Post</button>
+                            </form>
+                            <!-- href="/delete_post?post_id={{post.id}}  -->
+                                
                             {% endif %}
                             
                         </div>
 
                         <p>Posted at : <span>{{ post.created_at }}</span></p>
                     </div>
+                    <!-- image section of post -->
                     <div class="image-post-div">
                         <img src="{{ post.image.url }}" alt="" >
                         <br>
                         <div style="border: 1px solid green; width: 98%;">{{ post.caption }}</div>
                     </div>
                     <div>
-                        <li>{{post.no_of_likes}} <a href="/like_post?post_id={{post.id}} ">Like</a></li> 
-                        <li id="cmt_btn">0 Comment</li>
+                        <!-- like section of post -->
+                        
+                        <li>{{post.no_of_likes}}  <a href="/like_post?post_id={{post.id}} ">Like</a>
+                            <!-- <i class="fas fa-heart"></i> -->
+                                <!-- {% if like.user == user.id  %}
+                                    <a href="/like_post?post_id={{post.id}} ">Unlike</a>
+                                {% else %}
+                                    <a href="/like_post?post_id={{post.id}} ">Like</a>
+                                {% endif %} -->
+                        </li> 
+                        <li id="cmt_btn">{{post.no_of_comments}} Comments</li>
                         <a href="{{ post.image.url }}" download ><li>Save</li></a>
                     </div>
+                    <!-- comment section of post -->
                     <div id="cmt_box">
-                        <form action="{% url 'comment' usr=post.user %}" method="POST">
+                        <form action="{% url 'comment' %}" method="POST">
                             {% csrf_token %}
+                            <input type="hidden" name="po_usr" value="{{ post.user}}">  <!-- user id of the user whose the post is  -->
+                            <input type="hidden" name="po_id" value="{{ post.id }}">    <!-- post id -->
+
                             <label for=""><img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px; border-radius: 50%;"></label>
                             <input type="text" name="cmt_content" placeholder="Write your comments...">
                             <button>post</button>
                         </form>
                         <ul>
                             {% for comment in comments %}
-                                <!-- {% if comment.user == post.user %} -->
-                                <li>
-                                    <p>{{ comment.content }}</p>
-                                    <p>By: {{ comment.user.username }},</p>
-                                    <p>At: {{ comment.commented_at }}</p>
-                                    
-                                </li>
-                                <!-- {% endif %} -->
-                                
+                                {% if comment.post_id == post.id %}
+                                    <li class="cmt-li">
+                                        <span>
+                                            <img src="{{ comment.user.userprofile.profile_picture.url }}" alt="Profile Picture" style="width: 20px; height: 20px; border-radius: 50%; border: 1px double red;">@{{ comment.user.username }} :
+                                            "{{ comment.content }}"
+                                            at {{ comment.commented_at }}
+                                        </span>
+                                        <!-- delete comment part  -->
+                                        <span>
+                                            <form action="{% url 'delete_comment' comment.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete your comment ?');">
+                                                {% csrf_token %}
+                                                {% if comment.user == user_profile.user %}  <!-- if the coment user_id and current user user_id same then only delete button is seen -->
+                                                    <button  type="submit" style="color: red; cursor: pointer;" ><i class="fas fa-times"></i></button>
+                                                {% endif %}
+                                            </form>
+                                        </span>
+                                    </li><br>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
                     
                 </div>
+                
             {% endfor %}
-        
     </div>
     <div id="scrlUpBOx" style="cursor: pointer;">
         <span id="goTop"><i class="fa-solid fa-arrow-turn-up"></i>Go Up</span>

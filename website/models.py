@@ -22,6 +22,7 @@ class Post(models.Model):
     caption = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True) # auto_now_add=True: Sets the field to the current date and time only when the object is first created.  # default=datetime.now(): Sets the field to the current date and time both when creating and updating the object.
     no_of_likes =models.IntegerField(default=0)
+    no_of_comments =models.IntegerField(default=0)
     # because we have a ForeignKey field named 'user', # Django will create a column named 'user_id' in database table.
     
     def __str__(self):
@@ -45,8 +46,8 @@ class FollowersCount(models.Model):
     
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments') # id of the post which was commented
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # id of the user who wrote comment
     content = models.TextField()
     commented_at = models.DateTimeField(auto_now_add=True)
     
