@@ -232,6 +232,9 @@ def public_page(request):
     else:
         greeting = "Good evening"
 
+     # Checking if the user has liked each post and pass the information to the template
+    for post in feed:
+        post.user_has_liked = post.likes.filter(user=request.user).exists()
     
     context={
         'current_user': current_user, 
@@ -241,6 +244,7 @@ def public_page(request):
         'suggested_users': suggested_users_subset,
         'comments':comments,
         'likes':likes,
+
         
     }
 
@@ -392,22 +396,20 @@ def like_post(request):
         like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
 
         if like_filter == None:
-            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-            new_like.save()
-            post.no_of_likes=post.no_of_likes +1
-            post.save()
-            # like_text='UnLike'
-            # return render(request, 'public.html', {'like_text':like_text})
+            # new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+            # new_like.save()
+            # post.no_of_likes=post.no_of_likes +1
+            # post.save()
+            messages.success(request, 'You just liked a post')
             return redirect('public')
         else:
-            like_filter.delete()
-            post.no_of_likes=post.no_of_likes -1
-            post.save()
-            # like_text='Like'
-            # return render(request, 'public.html', {'like_text':like_text})
+            # like_filter.delete()
+            # post.no_of_likes=post.no_of_likes -1
+            # post.save()
+            messages.success(request, 'You Unliked a post')
             return redirect('public')
+        
 
-    
 # ------------------------------------------------------------------------------------------------------
 
     
@@ -579,4 +581,13 @@ def change_forgot_password(request):
             return redirect('forgot_pas')
     else:
         return redirect('login')
+    
+
+@login_required(login_url='login')
+def chat(request):
+    user = request.user
+    if request.method =='POST':
+        pass
+    else:
+        return render(request,'chat.html',{'user':user})
      

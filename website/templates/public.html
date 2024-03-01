@@ -4,7 +4,11 @@
 
 {% block head %}
     {% load static %}
+
     <link rel="stylesheet" href="{% static 'css/public.css' %}"> 
+
+    <!-- love sound : -->
+    <audio id="love-sound" src="{% static 'audios/love.mp3' %}" preload="auto"></audio>
 {% endblock %}
 
 {% block content %}
@@ -98,7 +102,7 @@
                             {% if post.user == user_profile.user %}
                             <form action="{% url 'delete_post' post.id %}" onsubmit="return confirm('Are you sure you want to delete your Post ?')" >
                                 {% csrf_token %}
-                                <button type="submit">Delete Post</button>
+                                <button type="submit">Delete Post  <i class="fa-solid fa-trash"></i></button>
                             </form>
                             <!-- href="/delete_post?post_id={{post.id}}  -->
                                 
@@ -116,16 +120,16 @@
                     </div>
                     <div>
                         <!-- like section of post -->
-                        
-                        <li>{{post.no_of_likes}}  <a href="/like_post?post_id={{post.id}} ">Like</a>
-                            <!-- <i class="fas fa-heart"></i> -->
-                                <!-- {% if like.user == user.id  %}
-                                    <a href="/like_post?post_id={{post.id}} ">Unlike</a>
+                        <li>{{post.no_of_likes}} 
+                                {% if post.user_has_liked %}
+                                    <a href="/like_post?post_id={{ post.id }}"><i class="fa-solid fa-heart" style="color: red;"></i></a>
+                                    <!-- <p onclick="playAudio()">LIKE</p> -->
+                                    <!-- <button onclick="likePost(post.id)">like</button> -->
                                 {% else %}
-                                    <a href="/like_post?post_id={{post.id}} ">Like</a>
-                                {% endif %} -->
+                                    <a href="/like_post?post_id={{ post.id }}"><i class="fa-regular fa-heart"></i></a>
+                                {% endif %}
                         </li> 
-                        <li id="cmt_btn">{{post.no_of_comments}} Comments</li>
+                        <li id="cmt_btn">{{post.no_of_comments}} <i class="fa-regular fa-comment"></i></li>
                         <a href="{{ post.image.url }}" download ><li>Save</li></a>
                     </div>
                     <!-- comment section of post -->
