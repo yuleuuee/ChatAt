@@ -4,8 +4,7 @@
 
 
 {% block head %}
-
-{% load static %}
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}"> 
 {% endblock %}
 
@@ -23,12 +22,13 @@
 
         <!--Dynamic follower and following Part  -->
         <div>{{user_post_no}} Post</div>
+        <div id="follower_no_div">{{no_of_followers}} 
         {% if user_followers == 0 or user_followers == 1 %}
-            <div>{{user_followers}} Follower</div>
+            Follower </div>
         {% else %}
-            <div>{{user_followers}} Followers</div>
+            Followers </div>
         {% endif %}
-        <div>{{user_following}} following</div>
+        <div id="following_no_div">{{no_of_following}} following</div>
 
         <form action="{% url 'follow' %}" method="POST">
             {% csrf_token %}
@@ -43,9 +43,47 @@
             
             
         </form>
+        
        
     </div>
-    
+
+    <!-- NOTE : hide and show of followers/following is avilable for the current user only -->
+    {% if user_object.username == user.username %}  
+        <!-- all followers profile list  -->
+        <div id="all_followers_users_div">
+            <p>Your All Followers :</p>
+            <ul>
+                {% for follower_user_profile in followers_profiles %}
+                    <li>
+                        <a href="{% url 'profile' pk=follower_user_profile.user %}">
+                            <span>
+                                <img src="{{ follower_user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
+                            </span>
+                            @{{follower_user_profile.user.username}}
+                        </a>
+                    </li>       
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- all following profiles list -->
+        <div id="all_following_users_div">
+            <p>You follow them :</p>
+            <ul class="all_following_users_ul">
+                {% for following_user_profile in following_profiles %}
+                    <li>
+                        <a href="{% url 'profile' pk=following_user_profile.user %}">
+                            <span>
+                                <img src="{{ following_user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
+                            </span>
+                            @{{following_user_profile.user.username}}
+                        </a>
+                    </li>       
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     <div id="profile_pic_div" >
         <div class="info">
             <p>Profile pic : </p>
@@ -73,12 +111,12 @@
         <div class="user-posts-div">
             <h2>All posts : </h2>
             <div>
-                {% for post in user_posts %}
-                    <img src="{{ post.image.url }}" alt="" style="width: 180px; height: 200px; border-radius: 20px" >
+                {% for post in user_posts reversed%}
+                    <img src="{{ post.image.url }}" alt="" style="width: 200px; height: 200px; border-radius: 20px;;" >
                 {% endfor %}
             </div>
         </div>
     </div>
 
-
+    <script src="{% static 'js/profile.js' %}"></script>
 {% endblock %}

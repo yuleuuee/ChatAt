@@ -21,3 +21,32 @@ function confirm_box() {
 }
 
 
+
+// ///*********** Sound part ***************///
+
+// love sound :
+function playAudioBulb() {
+  var audio = document.getElementById('click-sound');
+  audio.play();
+}
+
+/*********** Bulb ***************///
+let bulb_box = document.getElementById("light_bulb");
+let body = document.querySelector("body");
+let bulb = document.querySelector("#light_bulb>i");
+
+bulb_box.addEventListener("click", change);
+function change() {
+  if (body.className == "black") {
+    body.className = "white";
+    // bulb_box.style.border = "3px solid black";
+    bulb.style.color = "orange";
+    // bulb.style.textShadow = "none";
+    bulb.style.textShadow = "2px 2px 3px black,-1px -1px 3px black";
+  } else if (body.className == "white") {
+    body.className = "black";
+    // bulb_box.style.border = "3px solid black";
+    bulb.style.color = "black";
+    bulb.style.textShadow = "2px 2px 3px white,-1px -1px 3px white";
+  }
+}

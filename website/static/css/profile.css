@@ -40,3 +40,17 @@
 }
 
 
+/* followers and following div */
+
+#follower_no_div,#following_no_div{
+    cursor: pointer;
+}
+
+#all_followers_users_div{
+    display: none;
+}
+
+
+#all_following_users_div{
+    display: none;
+}

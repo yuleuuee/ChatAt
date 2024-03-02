@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Page{% endblock %}
+
+{% block head %}
+
+    {% load static %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<h1>Welcome "{{user.username}}" to chat_page </h1>
+
+<div>
+
+    <form id="chat-form" 
+        {% csrf_token %}
+        <input type="text" id="chat-message-input" name="message" autofocus>
+        <button type="submit">Send</button>
+    </form>
+</div>
+<!-- <script src="{% static 'js/chat_room.js' %}"></script> -->
+
+{% endblock %}

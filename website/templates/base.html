@@ -10,11 +10,17 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     {% block head %}
-    
+        
     {% endblock %}
+    <audio id="click-sound" src="{% static 'audios/click.mp3' %}" preload="auto"></audio>
 </head>
-<body>
+<body class="white">
     {% include "nav_bar.html" %}
+    
+    {% if user.is_authenticated %}
+        <span id="light_bulb" onclick="playAudioBulb()"><i class="fa-solid fa-lightbulb"></i></span>
+    {% endif %}
+   
     <br>
     <div id="notify_msg">
         {% if messages %}

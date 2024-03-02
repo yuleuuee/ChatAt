@@ -318,6 +318,15 @@ def profile(request,pk):
     user_post_no = len(user_posts)
 
 
+     # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+
+    # Query UserProfile to get profile pictures of following and followers
+    following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
+    followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
+
     follower = request.user.username
     user =pk
 
@@ -328,8 +337,8 @@ def profile(request,pk):
         button_text ='Follow'
 
     # no. of followers and no. following
-    user_followers = len(FollowersCount.objects.filter(user=pk)) # here the 'user : view' is the person that has been followed
-    user_following = len(FollowersCount.objects.filter(follower=pk)) # here the 'follower : viewer' is the person that has been followed
+    no_of_followers = len(FollowersCount.objects.filter(user=pk)) # here the 'user : view' is the person that has been followed
+    no_of_following = len(FollowersCount.objects.filter(follower=pk)) # here the 'follower : viewer' is the person that has been followed
 
     context={
         'user_object':user_object,
@@ -337,8 +346,10 @@ def profile(request,pk):
         'user_posts':user_posts,
         'user_post_no' : user_post_no,
         'button_text':button_text,
-        'user_followers':user_followers,
-        'user_following':user_following,
+        'no_of_followers':no_of_followers,
+        'no_of_following':no_of_following,
+        'following_profiles':following_profiles,
+        'followers_profiles':followers_profiles,
 
     }
 
@@ -583,11 +594,19 @@ def change_forgot_password(request):
         return redirect('login')
     
 
+
+# from django.http import HttpResponseBadRequest
+# from .models import ChatMessage
+
 @login_required(login_url='login')
-def chat(request):
-    user = request.user
-    if request.method =='POST':
-        pass
-    else:
-        return render(request,'chat.html',{'user':user})
-     
+def chat_room(request):
+
+    user = request.user # this is the current user
+
+    context={
+        'user':user,
+    }
+
+   
+    return render(request,'chat_room.html',{'context':context})
+    

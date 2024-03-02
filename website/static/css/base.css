@@ -1,7 +1,18 @@
 body{
     margin: 5px;
-    
+    transition: 0.8s ease;   
 }
+
+.black {
+    color: white;
+    background: black;
+}
+  
+.white {
+    color: black;
+    background: white;
+}
+
 
 /* @import url('https://fonts.googleapis.com/css2?family=Rancho&display=swap');
 font-family: "Rancho", cursive; */
@@ -50,3 +61,36 @@ li{
 }
 
 /* *********************************** */
+
+/**************** Bulb *****************/
+
+#light_bulb {
+    height: 30px;
+    width: 30px;
+    padding: 2px;
+    border: 2px solid black;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: whitesmoke;
+    position: fixed;
+    top: 12px;
+    right: 20px;
+    text-align: center;
+    
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #light_bulb > i {
+    font-size: 1.5em;
+    color: rgb(249, 164, 54);
+    text-shadow: 2px 2px 3px black,-1px -1px 3px black;
+   
+  }
+  
+
+   /* text-shadow: 2px 2px 3px black,-1px -1px 3px black; */
+
+
