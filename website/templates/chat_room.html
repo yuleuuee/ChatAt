@@ -5,6 +5,7 @@
 {% block head %}
 
     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/chat_room.css' %}"> 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 {% endblock %}
@@ -13,14 +14,89 @@
 
 <h1>Welcome "{{user.username}}" to chat_page </h1>
 
+
+<h2>    <p>Mutual Followers : ( You both follow each other )</p></h2>
+
+<div class="first-container" >
+    <div  class="second-container">
+        <div class="friends">
+            {% for mutual_flr in mutual_following_profiles %}
+            <div>
+                <a href="{% url 'chat' current_user=user.username friend_user=mutual_flr.user %}">
+                    <span>
+                        <img src="{{ mutual_flr.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
+                    </span>
+                    @{{mutual_flr.user.username}}
+                </a>    
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="chat-box">
+            <div id="message-list-box">
+                
+            </div>
+            <div>
+                <form id="chat-form" 
+                    {% csrf_token %}
+                    <input type="text" id="chat-message-input" name="message" autofocus size="60">
+                    <input type="button" id="submit" value="submit">
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
 <div>
 
-    <form id="chat-form" 
-        {% csrf_token %}
-        <input type="text" id="chat-message-input" name="message" autofocus>
-        <button type="submit">Send</button>
-    </form>
 </div>
 <!-- <script src="{% static 'js/chat_room.js' %}"></script> -->
 
+{{group_name|json_script:"group_name"}}
+<script>
+    // getting the string , changing to object, passing it to a variabel
+    const groupName = JSON.parse(document.getElementById('group_name').textContent)
+    console.log(groupName)
+
+    // var ws = new WebSocket('ws://127.0.0.1:8000/ws/awsc/')
+
+    var ws = new WebSocket(
+            'ws://'
+            + window.location.host // 127.0.0.1:8000
+            + '/ws/wsc/'
+            + groupName
+            + '/'
+        )
+    
+        ws.onopen = function(){
+            console.log('Websocket connection open ...')
+            // ws.send('Hi, from client ... ')
+        }
+
+        ws.onmessage = function(event){
+            console.log('Message received form server ...',event.data)
+            console.log('Message data type : ...',typeof(event.data))
+            const data = JSON.parse(event.data) // converting string to object
+            console.log('Parsed  message ... : ',data)
+            console.log('parsed data type : ...',typeof(data))
+            final_msg = data.message
+
+            // appending the final_msg of the server
+            document.getElementById('message-list-box').innerText=final_msg
+
+        }
+
+        ws.onclosed = function(){
+            console.log('Websocket connection closed ...')
+        }
+
+        document.getElementById('submit').addEventListener('click',(event)=>{
+            const inputBox =document.getElementById('chat-message-input')
+            const message =inputBox.value // every value is a object in js
+            ws.send(JSON.stringify({'msg':message})) // sending object in string form
+            inputBox.value='' // making the input field empthy after the message send 
+
+        })
+</script>
 {% endblock %}

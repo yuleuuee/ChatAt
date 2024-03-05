@@ -603,10 +603,44 @@ def chat_room(request):
 
     user = request.user # this is the current user
 
+
+    user_object = User.objects.get(username =user.username)
+    user_profile = UserProfile.objects.get(user=user_object)
+    user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
+
+
+     # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+
+    # Query UserProfile to get profile pictures of following and followers
+    following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
+    followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
+
+    # Find mutual followers
+    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
+
     context={
         'user':user,
+        'user_object':user_object,
+        'user_profile':user_profile,
+        'user_posts':user_posts,
+        'following_profiles':following_profiles,
+        'followers_profiles':followers_profiles,
+        'mutual_following_profiles': mutual_following_profiles,
     }
 
    
-    return render(request,'chat_room.html',{'context':context})
+    return render(request,'chat_room.html',context)
+
+@login_required(login_url='login')
+def private_chat(request,current_user, friend_user):
+
+    group_name = f"{current_user}_{friend_user}"
+
+    return render(request,'chat_room.html',{'group_name':group_name})
+
+
     

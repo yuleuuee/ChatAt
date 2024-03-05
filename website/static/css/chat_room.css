@@ -1,0 +1,55 @@
+.first-container{
+    display:flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.second-container{
+    border: 2px solid red;
+    padding:10px;
+    width: 60%;
+
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+
+    gap: 10px;
+
+}
+
+
+.friends{
+    border: 2px solid blue;
+    padding: 10px;
+    height: 400px;
+
+    flex:1.5
+}
+.chat-box{
+    border: 2px solid blue;
+    padding: 10px;
+    height: 400px;
+    flex:3
+}
+
+.chat-box div{
+    border: 2px solid black;
+    margin: 10px;
+}
+
+#message-list-box{
+    height: 85%;
+}
+
+#chat-message-input{
+    padding: 2px;
+    font-size: 1em;
+}
+.friends div{
+    border: 2px solid green;
+    padding: 5px;
+    margin: 10px;
+
+    
+}

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +70,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'chat_app.wsgi.application'
+# WSGI_APPLICATION = 'chat_app.wsgi.application'
+ASGI_APPLICATION = 'chat_app.asgi.application'
 
 
 # Database
@@ -147,12 +148,13 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# media files
+# media files :----------------------------------------
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website/media')
 
 
-# Email part :
+# Email part :----------------------------------------
 
 # DEBUG=True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -163,3 +165,14 @@ EMAIL_HOST_PASSWORD = 'zitm vcpt onrf mqhk'  # Your Gmail password or App Passwo
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'prabhav.gautum@gmail.com' 
+
+# Channel Redis part :--------------------------------
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
