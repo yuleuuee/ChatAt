@@ -1,7 +1,38 @@
-body{
-    margin: 5px;
-    transition: 0.8s ease;   
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+:root{
+    font-size: 16px;
 }
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    transition: 0.8s ease;   
+    position: relative;
+
+}
+
+a{
+    text-decoration: none;
+}
+
+/* scrollbar setup */
+
+/* body::-webkit-scrollbar{
+    width: .22rem;
+}
+
+body::-webkit-scrollbar-track{
+    background: black;
+}
+
+body::-webkit-scrollbar-thumb{
+    background: white;
+} */
+
+/* -------------------- */
 
 .black {
     color: white;
@@ -13,54 +44,144 @@ body{
     background: white;
 }
 
+/* ------------------------------------------------------ */
 
-/* @import url('https://fonts.googleapis.com/css2?family=Rancho&display=swap');
-font-family: "Rancho", cursive; */
-
-/* li a{
-    border: 2px solid red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
+#ChatAt_logo{
+    /* border: 2px solid black; */
+    margin: 10px;
+    text-align:left;
+    
+}
 
 #ChatAt_logo img{
     width: 140px;
     height: 40px;
-
 }
 
 
+aside{
+    border-right: 2px solid black;
+    height:100vh;
+    width: 16rem;  /* 1 rem = is the relative font size of root element */
+    position: fixed;
+}
 
-/********** nav bar styling ***********/
+main{
+    border: 2px solid black;
+    margin-left: 16.5rem;
+    padding: 1rem;
 
+    display: flex;
+    /* justify-content: baseline; */
+    /* align-items: baseline; */
+    flex-direction: column;
+    gap:5px;
+}
+
+
+/*---------------------- nav bar styling ----------------------*/
 
 nav{
-    border: 2px solid black;
+    /* border: 2px solid pink; */
+    height: 100vh;
+    /* position: relative; */
 }
 
-ul{
-    
-    padding-left: 10px;
-}
-
-li{
-    display: inline-block;
+.nav_list{
+    /* border: 2px solid black; */   
     list-style: none;
-    padding-right: 10px;
+    padding: 5px;
+    margin: 5px;
+    height: 100vh;
 
+}
+
+.nav_list a{
+    text-decoration: none;
+    color:inherit;
+    
+}
+
+#logout_btn{
+    border: 2px solid black;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 10px;
+    color:inherit;
+    position: fixed;
+    bottom: 20px;
+    left:20px
+}
+
+#logout_btn:hover{
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.534);
+}
+
+/*----------- nav list li before and after -------- */
+
+
+
+.nav_list li{
+    position: relative;
+    /* border-top: 1px solid green; */
+    font-family: Arial;
+    text-transform: uppercase;
+    /* font-weight: bold; */
+    padding: 10px;
+    margin-top: 40px;
+    border-radius: 0 15px;
     cursor: pointer;
 }
 
-#password_change_box{
-    display: none;
+
+.nav_list li::before{
+    position: absolute;
+    content:'';
+    border: 1.5px solid black;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: white;
+    top:-8px;
+    left:1px;
+    transition: 0.5s ease-in-out;   /* NOTE : give transition to the one who moves or changes */
 }
 
-#acc_delete_box{
-    display: none;
+.nav_list li:hover{
+    text-shadow: 1px 1px 2px rgba(26, 25, 26, 0.225);
+    background-color: rgba(68, 5, 79, 0.143);
+    background: linear-gradient(to right,transparent,rgba(193, 96, 242, 0.343));
 }
 
-/* *********************************** */
+.nav_list li:hover::before{
+    left:100%;
+    transform: translateX(-50%); /*horizontally center an element within its container */
+}
+
+/* bottom gradient line */
+.nav_list li::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 0.2em;
+    background: black;
+    left: 0;
+    bottom: 0;
+    background-image: linear-gradient(to right, #5e42a6, #b74e91)
+  }
+
+
+.nav_list li i{
+    margin-right: 8px;
+    margin-left: 5px;
+}
+
+/* ----------------------------------------------------- */
+/* pass cahnge box and delete acc box */
+
+#password_change_box,#acc_delete_box{
+    display: none;
+}
 
 /**************** Bulb *****************/
 
@@ -73,14 +194,15 @@ li{
     cursor: pointer;
     background-color: whitesmoke;
     position: fixed;
-    top: 12px;
-    right: 20px;
+    bottom: 15px;
+    left: 200px;
     text-align: center;
     
 
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 20;
   }
   
   #light_bulb > i {
@@ -89,8 +211,253 @@ li{
     text-shadow: 2px 2px 3px black,-1px -1px 3px black;
    
   }
-  
 
-   /* text-shadow: 2px 2px 3px black,-1px -1px 3px black; */
+/**************** notify_msg *****************/
 
+
+.error_msg{
+    position: fixed;
+    top:1.5rem;
+    right:0.6rem;
+
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    width: 20%;
+    border-radius: 20px;
+
+    border: 1px solid rgba(241, 6, 6, 0.81);
+    background-color: rgba(220, 17, 1, 0.16);
+    box-shadow: 0px 0px 2px #ff0303;
+    color: #ff0303;
+
+  }
+
+.success_msg{
+    position: fixed;
+    top:4rem;
+    right:1rem;
+
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    width: 20%;
+    border-radius: 20px;
+
+    border: 1px solid rgba(36, 241, 6, 0.46);
+    background-color: rgba(7, 149, 66, 0.12156862745098039);
+    box-shadow: 0px 0px 2px #259c08;
+    color: #0ad406;
+    transition:0.5s;
+
+}
+
+/* css for Large screens */
+@media only screen and (min-width :600px) {
+
+}
+
+
+/* **************************************************************** */
+/* css for small screens */
+@media only screen and (max-width :600px) {
+    aside{
+        height:110px;
+        width: 100%;  
+        position: fixed;
+        top: 0;
+        background-color: white;
+    }
+
+    main{
+        margin: 5px;
+        margin-top: 110px;
+    }
+
+    /* nav{
+        height: fit-content;
+    } */
+
+    .nav_list{
+        list-style: none;
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: row;
+        height: 20px;
+        padding: 0;
+        gap: 5px;
+    }
+
+    .nav_list a{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .nav_list li{
+        border: none;
+        padding: 2px;
+        padding-top: 5px;
+        font-weight: bold;
+        margin-top: 25px;
+        font-size: 12px;
+        border-radius: 0;
+        text-transform:none;
+        text-shadow: none;
+
+    }
+
+    .nav_list li::after{
+        display: none;
+    }
+
+    .nav_list li i{
+        margin-right: 2px;
+    }
+
+
+    #light_bulb {
+        height: 25px;
+        width: 25px;
+    }
+
+    #light_bulb > i {
+        font-size: 1.1em;
+    }
+
+    
+}
+
+/* for less height screen */
+@media only screen and (max-height :600px) {
+    #light_bulb {
+        height: 25px;
+        width: 25px;
+        
+        position: fixed;
+        top: 15px;
+        right: 10px;
+    
+      }
+
+      #logout_btn{
+        display: none;
+    }
+
+}
+
+
+
+/* ***************************** Search div *************************************** */
+
+.search-div{
+    /* border: 1px solid red; */
+    padding-left: 10px;
+    margin: 5px;
+    margin-top: 30px;
+    padding-bottom: 10px;
+}
+
+
+.searchBox{
+    margin-top: 10px;
+    position: relative;
+
+    transition: ease 1s;
+    width: 35px;
+    height: 35px;
+    /* background: black; */
+    background-image: linear-gradient(to right, #5130a5, rgb(143, 17, 97));
+    border-radius: 25px;
+    padding: 5px;
+}
+
+.searchInput{
+    position: absolute;
+    top: 0.2;
+    left: 0;
+    height: 35.5px;
+    outline: 0;
+    border: 0;
+    display: none;
+    font-size: 1em;
+    border-radius: 30px;
+    padding: 0 20px;
+}
+
+.fa-search{
+    /* box-sizing: border-box; */
+    padding: 10px;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    font-size: 1.2em;
+    transition: all 1s;
+    cursor: pointer;
+    box-shadow: inset 0 0  4px white;
+}
+
+.searchBox:hover,
+.searchBox:valid{
+    width: 220px;
+    cursor: pointer;
+}
+
+.searchBox:hover .searchInput,
+.searchBox:valid .searchInput{
+    display: block;
+}
+
+.searchBox:hover .fa-search,
+.searchBox:valid .fa-search{
+    background-image: linear-gradient(to right, #5130a5, rgb(143, 17, 97));
+    color: white;
+    box-shadow: inset 0 0  10px white;
+}
+
+#search_submit_btn{
+    outline: none;
+    border: none;
+    background-color: black;
+
+}
+
+.search-result {
+    border-top: 1px dashed rgb(38, 6, 46);
+    border-bottom: 1px dashed rgb(38, 6, 46);
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    margin: 15px 0px;
+
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 10px;
+
+    /* for scroll bar part */
+    max-height: 140px;
+    overflow-y:  scroll; 
+
+}
+
+.search-result a{
+    /* border: 1px solid palevioletred; */
+    border-radius: 20px 0 0 20px;
+    /* background-color: #7569e278; */
+    background: linear-gradient(to right,#e2696978,transparent);
+    display: flex;
+    justify-content: first baseline;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    padding: 5px;
+
+}
 

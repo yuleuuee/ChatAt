@@ -6,15 +6,133 @@
     <title>Home Page</title>
     {% load static %}
     <link rel="shortcut icon" type="image/png" href="{% static 'image/chat_app.png' %}"/>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
 </head>
-<body>
-    <h1>Home Page</h1>
-    {% if user.is_authenticated %}
-        <h4>Hey {{user.username|title}}! Last time you didn't logged out</h4>
-        <a href="{% url 'public' %}">Enter to the Page</a>
-    {% else %}
-        <a href="{% url 'login' %}">Login/Signup</a> <!-- name : name in the urls -->
+<body>     
+    <!-------------------- : Notification message section : ------------------->
+    {% if messages %}
+        <div id="notify_msg">
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <span style="color:red;"> {{ message }}</span>
+                {% else %}
+                    <span style="color:green;">{{ message }}</span>
+                {% endif %}
+            {% endfor %}
+        </div>
     {% endif %}
+
+    <section class="login_signup_section">
+        <!-- <p>share and chat whaerevere you are at</p> -->
+        <div class="main_container">
+            <div id="welcome">Welcome to <img src="{% static '/image/chatat.png' %}"></div>
+            
+            <div class="if_already_loggedin">
+                {% if user.is_authenticated %}
+                    <p>Hey {{user.username|title}}! Looks like you're still logged in from last time.</p>
+                    <p>No worries, just click the link to access your account again.</p>
+                    <a href="{% url 'public' %}" id="enter_btn">Continue</a><br><br>
+                {% else %}
+                    <!-- <p>An online platform to share and chat whereever you are at</p><br> -->
+                    <p>Your virtual space for sharing and chatting.</p><br>
+                {% endif %}
+            </div>
+
+            <div class="container" id="container">
+                <div class="form-container sign-in">
+                    <form action="{% url 'login' %}" method="POST">
+                        {% csrf_token %}
+                        <h1>Sign In</h1>
+
+                        <div class="social-icons">
+                            <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-weixin"></i></a>
+                        </div>
+                        
+                        <div class="sp-gab">or use your email or username</div>
+
+                        <div class="email_box">
+                            <span id="stamp_div"><i class="fa-solid fa-envelope"></i></i></span>
+                            <input id ="email_inp" type="text" name='username' placeholder=" "  autocomplete="off">
+                            <span class="em_label">Email or username</span>
+                            <!-- <span class="invis"></span> -->
+                        </div>
+                        <div class="pass_box">
+                            <span id="lock_div"><i class="fa-solid fa-lock"></i></span>
+                            <input id ="password_inp" type="password" name='password' autocomplete="off" placeholder=" " >
+                            <span class="pas_label">Password</span>
+                            <span id="eye_div"><!-- inner html from js--></span>
+                        </div>
+                        <a href="{% url 'forgot_pas' %}" id="forgot_password_btn">Forget Your Password ?</a>
+                        <button type="submit">LOGIN</button>
+                    </form>
+                </div>
+                
+                <!------------------------------------------------------------------------->
+                <div class="form-container sign-up">
+                    <form action="{% url 'signup' %}" method="POST">
+                        {% csrf_token %}
+                        <h1>Create Account</h1>
+                        <div class="social-icons">
+                            <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                            <a href="#" class="icon"><i class="fa-brands fa-weixin"></i></a>
+                        </div>
+                        <div class="sp-gab">or use your email for registeration</div>
+                       
+                        <div class="email_box">
+                            <span id="stamp_div"><i class="fa-solid fa-user"></i></i></span>
+                            <input id ="email_inp" type="text" name="username" placeholder=" "  autocomplete="off">
+                            <span class="em_label">Username</span>
+                            <!-- <span class="invis"></span> -->
+                        </div>
+                         <div class="email_box">
+                            <span id="stamp_div"><i class="fa-solid fa-envelope"></i></i></span>
+                            <input id ="email_res" type="text" name="email" placeholder=" "  autocomplete="off">
+                            <span class="em_label">Email</span>
+                            <!-- <span class="invis"></span> -->
+                        </div>
+                        <div class="pass_box">
+                            <span id="lock_div"><i class="fa-solid fa-lock"></i></span>
+                            <input id ="pass01" type="password" name="password1" placeholder=" ">
+                            <span class="pas_label">Password</span>
+                            <span id="ac_eye_div1"><!-- inner html from js--></span>
+                        </div>
+                        <div class="pass_box">
+                            <span id="lock_div"><i class="fa-solid fa-lock"></i></span>
+                            <input id ="pass02" type="password" name="password2" placeholder=" ">
+                            <span class="pas_label">Confirm Password</span>
+                            <span id="ac_eye_div2"><!-- inner html from js--></span>
+                        </div>
+                        <button type="submit">SUBMIT</button>
+                    </form>
+                </div>
+                <!------------------------------------------------------------------------->
+                <div class="block-container">
+                    <div class="block">
+                        <div class="block-panel block-right">
+                            <h1>Hello, Friend!</h1>
+                            <p>New to this Page ?</p>
+                            <button class="hidden" id="register">Sign Up</button>
+                        </div>
+                        <div class="block-panel block-left">
+                            <h1>Hey, there!</h1>
+                            <p>Already have an account ?</p>
+                            <button class="hidden" id="login">Sign In</button>
+                        </div>
+                    </div>
+                </div>
+                <!------------------------------------------------------------------------->
+            </div>
+        </div>
+    </div>
+    
+    <a href="#" id="stop_scroll"></a>
+    <script src="{% static 'js/home.js' %}"></script>
 </body>
 </html>

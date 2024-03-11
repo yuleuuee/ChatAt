@@ -1,56 +1,295 @@
-.follow-following-div,.edit-profile,#profile_pic_div{
-    border: 2px solid brown;
+
+#profile_top_div{
+    border-bottom: 5px double purple;
     padding: 10px;
-    margin: 5px;
-}
-
-.follow-following-div{
     display: flex;
-    justify-content: baseline;
+    align-items: center;
+    justify-content: space-around;
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 30px;
+    gap:10px;
 
 }
 
-#profile_pic_div img{
+
+.profile_img_part{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap:10px;
+}
+
+.profile_img_part img{
+    border: 4px solid #c73767;
+    padding: 5px;
+    width: 150px; 
+    height: 150px;
     border-radius: 50%;
 }
 
-.info,.user-posts-div{
-    border: 2px solid green;
-    padding: 10px;
-    margin: 5px;
+.profile_img_part div{
+    font-size: 1.4rem;
+    font-weight: 900;
 }
 
-.user-posts-div{
-    border: 2px solid green;
-}
+/*---  Right part :follower, following, setting, bio ---*/
 
-.user-posts-div div{
-    border: 2px solid red;
-    padding: 5px;
-    display:flex;
-    justify-content:first baseline;
-    align-items:first baseline;
-    flex-direction: row;
-    flex-wrap: wrap;
-
+.bio_and_info{
+    display: flex;
+    justify-content: baseline;
+    flex-direction: column;
     gap: 20px;
+
 }
-
-
-/* followers and following div */
 
 #follower_no_div,#following_no_div{
     cursor: pointer;
 }
 
-#all_followers_users_div{
-    display: none;
+#follower_no_div:hover,#following_no_div:hover{
+    color:rgb(182, 62, 26);
 }
 
+
+.top_follow-following-div,.bio_div,.em_joined_date{
+    /* border: 2px solid brown; */
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.bio_div{
+    text-align: end;
+    max-width: 530px;
+    
+}
+
+.email_joined_date{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+
+.top_follow-following-div{
+    /* border: 2px solid brown; */
+    display: flex;
+    justify-content: baseline;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+    font-size: 1.4rem;
+    font-weight: 800;
+
+}
+
+
+/* ---- profile setting ---- */
+
+
+
+.profile_settings .fa-gear {
+    transition: transform 0.5s ease; /* Apply transition for smooth animation */
+}
+
+.profile_settings:hover .fa-gear {
+    animation: rotate 1s infinite linear; /* Apply rotation animation */
+}
+
+.profile_settings:hover{
+    color: #a90e1d;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg); /* Start rotation from 0 degrees */
+    }
+    100% {
+        transform: rotate(360deg); /* End rotation at 360 degrees */
+    }
+}
+
+
+/* follow unfollow btn */
+
+#follow_unfollow_btn button{
+    /* border: 2px solid black; */
+    background:linear-gradient(to right,rgba(239, 40, 40, 0.858),rgba(80, 11, 133, 0.767));
+    border: none;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    font-size: 0.6em;
+    font-weight: 800;
+    color:white;
+    letter-spacing: 0.5px;
+    width: 100px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
+    transition: 0.5s ease-in;
+} 
+
+
+#follow_unfollow_btn button:hover{
+    background:linear-gradient(to left,rgba(239, 40, 40, 0.858),rgba(80, 11, 133, 0.767));
+}
+
+
+
+/* ------------- */
+
+
+
+.profile_page_bottom_div{
+    /* border: 2px solid green; */
+    padding: 10px;
+    /* margin: 5px; */
+}
+
+/*----- Hidden users followers and following div --- */
+
+#all_following_users_div,#all_followers_users_div{
+    /* display: flex; */
+    margin: 10px 0;
+    /* border: 2px solid blue; */
+    border-bottom: 1px dashed purple;
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+}
+
+
+
+#all_followers_users_div{
+    display: none;
+    
+}
 
 #all_following_users_div{
     display: none;
 }
+
+.following_list_items,.follower_list_items{
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+
+}
+
+.follower_list_items a,.following_list_items a{
+    /* border: 2px solid blue; */
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.following_list_items img,.follower_list_items img{
+    border: 2px solid #6937c7;
+    padding: 1px;
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+}
+
+/* ------------------------------------ */
+
+
+.all_posts_collections{
+    /* border: 2px solid red; */
+    padding: 5px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+ 
+}
+
+.each_post {
+    position: relative;
+    /* border: 1px solid greenyellow; */
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+}
+
+.each_post img {
+    cursor: pointer;
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    transition: opacity 0.3s ease; 
+}
+
+
+.each_post div {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.each_post:hover div {
+    display: flex;
+    color: white;
+    font-size: 1.2em;
+    font-weight: 600;
+    
+}
+
+
+.each_post:hover img{
+    filter: brightness(40%) grayscale(30%);
+}
+
+.each_post div p{
+    cursor: pointer;
+}
+
+/* ---delete post --*/
+
+#delete_post_btn{
+    display: none;
+    position: absolute;
+
+    top: 10%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+
+    cursor: pointer;
+    background-color: transparent;
+    border: none;    
+    color: gray;
+}
+
+#delete_post_btn i{
+    transition: 0.3s ease;
+}
+
+
+#delete_post_btn:hover i{
+    transform: rotate(45deg);
+    font-size: 1.3em;
+    color: red;
+
+}
+
+.each_post:hover #delete_post_btn {
+    display: block  
+}
+

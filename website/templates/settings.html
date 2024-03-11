@@ -41,5 +41,35 @@
             <button type='submit'>Save Changes</button>
         </form>
     </div>
+
+    <ul>
+        <li onclick="confirm_box2()"><i class="fa-solid fa-key"></i> Change Password</li>
+        <li onclick="confirm_box()"><i class="fa-solid fa-user-xmark"></i> Delete Account</li>
+    </ul>
+
+
+    <!-- password change box -->
+    <div id="password_change_box">
+        <h3>Modify Your Password</h3>
+        <form action="{% url 'change_password' %}" method="POST">
+            {% csrf_token %}
+            <input type='password' name="old_password" autocomplete="off" placeholder="old_password"><br><br>
+            <input type='password' name="new_password1" autocomplete="off" placeholder="new password"><br><br>
+            <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password"><br><br>
+            <button type='submit'>Submit</button>
+        </form>
+    </div>
+
+    <!-- Account delete box -->
+    <div id='acc_delete_box'>
+        <h3>Please enter your password to confirm the deletion of your account.</h3>
+        <form action="{% url 'delete_account' %}" method="POST">
+            {% csrf_token %}
+            <input type='password' name="confirm_pass" autocomplete="off">
+            <button type='submit'>Submit</button>
+        </form>
+    </div>
 </div>
+
+<script src="{% static 'js/settings.js' %}"></script>
 {% endblock %}

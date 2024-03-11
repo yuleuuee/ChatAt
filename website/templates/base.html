@@ -15,26 +15,70 @@
     <audio id="click-sound" src="{% static 'audios/click.mp3' %}" preload="auto"></audio>
 </head>
 <body class="white">
-    {% include "nav_bar.html" %}
-    
+
+    <!-- ------------------------------------------------ -->
+    {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <div class="notifymessage error_msg" id="error_msg"> 
+                        <span><i class="fa fa-times danger "></i> {{ message }}</span>
+                    </div> 
+                {% else %}
+                    <div class="notifymessage success_msg" id="success_msg"> 
+                        <span><i class="fa fa-times danger "></i> {{ message }}</span>
+                    </div>    
+                {% endif %}
+            {% endfor %}
+    {% endif %}
+
+    <!-- ------------------------------------------------ -->
     {% if user.is_authenticated %}
         <span id="light_bulb" onclick="playAudioBulb()"><i class="fa-solid fa-lightbulb"></i></span>
     {% endif %}
-   
-    <br>
-    <div id="notify_msg">
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == 'error' %}
-                    <span style="color:red;">{{ message }}</span>
-                {% else %}
-                    <span style="color:green;">{{ message }}</span>
+   <!-- ------------------------------------------------ -->
+
+    <aside>
+        <!-- logo -->
+        {% load static %}
+        <div id="ChatAt_logo" >
+            <a href="{% url 'public' %}" ><img src="{% static '/image/chatat.png' %}"></a>
+        </div>
+
+        <!-- seaarch users div -->
+            
+        {% if user.is_authenticated %}
+            <div class="search-div">
+
+                <form class="searchBox" action="{% url 'search_users' %}" method="POST">
+                    {% csrf_token %}
+                    <input class="searchInput" type="text"  name="query" placeholder="Search Users.." autocomplete="off" required >
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+
+
+                {% if search_results %}
+                    <div class="search-result">
+                        {% for user in search_results %} 
+                            <a href="{% url 'profile' pk=user.username %}">
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="" style="width: 30px; height: 30px; border-radius: 20px;">
+                                <span>@{{user.username }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
                 {% endif %}
-            {% endfor %}
+            </div>
         {% endif %}
-    </div>
-    {% block content %}{% endblock %}
+
+        {% include "nav_bar.html" %}
+        
+    </aside>
+    <!-- ------------------------------------------------ -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
     <script src="{% static 'js/base.js' %}"></script>
+
 </body>
 
 </html>

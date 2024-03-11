@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from .models import OTPModel
 from chat_app.settings import EMAIL_HOST_USER
+from django.utils.html import escape
+
 
 
 # Create your views here.
@@ -45,12 +47,12 @@ def user_login(request):
                 return redirect('public') #,{'user_profile':user_profile}
             else:
                 messages.error(request, "Password Incorrect!")
-                return redirect('login')
+                return redirect('home')
         else:
             messages.error(request, "User Doesn't Exist")
-            return redirect('login')
+            return redirect('home')
     else:
-        return render(request, 'login.html')
+        return render(request, 'home.html')
     
 # ----------------------------------- SIGNUP -------------------------------------------------------------------
     
@@ -84,9 +86,9 @@ def user_signup(request):
             return redirect('settings') # after succesful account creation users are sent to account settings page
         else:
             messages.error(request, "Password dosn't match!")
-            return redirect('signup')
+            return redirect('home')
     else:
-        return render(request, 'signup.html') 
+        return render(request, 'home.html') 
             
 # ----------------------------------- LOGOUT -------------------------------------------------------------------
 @login_required(login_url='login')
@@ -160,23 +162,19 @@ def change_password(request):
 @login_required(login_url='login')
 def public_page(request):
 
-
     #  object of the curreltly logged in user :
     user_profile = UserProfile.objects.get(user=request.user)
-
 
     # getting all comments object
     comments = Comment.objects.all()
 
     likes = Like.objects.all()
 
-
     current_user = request.user # i dont theink this is necessary , you can delete 
    
     current_time = datetime.now().time()
     #  today_date = datetime.now().date()
     # 'current_time': current_time,'today_date':today_date ,
-
 
 
     # ************ Show feeds of only following users and current user ***************
@@ -197,16 +195,20 @@ def public_page(request):
         user = get_object_or_404(User, username=user_follow.user)
         user_following_list.append(user)
 
+    from operator import attrgetter
     # Filter posts by the retrieved User objects
     for user in user_following_list:
         feed_lists = Post.objects.filter(user=user)
         feed.extend(feed_lists)
+    
+    # Sort the feed list based on the timestamp of each post
+    feed.sort(key=attrgetter('created_at'), reverse=True)
 
 
     # ****************************  User suggestions *********************************
     import random 
 
-      # Get all users except the current user and the admin user
+    # Get all users except the current user and the admin user
     all_users = User.objects.exclude(username=request.user.username).exclude(is_superuser=True)
 
     # Get the usernames of users whom the current user is following
@@ -215,12 +217,24 @@ def public_page(request):
     # Exclude the users whom the current user is already following
     suggested_users = all_users.exclude(username__in=following_usernames)
 
-    
-    
-     # Shuffle the suggested users and limiting the number of users shown
-    suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 4))
+    # Shuffle the suggested users and limiting the number of users shown
+    suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 3))
 
 
+
+    # ****************************  Only my followers suggestions *********************************
+
+    # Retrieve the usernames of users who follow you
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+    # Find users who follow you but you don't follow them back
+    followers_without_following_back = set(followers_usernames) - set(following_usernames)
+
+    # Shuffle the list of followers without following them back and limit the number of users shown
+    followers_without_following_back_subset = random.sample(list(followers_without_following_back), min(len(followers_without_following_back), 3))
+
+    # Query UserProfile to get profiles of users who follow you but you don't follow back
+    followers_without_following_back_profiles = UserProfile.objects.filter(user__username__in=followers_without_following_back_subset)
 
     #**************************** greeting for the users *********************************
         
@@ -232,7 +246,8 @@ def public_page(request):
     else:
         greeting = "Good evening"
 
-     # Checking if the user has liked each post and pass the information to the template
+
+    # Checking if the user has liked each post and pass the information to the template
     for post in feed:
         post.user_has_liked = post.likes.filter(user=request.user).exists()
     
@@ -244,27 +259,34 @@ def public_page(request):
         'suggested_users': suggested_users_subset,
         'comments':comments,
         'likes':likes,
-
-        
+        'followers_without_following_back_profiles':followers_without_following_back_profiles,
     }
-
-    # ****************************** Searching Users :*******************************
     
 
-    query = request.GET.get('query')
+    # ****************************** Searching Users :*******************************
 
-    if query:
-        search_results = User.objects.filter(username__icontains=query).exclude(is_superuser=True)
-        if search_results.exists():
-            # messages.success(request, 'Username was found successfully!')
-            pass
+    if request.method =='POST':
+        # query = request.GET.get('query')
+        query = request.POST['query']
+
+        if query:
+            search_results = User.objects.filter(username__icontains=query).exclude(is_superuser=True)
+            if search_results.exists():
+                # messages.success(request, 'Username was found successfully!')
+                pass
+            else:
+                print('came here last')
+                messages.error(request, 'Username does not match any existing user.')
         else:
-            messages.error(request, 'Username does not match any existing user.')
-    else:
-        search_results = None
+            search_results = None
 
-    context['search_results'] = search_results
-    return render(request, 'public.html', context)
+        context['search_results'] = search_results # apanding the search result to the context dictanaries
+        return render(request, 'public.html', context)
+    else:
+        return render(request, 'public.html', context)
+
+    
+
 
 # ------------------------------------------------------------------------------------------------------
 
@@ -274,6 +296,7 @@ def settings(request):
 
     # this is the UserProfile Object, we can now assign value to the object's entities
     # object's entities includes : profile_picture,bio,phone
+    
     user_profile = UserProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
@@ -291,9 +314,6 @@ def settings(request):
             new_bio = user_profile.bio
         else:
             new_bio = request.POST['new_bio']
-
-        # new_phone_no = request.POST['new_phone_no']
-        # new_bio = request.POST['new_bio']
     
         user_profile.profile_picture = new_profile_pic
         user_profile.phone = new_phone_no
@@ -387,7 +407,6 @@ def add_post(request):
         new_post.save()
         messages.success(request, "Post Added Succesfully!")
         return redirect('public')
-
     else:    
         return redirect('public') # this helps to go the the view public_page ,as it is using the name of the url
 
@@ -431,6 +450,8 @@ def follow(request):
         follower = request.POST['follower'] # Viewer : currently logged in user
         user = request.POST['user'] # view : user which the viewer is viewing
 
+        print(user)
+
         # checking whether or not the currerently logged in user is already followeing this user
         # if already followed case :
         if FollowersCount.objects.filter(follower=follower,user=user).first():
@@ -441,21 +462,28 @@ def follow(request):
              # if already not followed case :
             new_follower = FollowersCount.objects.create(follower=follower,user=user)
             new_follower.save()
+            # messages.success(request, 'You two are now friends!')
             return redirect('/profile/'+user) 
     else:
         return redirect('public')
     
 @login_required(login_url='login')
 def delete_post(request,post_id):
-    user = request.user
-    # post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
+    user = request.user.username
+    if request.method == 'POST':
+        user = request.user # user object 
 
-    # post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
+        # post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
+        # post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
 
-    post_to_delete = Post.objects.get(id=post_id, user=user)
-    post_to_delete.delete()
-    messages.success(request, 'Your Post Was deleted successfully.')
-    return redirect('public')
+        # post_to_delete = Post.objects.get(id=post_id, user=user)
+        # post_to_delete.delete()
+        messages.success(request, 'Your Post Was deleted successfully.')
+        user = request.user.username
+        return redirect('/profile/'+user)
+    else:
+        return redirect('/profile/'+user)
+
 
 
 # comment part
@@ -598,49 +626,49 @@ def change_forgot_password(request):
 # from django.http import HttpResponseBadRequest
 # from .models import ChatMessage
 
-@login_required(login_url='login')
-def chat_room(request):
+# @login_required(login_url='login')
+# def chat_room(request):
 
-    user = request.user # this is the current user
-
-
-    user_object = User.objects.get(username =user.username)
-    user_profile = UserProfile.objects.get(user=user_object)
-    user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
+#     user = request.user # this is the current user
 
 
-     # Retrieve following and followers data for the current user
-    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
-    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+#     user_object = User.objects.get(username =user.username)
+#     user_profile = UserProfile.objects.get(user=user_object)
+#     user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
 
 
-    # Query UserProfile to get profile pictures of following and followers
-    following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
-    followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
+#      # Retrieve following and followers data for the current user
+#     following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+#     followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
 
-    # Find mutual followers
-    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
-    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
-    context={
-        'user':user,
-        'user_object':user_object,
-        'user_profile':user_profile,
-        'user_posts':user_posts,
-        'following_profiles':following_profiles,
-        'followers_profiles':followers_profiles,
-        'mutual_following_profiles': mutual_following_profiles,
-    }
+#     # Query UserProfile to get profile pictures of following and followers
+#     following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
+#     followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
+
+#     # Find mutual followers
+#     mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+#     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
+
+#     context={
+#         'user':user,
+#         'user_object':user_object,
+#         'user_profile':user_profile,
+#         'user_posts':user_posts,
+#         'following_profiles':following_profiles,
+#         'followers_profiles':followers_profiles,
+#         'mutual_following_profiles': mutual_following_profiles,
+#     }
 
    
-    return render(request,'chat_room.html',context)
+#     return render(request,'chat_room.html',context)
 
-@login_required(login_url='login')
-def private_chat(request,current_user, friend_user):
+# @login_required(login_url='login')
+# def private_chat(request,current_user, friend_user):
 
-    group_name = f"{current_user}_{friend_user}"
+#     group_name = f"{current_user}_{friend_user}"
 
-    return render(request,'chat_room.html',{'group_name':group_name})
+#     return render(request,'chat_room.html',{'group_name':group_name})
 
 
     

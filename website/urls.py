@@ -13,6 +13,7 @@ urlpatterns = [
     path('settings',views.settings,name ='settings'),
 
     path('profile/<str:pk>/',views.profile,name ='profile'),
+    
     path('add_post/',views.add_post,name ='add_post'),
    
     path('like_post/',views.like_post,name ='like_post'),
@@ -33,9 +34,10 @@ urlpatterns = [
 
     path('delete_comment/<int:comment_id>/',views.delete_comment,name ='delete_comment'),
 
-    path('chat_room/',views.chat_room, name='chat_room'),
 
-    path('chat/<str:current_user>_<str:friend_user>/', views.private_chat, name='chat'),
+    # path('chat_room/',views.chat_room, name='chat_room'),
+
+    # path('chat/<str:current_user>_<str:friend_user>/', views.private_chat, name='chat'),
 
 ]
 

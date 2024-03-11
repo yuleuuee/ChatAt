@@ -80,10 +80,11 @@
             const data = JSON.parse(event.data) // converting string to object
             console.log('Parsed  message ... : ',data)
             console.log('parsed data type : ...',typeof(data))
-            final_msg = data.message
+            const finalMsg = data.message;
 
-            // appending the final_msg of the server
-            document.getElementById('message-list-box').innerText=final_msg
+            // Appending the finalMsg from the server
+            const messageListBox = document.getElementById('message-list-box');
+            messageListBox.textContent += finalMsg + '\n';
 
         }
 

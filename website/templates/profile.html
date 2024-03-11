@@ -11,112 +11,112 @@
 {% block content %}
 
 
-{% if user_object.username == user.username %}
-    <h1>@{{user_object.username}} ,This is Your Profile Page</h1>
+<!-- {% if user_object.username == user.username %}
+    <h1>{{user_object.username|title}}, This is your Profile Page </h1>
 {% else %}
     <h1> Profile Page of @{{user_object.username}} </h1>
-{% endif %}
-<h2>Informations :</h2>
-<div class="big-container">
-    <div class="follow-following-div">
-
-        <!--Dynamic follower and following Part  -->
-        <div>{{user_post_no}} Post</div>
-        <div id="follower_no_div">{{no_of_followers}} 
-        {% if user_followers == 0 or user_followers == 1 %}
-            Follower </div>
-        {% else %}
-            Followers </div>
-        {% endif %}
-        <div id="following_no_div">{{no_of_following}} following</div>
-
-        <form action="{% url 'follow' %}" method="POST">
-            {% csrf_token %}
-            <input type="hidden" value="{{user.username}}" name="follower"> <!-- Viewer : the username of the 'user who is currently viewing' the other's profile page  -->
-            <input type="hidden" value="{{user_object.username}}" name="user">  <!-- View : username of the 'user whose profile is currently being viewed -->
-            
-            {% if user_object.username == user.username %} <!--  if the 'view page' is of the 'user who is viewing'  -->
-                <a href="{% url 'settings' %}"> Profile Settings</a>
-            {% else %}
-                <div><button type="submit">{{button_text}}</button></div>
-            {% endif %}
-            
-            
-        </form>
-        
-       
-    </div>
-
-    <!-- NOTE : hide and show of followers/following is avilable for the current user only -->
-    {% if user_object.username == user.username %}  
-        <!-- all followers profile list  -->
-        <div id="all_followers_users_div">
-            <p>Your All Followers :</p>
-            <ul>
-                {% for follower_user_profile in followers_profiles %}
-                    <li>
-                        <a href="{% url 'profile' pk=follower_user_profile.user %}">
-                            <span>
-                                <img src="{{ follower_user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
-                            </span>
-                            @{{follower_user_profile.user.username}}
-                        </a>
-                    </li>       
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- all following profiles list -->
-        <div id="all_following_users_div">
-            <p>You follow them :</p>
-            <ul class="all_following_users_ul">
-                {% for following_user_profile in following_profiles %}
-                    <li>
-                        <a href="{% url 'profile' pk=following_user_profile.user %}">
-                            <span>
-                                <img src="{{ following_user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
-                            </span>
-                            @{{following_user_profile.user.username}}
-                        </a>
-                    </li>       
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-
-    <div id="profile_pic_div" >
-        <div class="info">
-            <p>Profile pic : </p>
-            <!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
-            
-            <!-- {% if user_profile.profile_picture %} -->
-            <a href="{{ user_profile.profile_picture.url }}">
-                <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
-            </a>
-
-            <!-- {% else %}
-                {% load static %}
-                <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
-            {% endif %}         -->
-        </div>
-        
-        <div class="info">
-            <p>Bio : {{user_profile.bio}}</p>
-            <!-- current_user.userprofile.phone -->
-            <p>Contact No : {{user_profile.phone}}</p>
-            <p>Email : {{user_object.email}}</p>
-            <p>Date Joined : {{user_object.date_joined}}</p>
-            <p>Last Login : {{user_object.last_login}}</p>
-        </div>
-        <div class="user-posts-div">
-            <h2>All posts : </h2>
-            <div>
-                {% for post in user_posts reversed%}
-                    <img src="{{ post.image.url }}" alt="" style="width: 200px; height: 200px; border-radius: 20px;;" >
-                {% endfor %}
+{% endif %} -->
+    <div id="profile_top_div" >
+            <div class="profile_img_part">
+                <a href="{{ user_profile.profile_picture.url }}">
+                    <img src="{{ user_profile.profile_picture.url }}" alt="" >
+                </a>
+                <div>{{user_profile.user.username}}</div>
             </div>
-        </div>
+
+            <div class="bio_and_info">
+                <div class="top_follow-following-div">
+                    <!--Dynamic follower and following Part  -->
+                    <div>{{user_post_no}} Post</div>
+                    <div id="follower_no_div">{{no_of_followers}} 
+                    {% if user_followers == 0 or user_followers == 1 %}
+                        Follower </div>
+                    {% else %}
+                        Followers </div>
+                    {% endif %}
+                    <div id="following_no_div">{{no_of_following}} following</div>
+            
+                    <form action="{% url 'follow' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{user.username}}" name="follower"> <!-- Viewer : the username of the 'user who is currently viewing' the other's profile page  -->
+                        <input type="hidden" value="{{user_object.username}}" name="user">  <!-- View : username of the 'user whose profile is currently being viewed -->
+                        
+                        {% if user_object.username == user.username %} <!--  if the 'view page' is of the 'user who is viewing'  -->
+                            <a href="{% url 'settings' %}" class="profile_settings" ><i class="fa-solid fa-gear"></i> Profile Settings </a>
+                        {% else %}
+                            <div  id="follow_unfollow_btn"><button type="submit">{{button_text}}</button></div>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div class="bio_div">
+                    <div> {{user_profile.bio}}</div>
+                </div>
+
+                <div class="email_joined_date">
+                    <p><strong> Email : </strong> {{user_object.email}}</p>
+                    <p><strong>Date Joined : </strong> {{user_object.date_joined| date:"F j, Y" }}</p>
+                </div>
+                
+            </div>   
     </div>
 
-    <script src="{% static 'js/profile.js' %}"></script>
+    <div class="profile_page_bottom_div">
+        
+        <!-- NOTE : hide and show of followers/following is avilable for the current user only -->
+        {% if user_object.username == user.username %}   
+            <!-- all followers profile list  -->
+            <div id="all_followers_users_div">
+                <div class="follower_list_items">
+                    {% for follower_user_profile in followers_profiles %}
+                        <a href="{% url 'profile' pk=follower_user_profile.user %}">
+                            <img src="{{ follower_user_profile.profile_picture.url }}" alt="" >
+                            <p>@{{follower_user_profile.user.username}}</p>
+                        </a>     
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- all following profiles list -->
+            <div id="all_following_users_div">
+                <div class="following_list_items">
+                    {% for following_user_profile in following_profiles %}
+                        <a href="{% url 'profile' pk=following_user_profile.user %}">
+                            <img src="{{ following_user_profile.profile_picture.url }}" alt="" >
+                            <p>@{{following_user_profile.user.username}}</p>
+                        </a> 
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="all_posts_collections">
+            {% for post in user_posts reversed%}
+                <div class="each_post">
+                    <img src="{{ post.image.url }}" alt="" >
+                    <div>
+                        <p>{{post.no_of_likes}} <i class="fa-regular fa-heart"></i></p>
+                        <p>{{post.no_of_comments}} <i class="fa-regular fa-comment"></i></p>
+                    </div>
+
+                    <!-- deleting post -->
+                    <!-- only show the delete form for the current users -->
+                    {% if post.user.username == request.user.username %}
+                        <form action="{% url 'delete_post' post.id %}" onsubmit="return confirm('Are you sure you want to delete your Post ?')" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" id="delete_post_btn"> <i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    {% endif %}    
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+<script src="{% static 'js/profile.js' %}"></script>
 {% endblock %}
+
+<!-- saying : 'user.userprofile.profile_picture' AND 'user_profile.profile_picture' are same -->
+<!-- {% if user_profile.profile_picture %} -->
+<!-- {% else %}
+    {% load static %}
+    <img src="{% static 'image/dummy.png' %}" alt="" style="width: 150px; height: 150px">
+{% endif %}         -->
