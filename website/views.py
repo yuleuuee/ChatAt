@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from .models import OTPModel
 from chat_app.settings import EMAIL_HOST_USER
-from django.utils.html import escape
+# from django.utils.html import escape
 
 
 
@@ -22,35 +22,34 @@ from django.utils.html import escape
 # # ------------------------------------------------------------------------------------------------------
 
 def home(request):
-    return render(request,'home.html',{})
+    return render(request,'home.html')
 
 # # --------------------------------- LOGIN -----------------------------------------------------------------------
 
 def user_login(request):
 
-    # user_profile = UserProfile.objects.get(user=request.user)
-    # user_profile = UserProfile.objects.get(user=request.user)  # Access id to fetch
-
-    
     if request.method == 'POST':
-        u_name = request.POST['username']
-        p_word = request.POST['password']
+        input_value = request.POST['username_or_email']
+        password = request.POST['password']
 
         #User.objects.filter(username=u_name).first()
-        if User.objects.filter(username=u_name).exists(): # to check if the username is in the 'auth_user' table exists
-            
-            user = authenticate(request,username=u_name, password=p_word)
-
-            if user is not None: # if there is user with  provided password matches the stored password
-                login(request, user)
-                messages.success(request, "Successfully logged in!")
-                return redirect('public') #,{'user_profile':user_profile}
-            else:
-                messages.error(request, "Password Incorrect!")
-                return redirect('home')
+        if User.objects.filter(username=input_value).exists(): # to check if the username is in the 'auth_user' table exists
+            user = authenticate(request,username=input_value, password=password)
+        elif User.objects.filter(email=input_value).exists(): 
+            user = authenticate(request,email=input_value,password=password)
+            messages.error(request, "Email login is encountering problem, Try with your Username !")
+            return redirect('home')
         else:
             messages.error(request, "User Doesn't Exist")
             return redirect('home')
+
+        if user: # if there is user with  provided password matches the stored password
+            login(request, user)
+            messages.success(request, "Successfully logged in!")
+            return redirect('public') #,{'user_profile':user_profile}
+        else:
+            messages.error(request, "Password Incorrect!")
+            return render(request, 'home.html',{'entered_username_or_email':input_value})
     else:
         return render(request, 'home.html')
     
@@ -118,10 +117,10 @@ def delete_account(request):
             return redirect('login')
         else:
             messages.error(request, "Password dosn't match!")
-            return redirect('public')
+            return redirect('settings')
     else:    
         # will never be this
-        return redirect('public')
+        return redirect('settings')
     
 
 # ------------------------------------------------------------------------------------------------------
@@ -139,25 +138,27 @@ def change_password(request):
         
         #Password is correct for the current user then
         if user is not None:
-            if new_password1 == new_password2:
+            if len(new_password1.strip()) == 0 or len(new_password2.strip()) == 0:
+                messages.error(request, "Password fields can't be empty!")
+                return redirect('settings')
+            elif len(new_password1) < 4 or len(new_password2) < 4:
+                messages.error(request, "Password must be at least 4 characters long!")
+                return redirect('settings')
+            elif new_password1 != new_password2:
+                messages.error(request, "New passwords don't match!")
+                return redirect('settings')
+            else:
                 user.set_password(new_password1)
                 user.save()
-                messages.success(request, "Password Successfully Changed")
-                return redirect('public')
-            else:
-                messages.error(request, "New Passwords dosn't match!")
-                return redirect('public')
+                messages.success(request, "Password successfully changed")
+                return redirect('settings')
         else:
             messages.error(request,'Old Password was Incorrect!, go to "Forgot password"')
-            return redirect('public')
+            return redirect('settings')
     else:    
         # will never be this
-        return redirect('public')
+        return redirect('settings')
 
-    
-# ------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
 def public_page(request):
@@ -292,39 +293,51 @@ def public_page(request):
 
 @login_required(login_url='login')
 def settings(request):
-    # current_user = request.user
-
-    # this is the UserProfile Object, we can now assign value to the object's entities
-    # object's entities includes : profile_picture,bio,phone
     
+    # getting user object
+    user = request.user
+
+    # this is the UserProfile Object, we can now assign value to the object's entities , # object's entities includes : profile_picture,bio,phone
     user_profile = UserProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
-        if request.FILES.get('new_profile_pic') == None: # if the user is'nt submitting profile picture, #getting the default profile pic from the media
-            new_profile_pic =user_profile.profile_picture 
-        else: # if the user is submitting a profile picture ,# getting from the uploaded file
-            new_profile_pic =request.FILES.get('new_profile_pic') 
 
-        if len(request.POST['new_phone_no']) == 0:
-            new_phone_no = user_profile.phone
-        else:
-            new_phone_no = request.POST['new_phone_no']
+        email = request.POST.get('email', '').strip()
+        phone_no = request.POST.get('phone_no', '').strip()
+
+
+        # Check if email is already in use(exceot the current user)
+        existing_email_user = User.objects.filter(email=email).exclude(username=user.username).first()
+        if existing_email_user:
+            messages.error(request, f"Email '{email}' is already in use.")
+            return redirect('settings')
+
+        # Check if phone number is already in use(exceot the current user)
+        existing_phone_user = UserProfile.objects.filter(phone=phone_no).exclude(user=user).first()
+        if existing_phone_user:
+            messages.error(request, f"Phone number '{phone_no}' is already in use.")
+            return redirect('settings')
         
-        if len(request.POST['new_bio']) == 0:
-            new_bio = user_profile.bio
-        else:
-            new_bio = request.POST['new_bio']
+        new_profile_pic = request.FILES.get('profile_picture', user_profile.profile_picture)
+        new_first_name = request.POST.get('first_name', '').strip() or user.first_name
+        new_last_name = request.POST.get('last_name', '').strip() or user.last_name
+        new_email = email or user.email
+        new_phone_no = phone_no or user_profile.phone
+        new_bio = request.POST.get('new_bio', '').strip() or user_profile.bio
     
+        user.first_name = new_first_name
+        user.last_name = new_last_name
+        user.email = new_email
+
         user_profile.profile_picture = new_profile_pic
         user_profile.phone = new_phone_no
         user_profile.bio = new_bio
 
+        user.save()
         user_profile.save()  # Saving the changes in UserProfile
 
-        messages.success(request, " Save Change Success! ")
-        # return render(request,'other_profile.html',{'user_profile':user_profile})
-
-        return redirect('profile', pk=user_profile.user)
+        messages.success(request, "Save Change Success!")
+        return redirect('settings')
     else:
         return render(request,'settings.html',{'user_profile':user_profile})
 
@@ -426,16 +439,16 @@ def like_post(request):
         like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
 
         if like_filter == None:
-            # new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-            # new_like.save()
-            # post.no_of_likes=post.no_of_likes +1
-            # post.save()
+            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+            new_like.save()
+            post.no_of_likes=post.no_of_likes +1
+            post.save()
             messages.success(request, 'You just liked a post')
             return redirect('public')
         else:
-            # like_filter.delete()
-            # post.no_of_likes=post.no_of_likes -1
-            # post.save()
+            like_filter.delete()
+            post.no_of_likes=post.no_of_likes -1
+            post.save()
             messages.success(request, 'You Unliked a post')
             return redirect('public')
         
@@ -585,14 +598,16 @@ def verify_otp(request):
         email = request.POST.get('email')
         otp_entered = request.POST.get('otp')
         otp_obj = OTPModel.objects.filter(user__email=email, otp=otp_entered).first()
+        
         if otp_obj:
             can_change_password = 'ok'
             messages.success(request, 'You can now Recover your password')
             return render(request, 'forgot_pas.html',{'can_change_password':can_change_password,'email_for_identity':email})
         else:
             messages.error(request, 'OTP Dose not match')
-            return render(request, 'login.html')
-    return render(request, 'forgot_pas.html')
+            return redirect('forgot_pas')
+    else:
+        return render(request, 'forgot_pas.html')
 
 
 # chnanging the forgot password part :
@@ -607,16 +622,20 @@ def change_forgot_password(request):
 
         user = User.objects.filter(email=email).first() # if email field is empty then this will give admin 
         if user.username != 'admin':
-            if new_password1 == new_password2:
+
+            if len(new_password1.strip()) < 0 or len(new_password1.strip()) <0:
+                messages.error(request, "Must enter password!")
+                return redirect('forgot_pas')
+            elif new_password1 != new_password2:
+                messages.error(request, "New Passwords dosn't match!")
+                return redirect('forgot_pas')
+            else:
                 user.set_password(new_password1)
                 user.save()
                 messages.success(request, "Password Was Succesfully Changed!")
                 return redirect('login')
-            else:
-                messages.error(request, "New Passwords dosn't match!")
-                return redirect('forgot_pas')
         else:
-            messages.error(request, "User name doesnt exists!")
+            messages.error(request, "That email doesnt match ! ")
             return redirect('forgot_pas')
     else:
         return redirect('login')
@@ -626,7 +645,7 @@ def change_forgot_password(request):
 # from django.http import HttpResponseBadRequest
 # from .models import ChatMessage
 
-# @login_required(login_url='login')
+# # @login_required(login_url='login')
 # def chat_room(request):
 
 #     user = request.user # this is the current user
@@ -663,7 +682,7 @@ def change_forgot_password(request):
    
 #     return render(request,'chat_room.html',context)
 
-# @login_required(login_url='login')
+# # @login_required(login_url='login')
 # def private_chat(request,current_user, friend_user):
 
 #     group_name = f"{current_user}_{friend_user}"

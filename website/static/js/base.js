@@ -4,7 +4,7 @@ const error_msg = document.getElementById('error_msg');
 if (error_msg) {
   setTimeout(() => {
     error_msg.style.display = 'none';
-  }, 5000); // 4000ms = 4s
+  }, 6000); // 6000ms = 6s
 }
 
 
@@ -14,7 +14,7 @@ const success_msg = document.getElementById('success_msg');
 if (success_msg) {
   setTimeout(() => {
     success_msg.style.display = 'none';
-  }, 5000); // 4000ms = 4s
+  }, 6000); // 6000ms = 6s
 }
 
 
@@ -26,28 +26,30 @@ function playAudioBulb() {
   audio.play();
 }
 
-/*********** Bulb ***************///
+/*********** dark_light mode:  sun_moon ***************///
 
-let bulb_box = document.getElementById("light_bulb");
+let dark_light = document.getElementById("dark_light");
 let body = document.querySelector("body");
-let bulb = document.querySelector("#light_bulb>i");
-// let a_link = document.querySelector(".nav_list>a");
+let sun_moon_icon = document.querySelector("#dark_light>i");
 
-bulb_box.addEventListener("click", change);
-function change() {
+dark_light.addEventListener("click", ()=>{
   if (body.className == "black") {
     body.className = "white";
-    // a_link.style.color ="black";
-    bulb.style.color = "orange";
-    bulb.style.textShadow = "2px 2px 3px black,-1px -1px 3px black";
-
+    dark_light.innerHTML='<i class="fa-solid fa-moon"></i>';
+    sun_moon_icon.style.transform = 'scale(1.2)';
   } else if (body.className == "white") {
     body.className = "black";
-    bulb.style.color = "black";
-    bulb.style.textShadow = "2px 2px 3px white,-1px -1px 3px white";
-    // a_link.style.color ="white";
+    sun_moon_icon.style.transform = 'scale(1.2)';
+    dark_light.innerHTML='<i class="fa-solid fa-sun"></i>';
   }
-}
+
+  // Reseting the transformation after 500 milliseconds
+  setTimeout(() => {
+    sun_moon_icon.style.transform = 'none';
+  }, 200);  // in 2ms
+});
+
+
 
 
 // search clear 

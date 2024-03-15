@@ -22,7 +22,6 @@ follower_no_div.addEventListener('click', () => {
     follower_no_div.style.color = 'rgb(182, 62, 26)';
     following_no_div.style.color ='inherit';
 
-
 });
 
 following_no_div.addEventListener('click', () => {

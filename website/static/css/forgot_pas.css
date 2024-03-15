@@ -1,0 +1,344 @@
+
+/* html{
+    background-color: white;
+} */
+
+body{
+    /* background-color: #0e1538; */
+    background-color: black;
+    margin: 0;
+    padding: 0;
+}
+
+.navigation_bar{
+    /* border: 1px solid white; */
+    padding: 0 10px;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+
+
+#ChatAt_logo{
+    /* border: 2px solid black; */
+    margin: 10px;
+    text-align:left;
+    
+}
+
+#ChatAt_logo img{
+    width: 140px;
+    height: 40px;
+    /* filter: drop-shadow(10px 20px 20px black); */
+}
+
+.navigation_bar a{
+    text-decoration: none;
+    color:gray;
+
+}
+
+.back_btn{
+    border: 1px solid gray;
+    border-radius: 10px;
+    padding: 5px 15px;
+    margin: 10px;   
+}
+
+.back_btn i{
+    color: gray;
+}
+
+.back_btn:hover:hover,.back_btn:hover:hover.back_btn i{
+    color: white;
+    border-color: white;
+}
+
+/* --------------- notify message ------------- */
+
+.error_msg{
+    position: fixed;
+    top:3.5rem;
+    right:0.6rem;
+
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    width: 20%;
+    border-radius: 20px;
+
+    border: 1px solid rgba(241, 6, 6, 0.81);
+    background-color: rgba(220, 17, 1, 0.16);
+    box-shadow: 0px 0px 2px #ff0303;
+    color: #ff0303;
+    z-index: 100;
+
+  }
+
+.success_msg{
+    position: fixed;
+    top:3.5rem;
+    right:0.6rem;
+
+    padding: 10px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    width: 20%;
+    border-radius: 20px;
+
+    border: 1px solid rgba(36, 241, 6, 0.46);
+    background-color: rgba(7, 149, 66, 0.12156862745098039);
+    box-shadow: 0px 0px 2px #259c08;
+    color: white;
+    /* color: white;; */
+    transition:0.5s;
+    z-index: 100;
+
+}
+
+/* ----------------------- */
+
+
+h1{
+    /* border: 2px solid blue; */
+    padding: 10px;
+    color: white;
+    text-align: center;
+}
+
+.big_box{
+    /* border: 2px solid blue; */
+    padding: 50px 10px;
+    /* height: 80vh; */
+    
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    flex-direction: column;
+    gap:50px;
+}
+
+/* ----------------------- */
+
+.send_and_verfy_otp{
+    border-top: 5px double rgba(161, 48, 159, 0.58);
+    border-bottom: 5px double rgba(225, 14, 221, 0.58);
+    /* border-radius: 20px; */
+    /* box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35); */
+    padding: 20px;
+    width: 350px;
+
+    display: flex;
+    justify-content:center;
+    /* align-items: center; */
+    flex-direction: column;
+    gap:10px
+}
+
+#send_email,#verify_otp{
+    /* border: 2px solid red;  */
+    padding: 10px;
+
+    display: flex;
+    justify-content:baseline;
+    /* align-items: center; */
+    flex-direction: row;
+    gap:10px;
+    flex-wrap: nowrap;
+
+}
+
+#send_email input{
+    border:0.5px solid black;
+    box-shadow: 1px 1px 10px rgba(123, 0, 255, 0.788);
+    /* border: none; */
+    border: 0.5px solid purple;
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    outline: none;
+    background-color: black;
+    color: white;
+
+}
+
+#verify_otp input{
+    border: none;
+    border-left: 2px solid purple;
+    border-right: 2px solid purple;
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    outline: none;
+    text-align: center;
+    background-color: black;
+    color: white;
+    
+}
+
+/* #verify_otp input:focus{
+    box-shadow: 0 0 5px rgba(102, 255, 0, 0.663);
+} */
+
+#send_email button{
+    /* border: 2px solid green; */
+    border: none;
+    color:#fff;
+    padding: 5px 10px;
+    width: fit-content;
+    cursor: pointer;
+    border-radius:10px;
+    font-weight: 600;
+
+    background:linear-gradient(to left,rgba(239, 40, 40, 0.858),rgba(82, 11, 133, 0.767));
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
+    background-size: 200% auto;
+    transition: 0.5s ease;
+
+}
+
+
+#send_email button:hover{
+    background-position: right center; 
+    
+}
+
+#verify_otp button{
+
+    border: none;
+    color:#fff;
+    padding: 5px 10px;
+    width: fit-content;
+    cursor: pointer;
+    border-radius:10px;
+    font-weight: 600;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    gap: 5px;
+
+
+    background:linear-gradient(to left,rgba(11, 242, 61, 0.858),rgba(19, 11, 133, 0.767));
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
+    background-size: 200% auto;
+    transition: 0.5s ease;
+   
+}
+
+
+
+#check_mark{
+    display: none;
+}
+
+
+/*  ------ change_forgot_password_box ------ */
+
+.modify_password{
+
+    /* box-shadow: 0 5px 15px rgba(231, 44, 206, 0.35); */
+    /* border: 1px solid green; */
+    border-radius: 20px;
+    padding: 20px;
+    width: 400px;
+
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    flex-direction: column;
+    gap:10px;
+
+    background-color: #0e1538;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+
+}
+
+
+h2{
+    margin-bottom: 10px;
+    color: white;
+    z-index: 1;
+}
+
+ .modify_password form{
+    display: block;
+    text-align: center;
+    z-index: 1;
+}
+
+
+.modify_password form input{
+    /* border:1px solid black; */
+    border: none;
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    outline: none;
+    box-shadow: 0 0 5px rgba(123, 0, 255, 0.663);
+    background-color: black;
+    color: white;
+}
+
+.modify_password form input:hover{
+    box-shadow: 0 0 5px rgba(0, 208, 255, 0.663);
+}
+
+
+.modify_password::before{
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 300%;
+    background: linear-gradient(#980df4,#e90505);
+    animation: rotate 5s linear infinite;
+    box-shadow: 0 20px 80px #980df4,0 2px 100px #e90505;
+    filter: blur(10px)
+}
+
+.modify_password::after{
+    content: "";
+    position: absolute;
+    background-color: #0e1538;
+    inset: 4px;
+    border-radius: 10px;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg) scale(1.2);
+    }
+    to{
+        transform:rotate(360deg) scale(1.2);
+    }
+}
+
+
+ 
+.modify_password form button{
+    border: 1px solid black;
+    padding: 5px 20px;
+    border-radius:10px;
+    cursor: pointer;
+    /* font-weight: 600; */
+
+    background:linear-gradient(to left,rgba(239, 40, 40, 0.858),rgba(64, 11, 133, 0.767));
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
+    background-size: 200% auto;
+    transition: 0.5s ease;
+    color: white;
+
+}
+
+.modify_password form button:hover{
+    box-shadow: 1px 1px 10px rgba(41, 132, 223, 0.689);
+    background-position: right center; 
+}
+
+

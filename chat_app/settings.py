@@ -166,6 +166,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = 'prabhav.gautum@gmail.com' 
 
+
 # Channel Redis part :--------------------------------
 
 CHANNEL_LAYERS = {
@@ -176,3 +177,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+

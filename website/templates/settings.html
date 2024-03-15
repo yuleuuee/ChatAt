@@ -5,71 +5,97 @@
 {% block head %}
 
 {% load static %}
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}"> 
 {% endblock %}
 
 {% block content %}
-<h1>Hello {{user.username|title}}, This is your Account Setting page </h1>
-<h2>Edit Your profile : @{{user.username}}</h2>
-<div class="big-container">
-    <div class="edit-profile">
-        <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data"> 
-            {% csrf_token %}
-            
-            <div>
-                <a href="{{ user_profile.profile_picture.url }}">
-                    <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
-                </a>
+<h1>Account Setting Page </h1>
+<!-- ------------------------------------------------------------------ -->
+<!-- <div class="profile_pic_containor">
+    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="profiel_img_div" onclick="defaultBtnActive()" id="profile_img_div">
+            <img id="default_img" src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+        </div>
+        <input type="file" id="default_btn" onchange="getImagePreview(event)" name="profile_picture"  accept="image/*,video/*" hidden>
+    </form>
+</div> -->
+
+<!-- <span class="change_btn">Change</span>
+<i class="fa-solid fa-xmark" id="profile_image_cross"></i> -->
+<!-- ------------------------------------------------------------------ -->
+<div class="edit_profile_div">
+    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data"> 
+        {% csrf_token %}
+
+        <div>
+            <h3>Profile Picture : </h3>
+            <div id="profile_img_div" onclick="defaultBtnActive()" >
+                <img id="default_img" src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
+                <span class="change_btn">Change</span>
             </div>
-            
-            <label for="file" >Upload Profile Picture : </label>
-            <input type="file" id="file" name="new_profile_pic" >
-            
-            
-            <br><br>
-
+            <input type="file" id="default_btn" onchange="getImagePreview(event)" name="profile_picture"  accept="image/*,video/*" hidden>
+        </div>
+        
+        <div>
+            <label for="first_name">First Name : </label>
+            <input type='text' id="first_name" name="first_name" autocomplete="off" value="{{user.first_name}}">
+        </div>
+        <div>
+            <label for="last_name">Last Name : </label>
+            <input type='text' id="last_name" name="last_name" autocomplete="off" value="{{user.last_name}}">
+        </div>
+        <div>
+            <label for="new_phone_no">Contact no : </label>
+            <input type='text' id="new_phone_no" name="phone_no" autocomplete="off" maxlength="15" value="{{user_profile.phone}}" >
+        </div>
+        <div>
+            <label for="email">Email : </label>
+            <input type="text" id="email" name="email" value="{{user.email}}">
+        </div>
+        <div>
             <label for="new_bio" >Bio : </label>
-            <textarea name="new_bio" id="" cols="45" rows="3">{{user_profile.bio}}</textarea>
+            <textarea name="new_bio" id="new_bio" cols="45" rows="3">{{user_profile.bio}}</textarea>
+        </div>
+        <button type='submit' class="save_btn">Save Change</button>
+    </form>
+</div>
 
-            <br><br>
+<!-- ------------------------------------------------------------------ -->
 
-            <label for="phone_no">Contact no : </label>
-            <input type='tel' name="new_phone_no" autocomplete="off" maxlength="15" value=" {{user_profile.phone}}">
-
-            <br><br>
-
-            <button type='submit'>Save Changes</button>
-        </form>
-    </div>
-
-    <ul>
-        <li onclick="confirm_box2()"><i class="fa-solid fa-key"></i> Change Password</li>
-        <li onclick="confirm_box()"><i class="fa-solid fa-user-xmark"></i> Delete Account</li>
-    </ul>
+<div class="hide_show_button">
+    <div id="change_pass_btn"><i class="fa-solid fa-key"></i> Change Password</div>
+    <div id="delete_acc_btn"><i class="fa-solid fa-user-xmark"></i> Delete Account</div>
+</div>
 
 
+<div class="change_pass_del_acc_box">
     <!-- password change box -->
     <div id="password_change_box">
-        <h3>Modify Your Password</h3>
+        <h3>Change Your Password</h3>
         <form action="{% url 'change_password' %}" method="POST">
             {% csrf_token %}
-            <input type='password' name="old_password" autocomplete="off" placeholder="old_password"><br><br>
-            <input type='password' name="new_password1" autocomplete="off" placeholder="new password"><br><br>
-            <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password"><br><br>
-            <button type='submit'>Submit</button>
+            <input type='password' name="old_password" autocomplete="off" placeholder="old_password">
+            <input type='password' name="new_password1" autocomplete="off" placeholder="new password">
+            <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password">
+            <button type='submit' class="confirm_btn">Submit</button>
         </form>
+        <i class="fa-solid fa-xmark" id="cross01"></i>
     </div>
 
     <!-- Account delete box -->
     <div id='acc_delete_box'>
-        <h3>Please enter your password to confirm the deletion of your account.</h3>
+        <h3>Are you sure for the deletion of your account ?</h3>
         <form action="{% url 'delete_account' %}" method="POST">
             {% csrf_token %}
-            <input type='password' name="confirm_pass" autocomplete="off">
-            <button type='submit'>Submit</button>
+            <input type='password' name="confirm_pass" autocomplete="off" placeholder="Confirm Your Password">
+            <button type='submit' class="confirm_btn">Confirm</button>
         </form>
+        <i class="fa-solid fa-xmark" id="cross02"></i>
     </div>
 </div>
+
+<div id="overlay"></div>
 
 <script src="{% static 'js/settings.js' %}"></script>
 {% endblock %}

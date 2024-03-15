@@ -1,12 +1,22 @@
 // *********************** notify_msg css ***************************/
 
-const notify_msg = document.getElementById('notify_msg');
+const error_msg = document.getElementById('error_msg');
 
 // Function to hide the message after 4s
-if (notify_msg) {
+if (error_msg) {
   setTimeout(() => {
-    notify_msg.style.display = 'none';
-  }, 5000); // 5000ms = 4s
+    error_msg.style.display = 'none';
+  }, 6000); // 6000ms = 6s
+}
+
+
+const success_msg = document.getElementById('success_msg');
+
+// Function to hide the message after 4s
+if (success_msg) {
+  setTimeout(() => {
+    success_msg.style.display = 'none';
+  }, 6000); // 6000ms = 6s
 }
 
 // *********************** Nice login page css **********************/

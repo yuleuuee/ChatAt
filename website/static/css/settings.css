@@ -1,5 +1,289 @@
-#password_change_box,#acc_delete_box{
-    border: 1px solid green;
-    height: auto;
+/*----------------------------- upload file part --------------------------- */
+
+/* .profile_pic_containor{
+    border: 2px solid blue;
+    padding: 10px;
+} */
+
+ /* .profiel_img_div{
+    border: 2px solid blue;
+    position: relative;
+    width: fit-content;
+} */
+
+
+/*
+.change_btn{
+    position: absolute;
+    color: white;
+    font-weight: 600;
+    top: 50px;
+    left: 50px;
+    transform: translate(-50%, -50%);
+}
+
+#custom_img_btn:hover{
+    filter: brightness(70%) grayscale(10%);
+    cursor: pointer;
+}
+
+#custom_img_btn:hover .change_btn{
+    display: block;
+} */
+
+
+/* ------------------------------ */
+
+h1{
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* ------------ edit_profile_div -------- */
+
+
+.edit_profile_div form{
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
 
 }
+
+.edit_profile_div div{
+    border-bottom: 0.5px solid black ;
+    border-top: 0.5px solid black ;
+    padding: 10px 20px;
+    /* border-radius: 10px; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    cursor: pointer;
+
+}
+
+.edit_profile_div div:hover{
+    box-shadow: 0 0 10px 0 rgba(12, 23, 12, 0.56)
+}
+
+.edit_profile_div label{
+    font-size: 1.2em;   
+    font-weight: 800;
+}
+
+.edit_profile_div input,.edit_profile_div textarea{
+    border: 1px solid black;
+    font-size: 1em;
+    padding: 5px 10px;
+    resize: none;
+    border-radius: 10px;
+    
+}
+
+.edit_profile_div textarea{
+    font-size: 0.9em;
+}
+
+
+/* ----- Profile picture ------ */
+
+.edit_profile_div{
+    border-radius: 20px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    padding: 25px 10px;
+    margin-bottom: 5px;
+}
+
+#profile_img_div{
+    border: 1px solid black;
+    background-color: white;
+    padding: 2px;
+    margin: 0;
+    position: relative;
+}
+
+.change_btn{
+    display: none;
+    position: absolute;
+    color:white;
+    font-weight: 600;
+    /* z-index: 20; */
+    transform: translate(25px,5px);
+    text-shadow: 1px 1px 10px black;
+}
+
+#profile_img_div:hover{
+    box-shadow: none;
+    filter: brightness(80%) grayscale(5%);
+}
+
+#profile_img_div:hover .change_btn{
+    display: block;
+}
+
+
+/* ------------ */
+
+.save_btn{
+    border: none;
+    padding: 8px 10px;
+    font-size: 0.8em;
+    font-weight: 800;
+    color:white;
+    letter-spacing: 0.5px;
+    width: fit-content;
+    border-radius: 10px;
+    cursor: pointer;
+    
+    background:linear-gradient(to left,rgba(239, 40, 40, 0.858),rgba(80, 11, 133, 0.767));
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
+    background-size: 200% auto;
+    transition: 0.5s ease;
+    
+} 
+
+
+.save_btn:hover{
+    background-position: right center; 
+}
+
+/* -------- change password and delete account  btn--------- */
+
+.hide_show_button{
+    display: flex;
+    /* padding: 0 10px; */
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#change_pass_btn:hover,#delete_acc_btn:hover{
+    color: brown;
+    text-shadow: 1px 1px 10px 2px black;
+    border-color: brown;
+}
+
+.hide_show_button div{
+    border: 2px solid black;
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+
+}
+
+
+.change_pass_del_acc_box{
+    /* border: 2px solid red; */
+    display: flex;
+    justify-content: center;
+
+    /* position: absolute;
+    top:400px;
+    right:600px; */
+}
+
+#password_change_box,#acc_delete_box{
+    /* border: 2px solid green; */
+    box-shadow: 2px 2px 20px 2px rgba(105, 16, 222, 0.355);
+    padding: 15px;
+    border-radius: 20px;
+    width: 300px;
+    height: auto;
+
+    /* display: flex; */
+    justify-content: center;
+    flex-direction: column;
+    /* gap: 10px; */
+    position: relative;
+    background-color: white;
+
+}
+
+#password_change_box h3,#acc_delete_box h3{
+    text-align: center;
+    margin: 20px 0;
+}
+
+#acc_delete_box h3{
+    color: brown;
+    /* text-shadow: 0 0 2px rgba(0, 0, 0, 0.172); */
+}
+
+#password_change_box form,#acc_delete_box form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap:15px
+}
+
+#password_change_box form input,#acc_delete_box form input{
+    text-align: left;
+    font-size: 1em;
+    padding:5px 10px;
+    /* margin: 10px; */
+    box-shadow: 2px 2px 20px 2px rgba(16, 171, 222, 0.353);
+    border-radius: 10px;
+    border: transparent;
+    background-color: transparent;
+    color: black;
+    outline: none;
+}
+
+#password_change_box form input:hover,#password_change_box form input:focus,#acc_delete_box form input:hover,#acc_delete_box form input:focus{
+    box-shadow: 1px 1px 20px 1px rgba(16, 222, 105, 0.592);
+}
+
+#password_change_box button,#acc_delete_box button{
+    /* border: 1px solid black; */
+    border: none;
+    padding: 4px 15px;
+    width: fit-content;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: 400;
+    text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.564);
+    background:linear-gradient(to right,rgba(207, 104, 236, 0.614),rgba(145, 81, 242, 0.472))
+
+}
+
+
+
+
+/*----- cross mark of the the box hidden_boxes -----*/
+
+#password_change_box i,#acc_delete_box i{
+    position: absolute;
+    cursor: pointer;
+    top:15px; 
+    left:15px;
+    transition: 0.5s ease-in-out;
+}
+
+#password_change_box i:hover,#acc_delete_box i:hover{
+    color: red;
+    transform: rotate(360deg);
+    scale: calc(1.5);
+
+}
+
+/* --------- the overlay div for the entire page -------- */
+#overlay {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black color */
+    z-index: 100; /* Ensure it appears above other content */
+}
+
+

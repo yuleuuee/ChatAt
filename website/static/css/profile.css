@@ -112,26 +112,31 @@
 
 /* follow unfollow btn */
 
+/* ---------------------- */
+
 #follow_unfollow_btn button{
-    /* border: 2px solid black; */
-    background:linear-gradient(to right,rgba(239, 40, 40, 0.858),rgba(80, 11, 133, 0.767));
     border: none;
-    text-transform: uppercase;
     padding: 8px 10px;
+    width: fit-content;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    cursor: pointer;
+    color: white;
     font-size: 0.6em;
     font-weight: 800;
-    color:white;
     letter-spacing: 0.5px;
     width: 100px;
+    text-shadow: 0px 0px 20px rgba(0,0,0,0.2);
     border-radius: 10px;
-    cursor: pointer;
-    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.546);
-    transition: 0.5s ease-in;
-} 
-
+  }
 
 #follow_unfollow_btn button:hover{
-    background:linear-gradient(to left,rgba(239, 40, 40, 0.858),rgba(80, 11, 133, 0.767));
+    background-position: right center; 
+}
+
+#follow_unfollow_btn button{
+    background-image: linear-gradient(to right, #930dc4ee 0%, #5195f4da 51%, #f60eaded 100%);
 }
 
 

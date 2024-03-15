@@ -10,18 +10,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
 </head>
-<body>     
+<body>  
     <!-------------------- : Notification message section : ------------------->
     {% if messages %}
-        <div id="notify_msg">
-            {% for message in messages %}
-                {% if message.tags == 'error' %}
-                    <span style="color:red;"> {{ message }}</span>
-                {% else %}
-                    <span style="color:green;">{{ message }}</span>
-                {% endif %}
-            {% endfor %}
-        </div>
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div class="notifymessage error_msg" id="error_msg"> 
+                    <span><i class="fa fa-times danger "></i> {{ message }}</span>
+                </div> 
+            {% else %}
+                <div class="notifymessage success_msg" id="success_msg"> 
+                    <span><i class="fa fa-times danger "></i> {{ message }}</span>
+                </div>    
+            {% endif %}
+        {% endfor %}
     {% endif %}
 
     <section class="login_signup_section">
@@ -57,7 +59,7 @@
 
                         <div class="email_box">
                             <span id="stamp_div"><i class="fa-solid fa-envelope"></i></i></span>
-                            <input id ="email_inp" type="text" name='username' placeholder=" "  autocomplete="off">
+                        <input id ="email_inp" type="text" name='username_or_email' placeholder=" "  autocomplete="off" value="{{entered_username_or_email}}">
                             <span class="em_label">Email or username</span>
                             <!-- <span class="invis"></span> -->
                         </div>
@@ -131,8 +133,6 @@
             </div>
         </div>
     </div>
-    
-    <a href="#" id="stop_scroll"></a>
     <script src="{% static 'js/home.js' %}"></script>
 </body>
 </html>

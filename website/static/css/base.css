@@ -67,7 +67,7 @@ aside{
 }
 
 main{
-    border: 2px solid black;
+    border-left: 1px dashed black;
     margin-left: 16.5rem;
     padding: 1rem;
 
@@ -76,6 +76,7 @@ main{
     /* align-items: baseline; */
     flex-direction: column;
     gap:5px;
+
 }
 
 
@@ -185,14 +186,14 @@ nav{
 
 /**************** Bulb *****************/
 
-#light_bulb {
+#dark_light {
     height: 30px;
     width: 30px;
     padding: 2px;
     border: 2px solid black;
     border-radius: 20px;
     cursor: pointer;
-    background-color: whitesmoke;
+    background-color: white;
     position: fixed;
     bottom: 15px;
     left: 200px;
@@ -205,12 +206,11 @@ nav{
     z-index: 20;
   }
   
-  #light_bulb > i {
+  #dark_light > i {
     font-size: 1.5em;
-    color: rgb(249, 164, 54);
-    text-shadow: 2px 2px 3px black,-1px -1px 3px black;
-   
+    color: black;
   }
+
 
 /**************** notify_msg *****************/
 
@@ -235,8 +235,8 @@ nav{
 
 .success_msg{
     position: fixed;
-    top:4rem;
-    right:1rem;
+    top:1.5rem;
+    right:0.6rem;
 
     padding: 10px;
     font-size: 16px;
@@ -247,7 +247,8 @@ nav{
     border: 1px solid rgba(36, 241, 6, 0.46);
     background-color: rgba(7, 149, 66, 0.12156862745098039);
     box-shadow: 0px 0px 2px #259c08;
-    color: #0ad406;
+    color: #044303;
+    /* color: white;; */
     transition:0.5s;
 
 }

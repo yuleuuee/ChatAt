@@ -1,61 +1,96 @@
-{% extends "base.html" %}
 
-{% block title %}Forgot Password{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/forgot_pas.css' %}"> 
 
-{% block content %}
-<h1>Forgot Password</h1>
-<div>
-    <!-- send otp to email -->
-    <form action="{% url 'forgot_pas' %}"  method="POST">
-        {% csrf_token %}
-        <!--  -->
-        {% if email %} <!-- at first no email is avialiable  -->
-            <input type="text" placeholder="Enter your Email" value="{{email}}" name="email">
-        {% else %}
-            <input type="text" placeholder="Enter your Email" name="email">  <!-- at 1st this input works , in which we have to emter email for sending otp -->
-        {% endif %}
-        <button>SEND OTP</button>
-    </form>
+    <link rel="shortcut icon" type="image/png" href="{% static 'image/chat_app.png' %}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="navigation_bar">
+        <div id="ChatAt_logo" >
+            <img src="{% static '/image/chatat.png' %}" >
+        </div>
+        <a href="{% url 'home' %}"><div class="back_btn"><i class="fa-solid fa-arrow-left"></i> Back</li></div></a>
+    </div>   
+<!-------------------- : Notification message section : ------------------->
+{% if messages %}
+{% for message in messages %}
+    {% if message.tags == 'error' %}
+        <div class="notifymessage error_msg" id="error_msg"> 
+            <span><i class="fa fa-times danger "></i> {{ message }}</span>
+        </div> 
+    {% else %}
+        <div class="notifymessage success_msg" id="success_msg"> 
+            <span><i class="fa fa-times danger "></i> {{ message }}</span>
+        </div>    
+    {% endif %}
+{% endfor %}
+{% endif %}
 
-    <br><br>
+<h1>Forgot Password Page</h1>
 
-    <!-- verify otp -->
+<div class="big_box">
+    <div class="send_and_verfy_otp">
+        <!-- send otp to email -->
+        <form action="{% url 'forgot_pas' %}"  method="POST" id="send_email">
+            {% csrf_token %}
+            <!--  -->
+            {% if email %} <!-- at first no email is avialiable  -->
+                <input type="text" placeholder="Enter your Email" value="{{email}}" name="email" autocomplete="off">
 
-    <form action="{% url 'verify_otp' %}"  method="POST">
-        {% csrf_token %}
+            {% else %}
+                <input list="email_list" type="text" placeholder="Enter your Email" name="email" autocomplete="off">  <!-- at 1st this input works , in which we have to emter email for sending otp -->
+                <datalist id="email_list">
+                    <option value="yuleuuee@gmail.com"></option>
+                    <option value="rain@gmail.com"></option>
+                </datalist>
+            {% endif %}
+            <button>SEND OTP </button>
+        </form>
+   
+        <!-- verify otp -->
+        <form action="{% url 'verify_otp' %}"  method="POST" id="verify_otp">
+            {% csrf_token %}
 
-        <!--  -->
-        {% if email %}
-            <input type="hidden" name="email" value="{{email}}" >
-        {% else %}
-            <input type="hidden" name="email" >
-        {% endif %}
-
-        <input type="text" placeholder="Enter OTP code" name="otp" maxlength="6">
-        
-        <!-- showmomg the verify buttton only when the otp got send  -->  
-        {% if email  %}
-            <button>Verify</button>   
-        {% endif %}
-    </form>
-
-    <br><br>
+            <!--  -->
+            {% if email %}
+                <input type="hidden" name="email" value="{{email}}" >
+            {% else %}
+                <input type="hidden" name="email" >
+            {% endif %}
+                <!-- this replaces any characters that are not numbers with an empty string -->
+            <input type="text" placeholder="Enter your OTP code" name="otp" maxlength="6" oninput="CheckmarkVisibility(this);">
+            
+                <!-- showmomg the verify buttton only when the otp got send  --> 
+            {% if email  %} 
+            <button id="verify_otp_btn" >Verify <i class="fas fa-check" id="check_mark"></i></button>
+            {% endif %}
+            
+        </form>
+    </div>
 
     <!-- change_forgot_password_box -->
     {% if can_change_password %}
-        <div>
-            <h3>Modify Your Password</h3>
+        <div class="modify_password">
+            <h2>Modify Your Password</h2>
             <form action="{% url 'change_forgot_password' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="email" value="{{email_for_identity}}"> <!-- this email is just for identification in the 'change_forgot_password' function-->
-                <input type='password' name="new_password1" autocomplete="off" placeholder="new password"><br><br>
-                <input type='password' name="new_password2" autocomplete="off" placeholder="confirm password"><br><br>
+                <input type='password' name="new_password1" autocomplete="off" placeholder="Enter new password"><br><br>
+                <input type='password' name="new_password2" autocomplete="off" placeholder="Confirm password"><br><br>
                 <button type='submit'>Submit</button>
             </form>
         </div>
     {% endif %}
-
 </div>
 
+<script src="{% static 'js/forgot_pass.js' %}"></script>
+</body>
+</html>
 
-{% endblock %}
