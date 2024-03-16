@@ -6,6 +6,7 @@ from .models import FollowersCount
 from .models import Comment
 from .models import OTPModel
 from .models import ChatMessage
+from .models import Group
 
 # Register your models here.
 
@@ -20,3 +21,4 @@ admin.site.register(FollowersCount)
 admin.site.register(Comment)
 admin.site.register(OTPModel)
 admin.site.register(ChatMessage)
+admin.site.register(Group)

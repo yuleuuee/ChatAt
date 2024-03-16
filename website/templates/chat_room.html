@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Chat Page{% endblock %}
-
+<!-- <a href="{% url 'chat_room' %}"><li><i class="fa-solid fa-comments"></i> Chat</li></a> -->
 {% block head %}
 
     {% load static %}
@@ -11,49 +11,43 @@
 {% endblock %}
 
 {% block content %}
+<img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px ; border-radius: 50%; ">
 
-<h1>Welcome "{{user.username}}" to chat_page </h1>
+<h1>{{current_user|title}} and {{friend_user|title}} chat page </h1>     
+<div class="chat-box">
+    <div id="message-list-box">
 
-
-<h2>    <p>Mutual Followers : ( You both follow each other )</p></h2>
-
-<div class="first-container" >
-    <div  class="second-container">
-        <div class="friends">
-            {% for mutual_flr in mutual_following_profiles %}
-            <div>
-                <a href="{% url 'chat' current_user=user.username friend_user=mutual_flr.user %}">
-                    <span>
-                        <img src="{{ mutual_flr.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
-                    </span>
-                    @{{mutual_flr.user.username}}
-                </a>    
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="chat-box">
-            <div id="message-list-box">
-                
-            </div>
-            <div>
-                <form id="chat-form" 
-                    {% csrf_token %}
-                    <input type="text" id="chat-message-input" name="message" autofocus size="60">
-                    <input type="button" id="submit" value="submit">
-                </form>
-            </div>
+        {% for chat_message in chat_messages %}
+        <div class="{% if chat_message.sender == user_profile.user %}sent{% else %}received{% endif %}">
+            <!-- if the current user is the sender then -->
+            {% if chat_message.sender == user_profile.user %} 
+                <span> <p>{{ chat_message.message }}</p> <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%;  text-align: right;"></span>
+            {% else %}
+                <!-- <span><strong>{{chat_message.sender.username|title}}</strong> : {{ chat_message.message }}</span> -->
+                <span><img src="{{ friend_user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%; ">  <p>{{ chat_message.message }}</p></span>
+                <!-- <span><img src="{{ chat_message.sender.userprofile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%; ">  <p>{{ chat_message.message }}</p></span> -->
+            {% endif %}
             
+            <!-- <span>{{ message.timestamp }}</span> -->
         </div>
+    {% endfor %}
+        
+    </div>
+    <br>
+    <div>
+        <form id="chat-form" 
+            {% csrf_token %}
+            <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%; ">
+            <input type="text" id="chat-message-input" name="message" size="20" autofocus autocomplete="off">
+            <input type="button" id="submit" value="Send">
+        </form>
     </div>
 </div>
 
-<div>
-
-</div>
-<!-- <script src="{% static 'js/chat_room.js' %}"></script> -->
-
 {{group_name|json_script:"group_name"}}
+<input type="hidden" name="" id="current_user" value="{{current_user}}">
+
+
 <script>
     // getting the string , changing to object, passing it to a variabel
     const groupName = JSON.parse(document.getElementById('group_name').textContent)
@@ -69,34 +63,65 @@
             + '/'
         )
     
+        //  whan connection happens this function get called 
         ws.onopen = function(){
             console.log('Websocket connection open ...')
-            // ws.send('Hi, from client ... ')
         }
 
+        // this gets called when client receives message form server
         ws.onmessage = function(event){
             console.log('Message received form server ...',event.data)
-            console.log('Message data type : ...',typeof(event.data))
-            const data = JSON.parse(event.data) // converting string to object
-            console.log('Parsed  message ... : ',data)
-            console.log('parsed data type : ...',typeof(data))
-            const finalMsg = data.message;
 
-            // Appending the finalMsg from the server
+            const data = JSON.parse(event.data);
+            const finalMsg = data.message;
+            const sender = data.sender_username;
+            // const finalMsg = data.msg;
+            // const sender = data.user;
+            // console.log(finalMsg);
+            // console.log(sender);
+
+
+
+            // Appending the finalMsg from the server to the HTML
             const messageListBox = document.getElementById('message-list-box');
-            messageListBox.textContent += finalMsg + '\n';
+            // strong>${sender}</strong> : ${finalMsg}
+            const current_user = document.getElementById('current_user').value
+            console.log(current_user);
+
+            if (current_user == sender){
+                messageListBox.innerHTML += `
+                    <div class="sent">
+                        <span><p>${finalMsg}</p> <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%;  text-align: right;"></span>
+                    </div>
+                `;
+            }else{
+                messageListBox.innerHTML += `
+                    <div class="received">
+                        <span><img src="{{ friend_user_profile.profile_picture.url }}" alt="" style="width: 20px; height: 20px ; border-radius: 50%; ">  <p>${finalMsg}</p></span>
+                    </div>
+                `;
+            }
+           
 
         }
 
+        
+        // this get callled when the connection get lost
         ws.onclosed = function(){
             console.log('Websocket connection closed ...')
         }
 
         document.getElementById('submit').addEventListener('click',(event)=>{
             const inputBox =document.getElementById('chat-message-input')
-            const message =inputBox.value // every value is a object in js
-            ws.send(JSON.stringify({'msg':message})) // sending object in string form
-            inputBox.value='' // making the input field empthy after the message send 
+            const message = inputBox.value.trim(); // trim() removes leading and trailing white spaces
+            if (message !== '') { // Check if the message is not empty
+                ws.send(JSON.stringify({'msg': message}));
+                inputBox.value = ''; // making the input field empty after the message is sent
+            } else {
+                // Optionally, you can provide feedback to the user that the message is empty
+                alert('Please enter a message.');
+            }
+
 
         })
 </script>

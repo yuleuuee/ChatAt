@@ -19,11 +19,13 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter,URLRouter
 import website.routing
+
+# this will solve the problem of the self.scope['user]
 from channels.auth import AuthMiddlewareStack
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'yule01.settings')
 
 application = ProtocolTypeRouter({
     'htttp':get_asgi_application(),
-    'websocket': URLRouter(website.routing.websocket_urlpatterns),
+    'websocket': AuthMiddlewareStack(URLRouter(website.routing.websocket_urlpatterns)),
 })

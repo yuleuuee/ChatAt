@@ -35,9 +35,8 @@ urlpatterns = [
     path('delete_comment/<int:comment_id>/',views.delete_comment,name ='delete_comment'),
 
 
-    # path('chat_room/',views.chat_room, name='chat_room'),
-
     # path('chat/<str:current_user>_<str:friend_user>/', views.private_chat, name='chat'),
+    path('chat/<str:current_user_id>_<str:friend_user_id>/', views.private_chat, name='chat'),
 
 ]
 

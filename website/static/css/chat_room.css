@@ -1,55 +1,83 @@
-.first-container{
-    display:flex;
-    justify-content: center; 
-    align-items: center;
+#message-list-box{
+    border: 1px solid black;
+    padding: 20px;
+    width: 60%;
+    height: 500px;
+    overflow: scroll;
+
 }
 
-.second-container{
-    border: 2px solid red;
-    padding:10px;
-    /* width: 60%; */
+.received{
+    /* background-color: greenyellow; */
+    padding: 5px;
+    margin: 5px;
 
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex;
+    justify-content: first baseline;
+    align-self: center;
     flex-direction: row;
 
-    gap: 10px;
-
 }
 
-
-.friends{
-    border: 2px solid blue;
-    padding: 10px;
-    height: 500px;
-
-    flex:1.5
-}
-.chat-box{
-    border: 2px solid blue;
-    padding: 10px;
-    height: 500px;
-    flex:3
+.received span{
+    background-color: lightblue;
+    padding: 5px 10px;
+    border-radius: 10px;
 }
 
-.chat-box div{
-    border: 2px solid black;
-    margin: 10px;
-}
-
-#message-list-box{
-    height: 85%;
-}
-
-#chat-message-input{
-    padding: 2px;
-    font-size: 1em;
-}
-.friends div{
-    border: 2px solid green;
+.sent{
+    /* background-color: lightblue; */
     padding: 5px;
-    margin: 10px;
+    margin: 5px;
+
+    display: flex;
+    justify-content: end;
+    align-self: center;
+    flex-direction: row;
+}
+
+.sent span{
+    background-color: greenyellow;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+
+.received span,.sent span{
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    flex-direction: row;
+    gap:10px;
+}
+
+/*------  to make the chat list of aside always avilable for the CHAT_ROOM ------*/
+#users_to_chat{
+    display: flex;
+    border: 0.5px solid rgb(38, 6, 46);
+    /* border-bottom: 1px dashed rgb(38, 6, 46); */
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin: 15px 0px;
 
     
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 10px;
+
+    /* for scroll bar part */
+    max-height: 140px;
+    overflow-y:  scroll; 
+}
+
+#users_to_chat a{
+    border-radius: 20px 0 0 20px;
+    background: linear-gradient(to right,#91e26978,transparent);
+    display: flex;
+    justify-content: first baseline;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    padding: 5px;
+
 }

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
-from .models import UserProfile,Post,Like,FollowersCount,Comment
+from .models import UserProfile,Post,Like,FollowersCount,Comment,ChatMessage,Group
 
 from datetime import datetime
 
@@ -221,6 +221,26 @@ def public_page(request):
     # Shuffle the suggested users and limiting the number of users shown
     suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 3))
 
+    # mutual followers :---------------------------------------------------------
+
+    # user_object = User.objects.get(username =user.username)
+    # user_profile = UserProfile.objects.get(user=user_object)
+    # user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
+
+
+     # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+
+    # Query UserProfile to get profile pictures of following and followers
+    # following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
+    # followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
+
+    # Find mutual followers
+    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
+
 
 
     # ****************************  Only my followers suggestions *********************************
@@ -261,6 +281,7 @@ def public_page(request):
         'comments':comments,
         'likes':likes,
         'followers_without_following_back_profiles':followers_without_following_back_profiles,
+        'mutual_following_profiles':mutual_following_profiles,
     }
     
 
@@ -299,6 +320,15 @@ def settings(request):
 
     # this is the UserProfile Object, we can now assign value to the object's entities , # object's entities includes : profile_picture,bio,phone
     user_profile = UserProfile.objects.get(user=request.user)
+
+    # mutual followers for chat div -----------
+    # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+    # Find mutual followers
+    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
     if request.method == 'POST':
 
@@ -339,7 +369,7 @@ def settings(request):
         messages.success(request, "Save Change Success!")
         return redirect('settings')
     else:
-        return render(request,'settings.html',{'user_profile':user_profile})
+        return render(request,'settings.html',{'user_profile':user_profile,'mutual_following_profiles':mutual_following_profiles})
 
     
 # ------------------------------------------------------------------------------------------------------
@@ -373,6 +403,16 @@ def profile(request,pk):
     no_of_followers = len(FollowersCount.objects.filter(user=pk)) # here the 'user : view' is the person that has been followed
     no_of_following = len(FollowersCount.objects.filter(follower=pk)) # here the 'follower : viewer' is the person that has been followed
 
+    # ------------ getting the mutual followeres :---------
+
+    # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+    # Find mutual followers
+    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
+
     context={
         'user_object':user_object,
         'user_profile':user_profile,
@@ -383,6 +423,7 @@ def profile(request,pk):
         'no_of_following':no_of_following,
         'following_profiles':following_profiles,
         'followers_profiles':followers_profiles,
+        'mutual_following_profiles':mutual_following_profiles,
 
     }
 
@@ -489,8 +530,8 @@ def delete_post(request,post_id):
         # post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
         # post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
 
-        # post_to_delete = Post.objects.get(id=post_id, user=user)
-        # post_to_delete.delete()
+        post_to_delete = Post.objects.get(id=post_id, user=user)
+        post_to_delete.delete()
         messages.success(request, 'Your Post Was deleted successfully.')
         user = request.user.username
         return redirect('/profile/'+user)
@@ -642,52 +683,79 @@ def change_forgot_password(request):
     
 
 
-# from django.http import HttpResponseBadRequest
-# from .models import ChatMessage
 
-# # @login_required(login_url='login')
-# def chat_room(request):
-
-#     user = request.user # this is the current user
-
-
-#     user_object = User.objects.get(username =user.username)
-#     user_profile = UserProfile.objects.get(user=user_object)
-#     user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
-
-
-#      # Retrieve following and followers data for the current user
-#     following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
-#     followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
-
-
-#     # Query UserProfile to get profile pictures of following and followers
-#     following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
-#     followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
-
-#     # Find mutual followers
-#     mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
-#     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
-
-#     context={
-#         'user':user,
-#         'user_object':user_object,
-#         'user_profile':user_profile,
-#         'user_posts':user_posts,
-#         'following_profiles':following_profiles,
-#         'followers_profiles':followers_profiles,
-#         'mutual_following_profiles': mutual_following_profiles,
-#     }
-
-   
-#     return render(request,'chat_room.html',context)
-
-# # @login_required(login_url='login')
+@login_required(login_url='login')
+def private_chat(request,current_user_id, friend_user_id):
 # def private_chat(request,current_user, friend_user):
 
-#     group_name = f"{current_user}_{friend_user}"
+    # getting the currrent user  profile form the currently logged in user
+    user_profile = UserProfile.objects.get(user=request.user)
 
-#     return render(request,'chat_room.html',{'group_name':group_name})
+
+    # also the current user profile , but we got this form the id that came form front end
+    current_user = User.objects.get(id=current_user_id)
+
+    # mutual followers for chat div -----------
+    # Retrieve following and followers data for the current user
+    following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+    # Find mutual followers
+    mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
+    mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
+
+
+
+    # Handellig the situation when users tries to use a random user form the URL
+    try:
+        friend_user = User.objects.get(id=friend_user_id)
+        # If the friend user is not a mutual friend, show an error message and redirect
+        if friend_user.username not in mutual_following_usernames:
+            messages.error(request, "To chat You both need follow each other.")
+            return redirect('public')  # Redirect to an appropriate view
+    except User.DoesNotExist:
+        messages.error(request, "You cant have a chat with unknown users")
+        return redirect('public')
+    
+    # Retrieve the user profile of the friend user
+    friend_user_profile = UserProfile.objects.get(user=friend_user)
+
+
+
+    if current_user != request.user:
+        messages.error(request, "You are not allowed to go to others private chat!")
+        return redirect('public')
+    else:
+        # Sorting user IDs to ensure consistency in group name
+        sorted_ids = sorted([current_user_id, friend_user_id])
+        sorted_id1= sorted_ids[0]
+        sorted_id2=sorted_ids[1]
+
+        group_name = f"ChatGroup_of_user{sorted_id1}_user{sorted_id2}" 
+
+        # if group name alreasy exist then 
+        group = Group.objects.filter(group_name=group_name).first()
+        if group is not None:
+            pass
+        else:
+            new_group =Group(group_name=group_name)
+            new_group.save()
+
+    # Retrieve messages for the current conversation
+    # all_messages = ChatMessage.objects.filter(group=group_name).order_by('timestamp')
+    chat_messages = ChatMessage.objects.filter(group=group)
+
+    context={
+        'group_name':group_name,
+        'current_user':current_user,
+        'friend_user':friend_user,
+        'mutual_following_profiles':mutual_following_profiles,
+        'user_profile':user_profile,
+        'friend_user_profile':friend_user_profile,
+        'chat_messages':chat_messages,
+    }
+
+    return render(request,'chat_room.html',context)
 
 
     

@@ -50,12 +50,19 @@ dark_light.addEventListener("click", ()=>{
 });
 
 
+// active status of the nav list------:
 
+// ------------- Chat users ----------- :
 
-// search clear 
+const chat_btn = document.querySelector('#chat_btn')
+const users_to_chat_div = document.querySelector('#users_to_chat')
+// users_to_chat_div.style.display='none';
+chat_btn.addEventListener('click',()=>{
+  if(users_to_chat_div.style.display ==='none'){
+    users_to_chat_div.style.display='flex';
+  }else{
+    users_to_chat_div.style.display='none';
+  }
+  
+})
 
-// const clearBtn = document.getElementById("clear-btn");
-// clearBtn.addEventListener("click", () => {
-//   const searchInput = document.getElementById('searchInput');
-//   searchInput.value = "";
-// })
