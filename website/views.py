@@ -45,6 +45,9 @@ def user_login(request):
 
         if user: # if there is user with  provided password matches the stored password
             login(request, user)
+            # Update user's profile to set is_active to True
+            user.userprofile.is_active = True
+            user.userprofile.save()
             messages.success(request, "Successfully logged in!")
             return redirect('public') #,{'user_profile':user_profile}
         else:
@@ -92,6 +95,11 @@ def user_signup(request):
 # ----------------------------------- LOGOUT -------------------------------------------------------------------
 @login_required(login_url='login')
 def user_logout(request):
+
+    # Update user's profile to set is_active to False
+    request.user.userprofile.is_active = False
+    request.user.userprofile.save()
+
     logout(request)
     messages.success(request,'Succesfully logged out!')
     return redirect('login')
@@ -707,12 +715,24 @@ def private_chat(request,current_user_id, friend_user_id):
 
 
     # Handellig the situation when users tries to use a random user form the URL
+    
+    
+
+    # print(type(friend_user_id))
+    # print(type(request.user.id))
+
+    # converting the str type to int for comparing  
+    friend_user_id_int= int(friend_user_id)
     try:
         friend_user = User.objects.get(id=friend_user_id)
         # If the friend user is not a mutual friend, show an error message and redirect
-        if friend_user.username not in mutual_following_usernames:
-            messages.error(request, "To chat You both need follow each other.")
-            return redirect('public')  # Redirect to an appropriate view
+        if (friend_user_id_int == request.user.id):
+            print('came here')
+            pass
+        else:
+            if (friend_user.username not in mutual_following_usernames):
+                messages.error(request, "To chat You both need follow each other.")
+                return redirect('public')  # Redirect to an appropriate view
     except User.DoesNotExist:
         messages.error(request, "You cant have a chat with unknown users")
         return redirect('public')

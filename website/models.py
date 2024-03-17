@@ -11,6 +11,9 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True,max_length=100)
     profile_picture = models.ImageField(upload_to='profile_pics/', default='dummy.png') # must install : pip3 install Pillow
 
+    # New field to track active status
+    is_active = models.BooleanField(default=False)
+
     # helps to see the username in the admin pannel insted of object 1 or object2
     def __str__(self):
         return self.user.username 

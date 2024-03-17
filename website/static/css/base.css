@@ -118,6 +118,14 @@ nav{
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.534);
 }
 
+#active_status{
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: rgb(140, 241, 25);
+}
+
+
 /*----------- nav list li before and after -------- */
 
 

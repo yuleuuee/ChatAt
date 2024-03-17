@@ -1,47 +1,109 @@
+.chat-box{
+    border: 1px solid blue;
+    padding: 10px;
+    max-width: 100%;
+
+    display: flex;
+    justify-content: center;
+    /* align-self: center; */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
+
+}
+
+#user_list_box{
+    border: 2px solid green;
+    padding: 10px;
+    width: 250px;
+    height: 60vh;
+    /* overflow: scroll; */
+    overflow-y: auto;
+}
+
+/* ------ right box of the chat page----- */
+#right_box{
+    border: 2px solid green;
+    padding: 5px;
+    width: 50%;
+    height: 60vh;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 5px;
+}
+
+.friend_user_top_box{
+    border: 2px solid black;
+    padding: 5px 10px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.friend_user_top_box div,.friend_user_top_box span{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
+}
+
 #message-list-box{
-    border: 1px solid black;
-    padding: 20px;
-    width: 60%;
-    height: 500px;
+    border: 2px solid black;
+    padding: 5px;
+    height: 100%;
     overflow: scroll;
 
 }
 
-.received{
-    /* background-color: greenyellow; */
+#message_input_box{
+    border: 2px solid black;
     padding: 5px;
-    margin: 5px;
-
-    display: flex;
-    justify-content: first baseline;
-    align-self: center;
-    flex-direction: row;
-
+    height: 8%;
 }
 
-.received span{
-    background-color: lightblue;
-    padding: 5px 10px;
+/* ------send and received messsage div ----- */
+.sent, .received {
+    /* border: 1px solid brown; */
+
+    padding: 5px;
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.sent {
+    justify-content: flex-end;
+}
+
+.received {
+    justify-content: flex-start;
+}
+
+/* ------ each message ----- */
+
+.sent p,.received p{
+    padding: 5px 15px;
     border-radius: 10px;
+    max-width: 50%;
+    word-wrap: break-word;
+    font-size: 1.1rem;
 }
 
-.sent{
-    /* background-color: lightblue; */
-    padding: 5px;
-    margin: 5px;
-
-    display: flex;
-    justify-content: end;
-    align-self: center;
-    flex-direction: row;
-}
-
-.sent span{
+.sent p{
     background-color: greenyellow;
-    padding: 5px 10px;
-    border-radius: 10px;
 }
 
+.received p{
+    background-color: lightblue;
+}
 
 .received span,.sent span{
     display: flex;
@@ -51,10 +113,40 @@
     gap:10px;
 }
 
+/*----- img of each send and received message -----*/
+
+.sent img,.received img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    
+}
+
+.sent img{
+    margin-left: 10px;
+}
+
+.received img{
+    margin-right: 10px;
+}
+
+/* ---- message_input_box-------- */
+
+#message_input_box input{
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    caret-color: rgb(149, 8, 225);
+    width: 50%;
+
+}
+
+
+
 /*------  to make the chat list of aside always avilable for the CHAT_ROOM ------*/
+
+
 #users_to_chat{
     display: flex;
-    border: 0.5px solid rgb(38, 6, 46);
     /* border-bottom: 1px dashed rgb(38, 6, 46); */
     border-radius: 10px;
     padding: 10px 15px;
