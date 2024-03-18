@@ -5,21 +5,21 @@ function scrollToBottom() {
     messageList.scrollTop = messageList.scrollHeight;
 }
 
-// Scroll to the bottom when the page is loaded
+// Scroll to the bottom when the page refresh
 window.onload = scrollToBottom;
 
 // auto-focousing the input of chat --------------
 
-window.addEventListener('DOMContentLoaded', (event) => {
-    const inputBox = document.getElementById('chat-message-input');
-    // Function to focus the input box
-    const focusInput = () => {
-        inputBox.focus();
-    };
+// window.addEventListener('DOMContentLoaded', (event) => {
+//     const inputBox = document.getElementById('chat-message-input');
+//     // Function to focus the input box
+//     const focusInput = () => {
+//         inputBox.focus();
+//     };
 
-    // Event listeners to focus the input box
-    window.addEventListener('click', focusInput);
-});
+//     // Event listeners to focus the input box
+//     window.addEventListener('click', focusInput);
+// });
 
 
 // send message on enter key press: -------------
@@ -35,18 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Trigger a click event on the send button
             sendButton.click();
 
-            
             // Prevent default form submission behavior
             event.preventDefault();
 
         }
     };
 
-    // Attach keypress event listener to input field
+    // Attaching keypress event listener to input field
     inputBox.addEventListener('keypress', handleKeyPress);
-
-    // // Prevent form submission
-    // form.addEventListener('submit', (event) => {
-    //     event.preventDefault();
-    // });
 });

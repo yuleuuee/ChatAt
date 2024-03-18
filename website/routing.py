@@ -6,4 +6,6 @@ from . import consumers
 websocket_urlpatterns =[
     path('ws/wsc/<str:groupko_name>/',consumers.MyWebsocketConsumer.as_asgi()),
     path('ws/awsc/<str:groupko_name>/',consumers.MyAsyncWebsocketConsumer.as_asgi()),
+
+    path('ws/wsc/',consumers.Public_WebsocketConsumer.as_asgi()),
 ]

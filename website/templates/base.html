@@ -38,14 +38,15 @@
    <!-- ------------------------------------------------ -->
 
     <aside>
-        <!-- logo -->
+        <!---------- logo -------------------->
+
         {% load static %}
         <div id="ChatAt_logo" >
             <a href="{% url 'public' %}" ><img src="{% static '/image/chatat.png' %}"></a>
         </div>
 
-        <!-- seaarch users div -->
-            
+        <!-------- seaarch users div ---------->
+        
         {% if user.is_authenticated %}
             <div class="search-div">
 
@@ -69,7 +70,39 @@
             </div>
         {% endif %}
 
-        {% include "nav_bar.html" %}
+        <!---------- nav bar for all  ------->
+        
+        <nav>
+            {% if user.is_authenticated %}
+                <ul class="nav_list">
+                    <a href="{% url 'public' %}"><li><i class="fa-solid fa-house-chimney"></i> Public Page</li></a>
+                    <a href="{% url 'profile' pk=user %}"><li><i class="fa-solid fa-user"></i> Your Profile</li></a>
+                    <a href="{% url 'settings' %}"><li><i class="fa-solid fa-gears"></i> Settings</li></a>
+                    <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}"><li><i class="fa-regular fa-comments"></i>Solo-Chat</li></a>
+        
+                    <li id="chat_btn"><i class="fa-solid fa-comments"></i>Duo-Chat</li>
+        
+                    <!-- chat list -->
+                    {% if mutual_following_profiles %}  
+                    <div id="users_to_chat" >
+                        {% for mutual_flr in mutual_following_profiles %}
+                        <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
+                            <img src="{{ mutual_flr.profile_picture.url }}" alt="" style="width: 25px; height: 25px; border-radius: 50%;">
+                            <span>@{{mutual_flr.user.username}}</span>
+                            <!-- <i class="fa-regular fa-comment" style="color: green; font-size: 0.9em;"></i> -->
+                            {% if mutual_flr.user.userprofile.is_active %}
+                                <p id="active_status"></p>
+                            {% endif %}
+                        </a>    
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+        
+                </ul>
+                <a href="{% url 'logout' %}" id="logout_btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            {% endif %}
+        </nav> 
+        <!-- --------------- -->
     </aside>
     <!-- ------------------------------------------------ -->
     <main>

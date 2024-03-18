@@ -108,14 +108,20 @@
                     <!-- like, comments, download -->
                     <div class="like_cmt_share_box">
                         <!-- like section of post -->
-                        <div id="like_cmt_only">{{post.no_of_likes}} 
-                                {% if post.user_has_liked %}
+                         <!-- <p onclick="playAudio()">LIKE</p> -->
+                        <!-- <button onclick="likePost(post.id)">like</button> -->
+
+                        <!-- {{post.no_of_likes}}  -->
+                        <div id="like_cmt_only"><span id="post-{{post.id}}" >{{post.no_of_likes}}</span>
+                                <!-- {% if post.user_has_liked %}
                                     <a href="/like_post?post_id={{ post.id }}"><i class="fa-solid fa-heart" style="color: red;"></i></a>
-                                    <!-- <p onclick="playAudio()">LIKE</p> -->
-                                    <!-- <button onclick="likePost(post.id)">like</button> -->
+                                   
                                 {% else %}
                                     <a href="/like_post?post_id={{ post.id }}"><i class="fa-regular fa-heart"></i></a>
-                                {% endif %}
+                                {% endif %} -->
+                                <i class="fa-regular fa-heart heart_icon" id="heart-{{post.id}}" onclick="playAudio()"></i>
+                                <input class="post_id_value" type="hidden" value="{{post.id}}">
+
                                 <div id="cmt_btn">{{post.no_of_comments}} <i class="fa-regular fa-comment"></i></div>
                         </div> 
                         <div id="save_btn">
@@ -168,6 +174,80 @@
     <div id="scrlUpBOx" style="cursor: pointer;">
         <span id="goTop"> <i class="fa-solid fa-rocket"></i> Go Up</span>
     </div>
+
+    <script>
+
+        var ws = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/wsc/'
+        );
+
+
+         //  whan connection happens this function get called 
+         ws.onopen = function(){
+            console.log('Websocket connection open form public page...')
+            // var message = 'hello'
+            // ws.send(JSON.stringify({'msg': message}));
+        }
+
+        // this gets called when client receives message form server
+        ws.onmessage = function(event){
+            console.log('Message received form server ...',event.data)
+
+            const data = JSON.parse(event.data);
+            const no_of_likes = data.no_of_likes;
+            console.log('Post no of likes ...:::',no_of_likes)
+
+            if (data.no_of_likes !== undefined) {
+            const postId = data.post_id; // Assuming the server also sends the post ID along with the like count
+            // Find the like count element corresponding to the post ID
+            const likeCountElement = document.getElementById(`post-${postId}`);
+            if (likeCountElement) {
+                likeCountElement.innerHTML = no_of_likes;
+            }
+            }
+            
+        }
+
+        
+        // this get callled when the connection get lost
+        ws.onclosed = function(){
+            console.log('Websocket connection closed ...')
+        }
+
+        // document.getElementById('heart_icon').addEventListener('click',(event)=>{
+        //     const post_id = document.getElementById('post_id_value').value
+        //     ws.send(JSON.stringify({'po_id': post_id}));
+        // })
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('heart_icon')) {
+                // Find the parent element of the clicked heart icon
+                var parentDiv = event.target.closest('#like_cmt_only');
+                if (parentDiv) {
+                    // Find the hidden input field within the parent element
+                    var postIdInput = parentDiv.querySelector('.post_id_value').value ;
+
+                    ws.send(JSON.stringify({'po_id': postIdInput}));
+
+                    // Apply animation to the heart icon
+                    const heartIcon = event.target;
+                    heartIcon.style.transform = 'scale(1.2)';
+                    setTimeout(function () {
+                        heartIcon.style.transform = 'scale(1)';
+                    }, 200);
+
+                }
+            }
+        });
+
+        
+
+
+
+
+    </script>
     
     <script src="{% static 'js/public.js' %}"></script>
     

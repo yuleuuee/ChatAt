@@ -358,7 +358,7 @@ def settings(request):
         
         new_profile_pic = request.FILES.get('profile_picture', user_profile.profile_picture)
         new_first_name = request.POST.get('first_name', '').strip() or user.first_name
-        new_last_name = request.POST.get('last_name', '').strip() or user.last_name
+        new_last_name = request.POST.get('last_name', '').strip()
         new_email = email or user.email
         new_phone_no = phone_no or user_profile.phone
         new_bio = request.POST.get('new_bio', '').strip() or user_profile.bio
@@ -478,7 +478,7 @@ def add_post(request):
 def like_post(request):
 
         post_id = request.GET.get('post_id') ; # if only GET request , using <a></a>
-    # if request.method =='POST':
+        # if request.method =='POST':
         user = request.user
         # user_id = request.POST['user_id']
         # post_id = request.POST['post_id'] # getting the post id which was just  liked 
@@ -488,16 +488,16 @@ def like_post(request):
         like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
 
         if like_filter == None:
-            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-            new_like.save()
-            post.no_of_likes=post.no_of_likes +1
-            post.save()
+            # new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+            # new_like.save()
+            # post.no_of_likes=post.no_of_likes +1
+            # post.save()
             messages.success(request, 'You just liked a post')
             return redirect('public')
         else:
-            like_filter.delete()
-            post.no_of_likes=post.no_of_likes -1
-            post.save()
+            # like_filter.delete()
+            # post.no_of_likes=post.no_of_likes -1
+            # post.save()
             messages.success(request, 'You Unliked a post')
             return redirect('public')
         
@@ -570,7 +570,7 @@ def comment(request):
         print(f'commenter: {commentor}')
         print('Post of : '+ po_usr)
         print('Post id : '+ po_id)
-        if len(content) !=0 :
+        if len(content) != 0 :
             new_comment = Comment.objects.create(post_id=po_id, user_id=commentor.id, content=content)
             post.no_of_comments=post.no_of_comments +1 # increasing the "no_of_comments" every time post with the particular id is commented
             post.save() # Save the updated Post object

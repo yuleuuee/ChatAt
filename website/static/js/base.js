@@ -56,7 +56,7 @@ dark_light.addEventListener("click", ()=>{
 
 const chat_btn = document.querySelector('#chat_btn')
 const users_to_chat_div = document.querySelector('#users_to_chat')
-// users_to_chat_div.style.display='none';
+users_to_chat_div.style.display='none';
 chat_btn.addEventListener('click',()=>{
   if(users_to_chat_div.style.display ==='none'){
     users_to_chat_div.style.display='flex';

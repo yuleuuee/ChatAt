@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Chat Page{% endblock %}
-<!-- <a href="{% url 'chat_room' %}"><li><i class="fa-solid fa-comments"></i> Chat</li></a> -->
+
 {% block head %}
 
     {% load static %}
@@ -11,40 +11,48 @@
 {% endblock %}
 
 {% block content %}
-<img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 50px; height: 50px ; border-radius: 50%; ">
+
 {% if current_user == friend_user %}
-<h1>{{current_user|title}} This is your solo chat page </h1>         
+<h1> Chat Page - SoloChat </h1>         
 {% else %}
-<h1>{{current_user|title}} and {{friend_user|title}} chat page </h1>     
+<h1> Chat Page - DuoChat </h1>     
 {% endif %}
 
 <div class="chat-box">
-    <div id="user_list_box">
-        {% if mutual_following_profiles %}  
-            <div id="users_to_chat">
-                {% for mutual_flr in mutual_following_profiles %}
-                <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
-                    <img src="{{ mutual_flr.profile_picture.url }}" alt="" style="width: 25px; height: 25px; border-radius: 50%;">
-                    <span>@{{mutual_flr.user.username}}</span>
-                    <!-- <i class="fa-regular fa-comment" style="color: green; font-size: 0.9em;"></i> -->
-                    {% if mutual_flr.user.userprofile.is_active %}
-                        <p id="active_status"></p>
-                    {% endif %}
-                </a>    
-                {% endfor %}
-            </div>
-            {% endif %}
+    <div id="left_box">
+        <div class="left_top">
+            <img src="{{ user_profile.profile_picture.url }}" alt="" style="width: 40px; height: 40px ; border-radius: 50%; ">
+            <input type="text" name="" id="" placeholder="Search ... ">
+        </div>
+        <div id="all_users">
+            {% for mutual_flr in mutual_following_profiles %}
+            <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
+                <!-- <img src="{{ mutual_flr.profile_picture.url }}" alt=""> -->
+                {% if mutual_flr.user.userprofile.is_active %}
+                    <span class="chat_user_online"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                {% else %}
+                    <span class="chat_user_offline"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                {% endif %}
+                    <span>{{mutual_flr.user.first_name|title}} {{mutual_flr.user.last_name|title}}</span>
+                <!-- <i class="fa-regular fa-comment" style="color: green; font-size: 0.9em;"></i> -->
+            </a>    
+            {% endfor %}
+            
+        </div>
     </div>
     <div id="right_box">
         <div class="friend_user_top_box">
             <div>
-                <img src="{{ friend_user_profile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
-                <p>{{friend_user_profile.user.username|title}}</p>
+                <a href="{% url 'profile' pk=friend_user_profile.user %}">
+                    <img src="{{ friend_user_profile.profile_picture.url }}" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
+                </a>
+                <h2>{{friend_user_profile.user.username|title}}</h2>
             </div>
 
             <span>
                 <i class="fa-solid fa-video"></i>
                 <i class="fa-solid fa-phone"></i>
+                <i class="fa-solid fa-ellipsis-vertical"></i>
             </span>
         </div>
         <div id="message-list-box">
@@ -68,9 +76,15 @@
         </div>
         <div id="message_input_box">
             <form>
+                <i class="fa-solid fa-microphone-lines"></i>
                 <input type="text" id="chat-message-input" name="message" autofocus autocomplete="off">
                 <!-- <input type="button" id="submit" value="Send"> -->
                 <button type="button" id="submit">Send</button>
+                <i class="fa-solid fa-circle-plus"></i>
+                <!-- <span>
+                    <i class="fa-solid fa-photo-film"></i>
+                    <i class="fa-solid fa-paperclip"></i>
+                </span> -->
             </form>
         </div>
     </div>
@@ -84,6 +98,7 @@
     // getting the string , changing to object, passing it to a variabel
     const groupName = JSON.parse(document.getElementById('group_name').textContent)
     console.log(groupName)
+    
 
     // var ws = new WebSocket('ws://127.0.0.1:8000/ws/awsc/')
 
@@ -108,12 +123,6 @@
             const data = JSON.parse(event.data);
             const finalMsg = data.message;
             const sender = data.sender_username;
-            // const finalMsg = data.msg;
-            // const sender = data.user;
-            // console.log(finalMsg);
-            // console.log(sender);
-
-
 
             // Appending the finalMsg from the server to the HTML
             const messageListBox = document.getElementById('message-list-box');
@@ -134,8 +143,6 @@
                     </div>
                 `;
             }
-           
-
         }
 
         
@@ -154,11 +161,9 @@
             } else {
                 // Optionally, you can provide feedback to the user that the message is empty
                 alert('Please enter a message.');
+                // inputBox.preventDefault();
             }
-
         })
-
-
 
 </script>
 <script src="{% static 'js/chat.js' %}"></script>

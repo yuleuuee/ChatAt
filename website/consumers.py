@@ -3,9 +3,12 @@ from asgiref.sync import async_to_sync
 from . models import User,ChatMessage,Group
 import json
 from channels.db import database_sync_to_async
-
 from . models import ChatMessage
-# ********************************* : WebsocketConsumer :(wsc) **************************************************** #
+
+from . models import Post,Like,Comment
+
+
+# ********************************* :: WebsocketConsumer :(wsc), for Real time Chat :: **************************************************** #
 
 class MyWebsocketConsumer(WebsocketConsumer):
 
@@ -49,9 +52,6 @@ class MyWebsocketConsumer(WebsocketConsumer):
         # Extract the message and sender's username
         message = data.get('msg')
         sender_username = self.scope['user'].username
-
-
-
         
 
         # -------------------------------------- #
@@ -75,8 +75,6 @@ class MyWebsocketConsumer(WebsocketConsumer):
         sender =self.scope['user']
         print(sender)
         print(receiver)
-
-
 
         data=json.loads(text_data)
         print('Type of data',type(data))
@@ -185,3 +183,79 @@ class MyAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message,
         }))
+
+# ********************************* :: Public page : WebsocketConsumer :(wsc) , For like and Comment Part :: **************************************************** #
+class Public_WebsocketConsumer(WebsocketConsumer):
+
+    
+    # This function get called when client opens the connection and is about to do handshake
+    def connect(self):
+        print('------------------------------------------------ Public_page_WebsocketConsumer ::: connect function ::: Websocket Connected ...')
+        self.group_name = 'public_page'
+        async_to_sync(self.channel_layer.group_add)(
+            self.group_name,
+            self.channel_name
+        )
+        self.accept() # this keeps hendshanke(connected)
+        
+
+    # This function get called when the connetion is cut off 
+    def disconnect(self, close_code):
+        print('------------------------------------------------ Public_page_WebsocketConsumer ::: disconnect function ::: Websocket Disconnected ...')
+        print('Websocket Disconnected ...',close_code)
+        async_to_sync(self.channel_layer.group_discard)(
+            self.group_name,
+            self.channel_name
+        )
+
+
+    # This function get called when data is received form client
+    def receive(self, text_data=None, bytes_data=None):
+        print('------------------------------------------------ Public_page_WebsocketConsumer::: receive function')
+        print('Message received from client ...',text_data)
+        data = json.loads(text_data)
+
+        post_id = data.get('po_id')
+        print("post id ...::: ",post_id)
+        user = self.scope['user']
+
+
+        post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
+
+        like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
+
+        if like_filter == None:
+            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
+            new_like.save()
+            post.no_of_likes=post.no_of_likes +1
+            post.save()
+        else:
+            like_filter.delete()
+            post.no_of_likes=post.no_of_likes -1
+            post.save()
+
+        no_of_likes = post.no_of_likes
+        print('Type of data ... :::',type(no_of_likes))
+        # self.send({'no_of_likes':str(no_of_likes)})
+
+         # Send message to the group
+        async_to_sync(self.channel_layer.group_send)(
+            self.group_name,
+            {
+                'type': 'chat.message',
+                'no_of_likes': no_of_likes,
+                'post_id':post_id,
+            }
+        )
+
+    def chat_message(self, event):
+        no_of_likes = event['no_of_likes'],
+        post_id = event['post_id']
+        # print('Type of data....:::::',type(message))
+        
+        self.send(text_data=json.dumps({'no_of_likes': no_of_likes,'post_id':post_id}))
+
+        
+
+    
+
