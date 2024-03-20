@@ -334,11 +334,12 @@
     justify-content: space-between;
     flex-direction: row;
     gap: 5px;
+    color:inherit;
 }
 
 .profile_img_div p{
     font-size: 0.9em;
-    color: black;
+    color: grey;
 }
 
 .profile_img_div a img{
@@ -382,6 +383,10 @@
     font-size: 1.2em;
 }
 
+#like_cmt_only i{
+    cursor: pointer;
+}
+
 .like_cmt_share_box #save_btn a{
     font-size: 1em;
     color: purple;
@@ -389,6 +394,7 @@
 
 .like_cmt_share_box #save_btn a:hover{
     color:green;
+
 }
 
 
@@ -426,18 +432,19 @@
 }
 
 .comment_post_btn{
-    padding: 5px;
+    padding: 4px;
     border-radius: 10px;
     border: none;
+    color:inherit;
     cursor: pointer;
 
-    box-shadow: 0 0 2px rgba(54, 38, 5, 0.5); 
+    /* box-shadow: 0 0 1px rgba(54, 38, 5, 0.5);  */
     background-color: transparent;
 
 }
 
-.comment_post_btn:hover{
-    box-shadow: 0 0 10px rgba(54, 38, 5, 0.5); 
+.comment_post_btn i:hover {
+    color: green;
 }
 
 
@@ -484,9 +491,12 @@
 
 .cmt_li button{
     /* border-radius: 50%; */
+    border: none;
+    background-color: transparent;
     padding: 0 5px;
     color: #3f0e1f;
     cursor: pointer;
+
 
 }
 

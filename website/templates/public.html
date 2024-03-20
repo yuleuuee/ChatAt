@@ -33,7 +33,7 @@
                     </div>
                     <div class="content">
                         <div class="icon"><i class="fa-solid fa-cloud-upload-alt"></i></div>
-                        <div class="text">No file chosen, yet!</div>
+                        <div class="text">No Picture chosen, yet!</div>
                     </div>
                     <div id="cancel-btn"><i class="fa fa-times"></i></div>
                     <div class="file-name"></div>
@@ -101,7 +101,7 @@
                     <div class="image-post-div">
                         <img src="{{ post.image.url }}" alt="" >
                         {% if post.caption != 'No Caption' %}
-                            <div class="post_caption"><strong>{{ post.user.username}}</strong> {{ post.caption }}</div>
+                            <div class="post_caption"><strong>{{ post.user.username}}</strong> [ {{ post.caption }} ]</div>
                         {% endif %}
                     </div>
 
@@ -113,16 +113,19 @@
 
                         <!-- {{post.no_of_likes}}  -->
                         <div id="like_cmt_only"><span id="post-{{post.id}}" >{{post.no_of_likes}}</span>
-                                <!-- {% if post.user_has_liked %}
-                                    <a href="/like_post?post_id={{ post.id }}"><i class="fa-solid fa-heart" style="color: red;"></i></a>
-                                   
-                                {% else %}
-                                    <a href="/like_post?post_id={{ post.id }}"><i class="fa-regular fa-heart"></i></a>
-                                {% endif %} -->
-                                <i class="fa-regular fa-heart heart_icon" id="heart-{{post.id}}" onclick="playAudio()"></i>
-                                <input class="post_id_value" type="hidden" value="{{post.id}}">
+                                <span id="heart_span-{{user.id}}-{{post.id}}">
+                                    {% if post.user_has_liked %}
+                                        <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" style="color:red;" ></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" onclick="playAudio()" style="color:inherit;"></i>
+                                    {% endif %}
+                                    <!-- <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" onclick="playAudio()"></i> -->
 
-                                <div id="cmt_btn">{{post.no_of_comments}} <i class="fa-regular fa-comment"></i></div>
+                                </span>
+                                <!-- <i class="fa-regular fa-heart heart_icon" id="heart-{{post.id}}" onclick="playAudio()"></i> -->
+                                <input class="post_id_value"  id="post-{{post.id}}" type="hidden" value="{{post.id}}">
+
+                                <div><span id="cmt_btn-{{post.id}}">{{post.no_of_comments}}</span> <i class="fa-regular fa-comment"></i></div>
                         </div> 
                         <div id="save_btn">
                             <a href="{{ post.image.url }}" download >Save <i class="fa-solid fa-download"></i></a>
@@ -132,17 +135,26 @@
                     <!------------- comment section of post ------------>
 
                     <div id="cmt_box">
-                        <form action="{% url 'comment' %}" method="POST">
+                        <!-- <form action="{% url 'comment' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="po_usr" value="{{ post.user}}">  <!-- user id of the user whose the post is  -->
-                            <input type="hidden" name="po_id" value="{{ post.id }}">    <!-- post id -->
+                            <input type="hidden" name="po_usr" value="{{ post.user}}">  
+                            <input type="hidden" name="po_id" value="{{ post.id }}">    
 
                             <img src="{{ user_profile.profile_picture.url }}" alt="img">
                             <input type="text" name="cmt_content" placeholder="Write your comments..." autocomplete="off">
-                            <button class="comment_post_btn">Post</button>
-                        </form>
+                            <button class="comment_post_btn">Add <i class="fa-solid fa-paper-plane"></i></button>
+                        </form> -->
 
-                        <ul class="all_comments_list">
+                        <div class="comment-form">
+                            <form class="comment-form" data-post-id="{{ post.id }}">
+                                {% csrf_token %}
+                                <img src="{{ user_profile.profile_picture.url }}" alt="img">
+                                <input type="text" name="cmt_content" placeholder="Write your comments..." autocomplete="off">
+                                <button class="comment_post_btn"><i class="fa-solid fa-paper-plane"></i></button>
+                            </form>
+                        </div>
+
+                        <ul class="all_comments_list" id="cmt_list-{{post.id}}">
                             {% for comment in comments %}
                                 {% if comment.post_id == post.id %}
                                     <li class="cmt_li">
@@ -150,13 +162,13 @@
                                             <img src="{{ comment.user.userprofile.profile_picture.url }}" alt="Profile Picture" >
                                             <p><strong>@{{ comment.user.username }}</strong> <i class="fa-solid fa-arrow-right"></i> {{ comment.content }}</p>
                                             <!-- <strong>@{{ comment.user.username }}</strong>  -->
-                                            <p id="date_posted"> {{ comment.commented_at }} </p>
+                                            <p id="date_posted"> ( {{ comment.commented_at }} ) </p>
                                         </span>
                                         <!-- delete comment part  -->
                                         <form action="{% url 'delete_comment' comment.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete your comment ?');">
                                             {% csrf_token %}
                                             {% if comment.user == user_profile.user %}  <!-- if the coment user_id and current user user_id same then only delete button is seen -->
-                                                <button  type="submit" ><i class="fas fa-times"></i></button>
+                                                <button  type="submit" ><i class="fa-regular fa-circle-xmark"></i></button>
                                             {% endif %}
                                         </form>
                                     </li>
@@ -175,6 +187,8 @@
         <span id="goTop"> <i class="fa-solid fa-rocket"></i> Go Up</span>
     </div>
 
+    <input type="hidden" name="" id="current_user_id" value="{{user.id}}">
+
     <script>
 
         var ws = new WebSocket(
@@ -191,35 +205,83 @@
             // ws.send(JSON.stringify({'msg': message}));
         }
 
-        // this gets called when client receives message form server
+        let alreadyLiked = false;
+
+        // this gets called when client receives message from server
         ws.onmessage = function(event){
             console.log('Message received form server ...',event.data)
 
             const data = JSON.parse(event.data);
-            const no_of_likes = data.no_of_likes;
-            console.log('Post no of likes ...:::',no_of_likes)
 
-            if (data.no_of_likes !== undefined) {
-            const postId = data.post_id; // Assuming the server also sends the post ID along with the like count
-            // Find the like count element corresponding to the post ID
-            const likeCountElement = document.getElementById(`post-${postId}`);
-            if (likeCountElement) {
-                likeCountElement.innerHTML = no_of_likes;
-            }
+            if(data.no_of_likes){
+                const no_of_likes = data.no_of_likes;
+                const postId = data.like_post_id;
+                const userId = data.user_liked_id;
+
+                console.log('Post no of likes ...::: ',no_of_likes)
+
+                if (data.no_of_likes !== undefined) {
+                // Finding the like count element corresponding to the post ID
+                    const likeCountElement = document.getElementById(`post-${postId}`);
+                    if (likeCountElement) {
+                        likeCountElement.innerHTML = no_of_likes;
+                    }
+                }
             }
             
+            if(data.no_of_comments){
+                const no_of_comments = data.no_of_comments;
+                const cmt_content = data.cmt_content;
+                const post_id_cmt = data.cmt_post_id;
+                const user_comented_id = data.user_comented_id;
+
+                console.log('no_of_comments...::: ',no_of_comments)
+                // console.log('post cmt id ...::: ',post_id_cmt)
+                // console.log('User comment id...::: ',user_comented_id)
+                // console.log('comment COntent...::: ',cmt_content)
+
+                const cmt_no_box = document.getElementById(`cmt_btn-${post_id_cmt}`)
+                cmt_no_box.innerText = no_of_comments;
+
+                const cmt_list = document.getElementById(`cmt_list-${post_id_cmt}`)
+                const current_user_id = document.getElementById('current_user_id').value 
+
+                if(current_user_id == user_comented_id){
+                    // for current user show this
+                    cmt_list.innerHTML += `
+                        <li class='cmt_li'>
+                            <span>
+                                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" >
+                                <p><strong>@{{ user.username }}</strong> <i class="fa-solid fa-arrow-right"></i> ${cmt_content}</p>
+                                <p id="date_posted"> {{ comment.commented_at }} </p>
+                            </span>
+                        </li>
+                    `;
+                    
+                }else{
+                    // for other user show this 
+                    cmt_list.innerHTML += `
+                    <li class='cmt_li'>
+                        <span>
+                            <p><strong>New Comment : </strong> ${cmt_content}</p>
+                        </span>
+                    </li>
+                `;
+                }
+                
+                
+
+            }
+
         }
 
-        
         // this get callled when the connection get lost
         ws.onclosed = function(){
             console.log('Websocket connection closed ...')
         }
 
-        // document.getElementById('heart_icon').addEventListener('click',(event)=>{
-        //     const post_id = document.getElementById('post_id_value').value
-        //     ws.send(JSON.stringify({'po_id': post_id}));
-        // })
+
+        // // for Liking in the post :------------------------------
 
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('heart_icon')) {
@@ -238,17 +300,54 @@
                         heartIcon.style.transform = 'scale(1)';
                     }, 200);
 
+                    // This allows us to access the current style of the heart icon
+                    var computedStyle = window.getComputedStyle(heartIcon);
+                    var currentColor = computedStyle.color;
+
+                    if (currentColor === 'rgb(255, 0, 0)') { // red
+                        heartIcon.style.color = 'black';
+                    } else {
+                        heartIcon.style.color = 'red';
+                    }
+
+                }
+            }
+
+            
+        });
+
+
+        // // for commenting in the post :------------------------------
+
+        document.addEventListener('submit', function(event) {
+            // Check if the submitted form is a comment form
+            if (event.target.classList.contains('comment-form')) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+
+                // Extract post ID and comment content
+                const postId = event.target.dataset.postId;
+                const commentContent = (event.target.querySelector('input[name="cmt_content"]').value).trim();
+
+                console.log('post_id...::: ',postId)
+                console.log('CommentContent...::: ',commentContent)
+
+                if (commentContent !== '') { 
+                    // Check if the message is not empty
+                    // Send WebSocket message with comment data
+                    ws.send(JSON.stringify({'post_id':postId,'cmt_content':commentContent}));
+                    event.target.querySelector('input[name="cmt_content"]').value = '';
+
+                } else {
+                    event.preventDefault(); // it is just like the pass in PYTHON
+                    console.log('came here')
                 }
             }
         });
-
-        
-
-
-
 
     </script>
     
     <script src="{% static 'js/public.js' %}"></script>
     
 {% endblock %}
+
+

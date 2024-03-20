@@ -1,21 +1,35 @@
-const error_msg = document.getElementById('error_msg');
+// *********************** :: Notify message Part :: ***************************/
 
-// Function to hide the message after 4s
+// auto hide msg
+const error_msg = document.getElementById('error_msg');
+const success_msg = document.getElementById('success_msg');
+
+// Function to hide the message after 6s ( 6000ms = 6s )
+
 if (error_msg) {
   setTimeout(() => {
     error_msg.style.display = 'none';
-  }, 6000); // 6000ms = 6s
+  }, 6000); 
 }
 
-
-const success_msg = document.getElementById('success_msg');
-
-// Function to hide the message after 4s
 if (success_msg) {
   setTimeout(() => {
     success_msg.style.display = 'none';
-  }, 6000); // 6000ms = 6s
+  }, 6000); 
 }
+
+// cross mark hide message
+const cross_mark = document.getElementById('cross_mark');
+if(cross_mark){
+  cross_mark.addEventListener('click',()=>{
+    error_msg.style.display = 'none';
+  });
+
+  cross_mark.addEventListener('click',()=>{
+    success_msg.style.display = 'none';
+  });
+}
+
 
 
 // ///*********** Sound part ***************///

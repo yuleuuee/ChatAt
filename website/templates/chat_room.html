@@ -25,6 +25,11 @@
             <input type="text" name="" id="" placeholder="Search ... ">
         </div>
         <div id="all_users">
+            <!-- always showing current user on top (solo-chat)-->
+            <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}">
+                <span class="chat_user_online"><img src="{{ user.userprofile.profile_picture.url }}" alt=""></span>
+                <span>{{user.first_name|title}} {{user.last_name|title}}</span>
+            </a>
             {% for mutual_flr in mutual_following_profiles %}
             <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
                 <!-- <img src="{{ mutual_flr.profile_picture.url }}" alt=""> -->
@@ -159,9 +164,9 @@
                 ws.send(JSON.stringify({'msg': message}));
                 inputBox.value = ''; // making the input field empty after the message is sent
             } else {
-                // Optionally, you can provide feedback to the user that the message is empty
-                alert('Please enter a message.');
-                // inputBox.preventDefault();
+                event.preventDefault(); // it is just like the pass in PYTHON
+                // Optionally, we can provide feedback to the user that the message is empty
+                // alert('Please enter a message.');
             }
         })
 

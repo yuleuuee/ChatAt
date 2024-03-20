@@ -93,8 +93,8 @@ h1{
 
 .edit_profile_div{
     border-radius: 20px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
     padding: 25px 10px;
     margin-bottom: 5px;
 }
@@ -170,7 +170,7 @@ h1{
 }
 
 .hide_show_button div{
-    border: 2px solid black;
+    border: 2px solid grey;
     padding: 5px 10px;
     border-radius: 10px;
     cursor: pointer;

@@ -1,23 +1,35 @@
-// *********************** notify_msg css ***************************/
+// *********************** :: Notify message Part :: ***************************/
 
+// auto hide msg
 const error_msg = document.getElementById('error_msg');
+const success_msg = document.getElementById('success_msg');
 
-// Function to hide the message after 4s
+// Function to hide the message after 6s ( 6000ms = 6s )
+
 if (error_msg) {
   setTimeout(() => {
     error_msg.style.display = 'none';
-  }, 6000); // 6000ms = 6s
+  }, 6000); 
 }
 
-
-const success_msg = document.getElementById('success_msg');
-
-// Function to hide the message after 4s
 if (success_msg) {
   setTimeout(() => {
     success_msg.style.display = 'none';
-  }, 6000); // 6000ms = 6s
+  }, 6000); 
 }
+
+// cross mark hide message
+const cross_mark = document.getElementById('cross_mark');
+if(cross_mark){
+  cross_mark.addEventListener('click',()=>{
+    error_msg.style.display = 'none';
+  });
+
+  cross_mark.addEventListener('click',()=>{
+    success_msg.style.display = 'none';
+  });
+}
+
 
 // *********************** Nice login page css **********************/
 
@@ -137,18 +149,3 @@ pass02.addEventListener("focus", () => {
     }
     });
 
-
-/********** Auto Scroll Down ******* */
-
- let day = document.querySelector('#stop_scroll');
- let go_down= document.querySelector('#go_down');
- go_down.addEventListener('click', () => scrolldown()); 
-
- function scrolldown() {
-         day.scrollIntoView(
-         {
-             block:'center', 
-             behavior:'smooth'
-         }
-         );
- };

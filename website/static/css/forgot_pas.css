@@ -1,14 +1,13 @@
 
-/* html{
-    background-color: white;
-} */
-
 body{
     /* background-color: #0e1538; */
     background-color: black;
+    /* background: linear-gradient(to top,grey,black); */
     margin: 0;
     padding: 0;
 }
+
+/* ------------- :: Nav bar top :: ----------- */
 
 .navigation_bar{
     /* border: 1px solid white; */
@@ -19,7 +18,6 @@ body{
     align-items: center;
     flex-direction: row;
 }
-
 
 
 #ChatAt_logo{
@@ -57,49 +55,58 @@ body{
     border-color: white;
 }
 
-/* --------------- notify message ------------- */
+/* --------------- :: notify message :: ------------- */
 
-.error_msg{
+.notifymessage{
+    display: flex;
+    justify-content: first baseline;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
+
     position: fixed;
     top:3.5rem;
     right:0.6rem;
 
-    padding: 10px;
+    padding: 0 15px;
     font-size: 16px;
     font-family: 'Arial', sans-serif;
     width: 20%;
     border-radius: 20px;
+}
+
+
+.error_msg{
 
     border: 1px solid rgba(241, 6, 6, 0.81);
     background-color: rgba(220, 17, 1, 0.16);
     box-shadow: 0px 0px 2px #ff0303;
     color: #ff0303;
+    transition:0.5s;
     z-index: 100;
 
   }
 
 .success_msg{
-    position: fixed;
-    top:3.5rem;
-    right:0.6rem;
-
-    padding: 10px;
-    font-size: 16px;
-    font-family: 'Arial', sans-serif;
-    width: 20%;
-    border-radius: 20px;
 
     border: 1px solid rgba(36, 241, 6, 0.46);
     background-color: rgba(7, 149, 66, 0.12156862745098039);
     box-shadow: 0px 0px 2px #259c08;
     color: white;
-    /* color: white;; */
     transition:0.5s;
     z-index: 100;
 
 }
 
-/* ----------------------- */
+#cross_mark:hover{
+    cursor: pointer;
+    color: brown;
+    transform: scale(1.5);
+    transition: 0.5s ease-in-out;
+}
+
+/* -------------------- :: Main Stuffs of Page :: ------------------------ */
 
 
 h1{
@@ -230,17 +237,14 @@ h1{
    
 }
 
-
-
 #check_mark{
     display: none;
 }
 
 
-/*  ------ change_forgot_password_box ------ */
+/* -------- :: Change forgot password box :: -------- */
 
 .modify_password{
-
     /* box-shadow: 0 5px 15px rgba(231, 44, 206, 0.35); */
     /* border: 1px solid green; */
     border-radius: 20px;
@@ -290,7 +294,7 @@ h2{
     box-shadow: 0 0 5px rgba(0, 208, 255, 0.663);
 }
 
-
+/*--- the gradient box that rotates inside ---*/
 .modify_password::before{
     content: "";
     position: absolute;
@@ -320,7 +324,6 @@ h2{
 }
 
 
- 
 .modify_password form button{
     border: 1px solid black;
     padding: 5px 20px;

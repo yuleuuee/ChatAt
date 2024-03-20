@@ -6,62 +6,74 @@ body{
     /* border: 2px solid red;  */
     margin: 0;
     padding: 0;
-
     position:relative;
 }
 
-/**************** notify_msg *****************/
+/* --------------- :: notify message :: ------------- */
 
+.notifymessage{
+    display: flex;
+    justify-content: first baseline;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 20px;
 
-.error_msg{
     position: fixed;
-    top:1.5rem;
+    top:3.5rem;
     right:0.6rem;
 
-    padding: 10px;
+    padding: 0 15px;
     font-size: 16px;
     font-family: 'Arial', sans-serif;
     width: 20%;
     border-radius: 20px;
+}
+
+
+.error_msg{
 
     border: 1px solid rgba(241, 6, 6, 0.81);
     background-color: rgba(220, 17, 1, 0.16);
     box-shadow: 0px 0px 2px #ff0303;
     color: #ff0303;
+    transition:0.5s;
     z-index: 100;
 
   }
 
 .success_msg{
-    position: fixed;
-    top:1.5rem;
-    right:0.6rem;
-
-    padding: 10px;
-    font-size: 16px;
-    font-family: 'Arial', sans-serif;
-    width: 20%;
-    border-radius: 20px;
 
     border: 1px solid rgba(36, 241, 6, 0.46);
     background-color: rgba(7, 149, 66, 0.12156862745098039);
     box-shadow: 0px 0px 2px #259c08;
     color: white;
-    /* color: white;; */
     transition:0.5s;
     z-index: 100;
 
 }
 
-/* ******************************************************************* */
-/*********************** Nice login page css ***************************/
-/* ******************************************************************* */
+#cross_mark:hover{
+    cursor: pointer;
+    color: brown;
+    transform: scale(1.5);
+    transition: 0.5s ease-in-out;
+}
+
+.fa-check{
+    margin-left: 10px;
+}
+
+/***********************::  Nice login Part ::***************************/
+
 
 .login_signup_section{
     /* border: 2px solid white; */
     position: relative;
     /* padding: 100px; */
-    background: linear-gradient(to top, #cfe0f6, rgb(14, 36, 59));
+    /* background: linear-gradient(to top, #cfe0f6, rgb(14, 36, 59)); */
+    background: linear-gradient(to top, #cfe0f6, rgb(47, 14, 59));
+
     color: #fff;
 
     display: flex;
@@ -189,7 +201,7 @@ body{
     }
 }
 
-/* ****************** login SignUp container ****************** */
+/* ****************** login and SignUp container ****************** */
 
 .container{
     background-color: #fff;
@@ -277,7 +289,7 @@ button.hidden{
     height: 100%;
 }
 
-/* ****************** MOVING INPUT LABLES ***************** */
+/* ****************** MOVING INPUT LABLES to up ***************** */
 
 .container .email_box,.pass_box{
     /* background-color: #eeee; */
@@ -341,7 +353,7 @@ button.hidden{
     z-index: 4;
 }
 
-/************* For the 'Create acc' password part *************/
+/************* For the 'Signup' password part *************/
 
 /* pass01 */
 #email_res:focus + .em_label,#pass01:focus + .pas_label{

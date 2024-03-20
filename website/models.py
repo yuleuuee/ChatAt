@@ -13,6 +13,7 @@ class UserProfile(models.Model):
 
     # New field to track active status
     is_active = models.BooleanField(default=False)
+    dark_mode = models.BooleanField(default=False)
 
     # helps to see the username in the admin pannel insted of object 1 or object2
     def __str__(self):
@@ -36,6 +37,10 @@ class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     liked_at = models.DateTimeField(auto_now_add=True)
+
+    # New field to track active status
+    # already_liked = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"Liked by {self.user.username} on {self.post}"

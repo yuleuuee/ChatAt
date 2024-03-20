@@ -32,6 +32,13 @@ def user_login(request):
         input_value = request.POST['username_or_email']
         password = request.POST['password']
 
+        if len(input_value)== 0:
+            messages.error(request, "Must enter Email or Username !")
+            return redirect('home')
+        elif len(password) == 0:
+            messages.error(request, "Password field can't be empty !")
+            return redirect('home')
+        
         #User.objects.filter(username=u_name).first()
         if User.objects.filter(username=input_value).exists(): # to check if the username is in the 'auth_user' table exists
             user = authenticate(request,username=input_value, password=password)
@@ -67,12 +74,25 @@ def user_signup(request):
         pass2 = request.POST['password2']
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists!")
-            return redirect('signup')
+            messages.error(request, "Username already exists ! Try another one")
+            return redirect('home')
+        elif len(email.strip())==0:
+            messages.error(request, "Must enter email ! Try again !")
+            return redirect('home')
         elif User.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists!")
-            return redirect('signup')
-        elif pass1 == pass2:
+            messages.error(request, "Email already exists ! Try again !")
+            return redirect('home')
+        elif len(pass1.strip())==0 or len(pass2.strip())==0:
+            messages.error(request, "Must enter Password ! Try again !")
+            return redirect('home')
+        elif len(pass1.strip())<4 or len(pass2.strip())<4:
+            messages.error(request, "Password too Short ! Try again !")
+            return redirect('home')
+        elif pass1 != pass2:
+            messages.error(request, "Password dosn't match! Try again !")
+            return redirect('home')
+        else:
+            # creating a new user with the provided info
             user = User.objects.create_user(username=username,email=email,password=pass1)
             user.save()
 
@@ -83,19 +103,17 @@ def user_signup(request):
             new_UserProfile.save()
 
             login(request, user) # making the user logged in 
+            user.userprofile.is_active = True
+            user.userprofile.save()
 
             messages.success(request, "Successfully registered")
-            return redirect('settings') # after succesful account creation users are sent to account settings page
-        else:
-            messages.error(request, "Password dosn't match!")
-            return redirect('home')
+            return redirect('settings') # after succesful account creation users are sent to account settings page   
     else:
         return render(request, 'home.html') 
             
 # ----------------------------------- LOGOUT -------------------------------------------------------------------
 @login_required(login_url='login')
 def user_logout(request):
-
     # Update user's profile to set is_active to False
     request.user.userprofile.is_active = False
     request.user.userprofile.save()
@@ -105,9 +123,7 @@ def user_logout(request):
     return redirect('login')
 
 # ------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------------
 # ----------------------------------------: FUNCTIONS :-------------------------------------------------
-# ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
 
 @login_required(login_url='login')
@@ -131,7 +147,7 @@ def delete_account(request):
         return redirect('settings')
     
 
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------:: CHANGE PASSWORD ::---------------------------------------------
 
 
 @login_required(login_url='login')
@@ -167,7 +183,8 @@ def change_password(request):
         # will never be this
         return redirect('settings')
 
-
+# -----------------------------------------:: PUBLIC PAGE ::---------------------------------------------
+    
 @login_required(login_url='login')
 def public_page(request):
 
@@ -214,7 +231,7 @@ def public_page(request):
     feed.sort(key=attrgetter('created_at'), reverse=True)
 
 
-    # ****************************  User suggestions *********************************
+    # **************  User suggestions ********************
     import random 
 
     # Get all users except the current user and the admin user
@@ -229,29 +246,19 @@ def public_page(request):
     # Shuffle the suggested users and limiting the number of users shown
     suggested_users_subset = random.sample(list(suggested_users), min(len(suggested_users), 3))
 
-    # mutual followers :---------------------------------------------------------
-
-    # user_object = User.objects.get(username =user.username)
-    # user_profile = UserProfile.objects.get(user=user_object)
-    # user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
+    # -----------------: mutual followers :------------------------------
 
 
-     # Retrieve following and followers data for the current user
+    # Retrieve following and followers data for the current user
     following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
     followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
 
 
-    # Query UserProfile to get profile pictures of following and followers
-    # following_profiles = UserProfile.objects.filter(user__username__in=following_usernames)
-    # followers_profiles = UserProfile.objects.filter(user__username__in=followers_usernames)
-
-    # Find mutual followers
+    # Finding mutual followers
     mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
-
-
-    # ****************************  Only my followers suggestions *********************************
+    # *****************: Only my followers suggestions :**********************
 
     # Retrieve the usernames of users who follow you
     followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
@@ -265,8 +272,8 @@ def public_page(request):
     # Query UserProfile to get profiles of users who follow you but you don't follow back
     followers_without_following_back_profiles = UserProfile.objects.filter(user__username__in=followers_without_following_back_subset)
 
-    #**************************** greeting for the users *********************************
-        
+
+    #*************: greeting for the users :***********
 
     if current_time.hour < 12:
         greeting = "Good morning"
@@ -276,7 +283,7 @@ def public_page(request):
         greeting = "Good evening"
 
 
-    # Checking if the user has liked each post and pass the information to the template
+    # Checking if the user has liked each post inorder to  pass the information to the template
     for post in feed:
         post.user_has_liked = post.likes.filter(user=request.user).exists()
     
@@ -293,7 +300,7 @@ def public_page(request):
     }
     
 
-    # ****************************** Searching Users :*******************************
+    # *******************: Searching Users :******************
 
     if request.method =='POST':
         # query = request.GET.get('query')
@@ -316,9 +323,7 @@ def public_page(request):
         return render(request, 'public.html', context)
 
     
-
-
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------:: SETTING PAGE ::---------------------------------------------
 
 @login_required(login_url='login')
 def settings(request):
@@ -349,18 +354,22 @@ def settings(request):
         if existing_email_user:
             messages.error(request, f"Email '{email}' is already in use.")
             return redirect('settings')
+        
 
-        # Check if phone number is already in use(exceot the current user)
-        existing_phone_user = UserProfile.objects.filter(phone=phone_no).exclude(user=user).first()
-        if existing_phone_user:
-            messages.error(request, f"Phone number '{phone_no}' is already in use.")
-            return redirect('settings')
+        if len(phone_no.strip())== 0:
+            pass
+        else:
+            # Check if phone number is already in use(exceot the current user)
+            existing_phone_user = UserProfile.objects.filter(phone=phone_no).exclude(user=user).first()
+            if existing_phone_user:
+                messages.error(request, f"Phone number '{phone_no}' is already in use.")
+                return redirect('settings')
         
         new_profile_pic = request.FILES.get('profile_picture', user_profile.profile_picture)
         new_first_name = request.POST.get('first_name', '').strip() or user.first_name
         new_last_name = request.POST.get('last_name', '').strip()
         new_email = email or user.email
-        new_phone_no = phone_no or user_profile.phone
+        new_phone_no = phone_no 
         new_bio = request.POST.get('new_bio', '').strip() or user_profile.bio
     
         user.first_name = new_first_name
@@ -375,12 +384,13 @@ def settings(request):
         user_profile.save()  # Saving the changes in UserProfile
 
         messages.success(request, "Save Change Success!")
-        return redirect('settings')
+        return redirect('profile')
     else:
         return render(request,'settings.html',{'user_profile':user_profile,'mutual_following_profiles':mutual_following_profiles})
 
     
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------:: PROFILE PAGE ::---------------------------------------------
+    
 @login_required(login_url='login')
 def profile(request,pk):
     user_object = User.objects.get(username =pk)
@@ -438,7 +448,7 @@ def profile(request,pk):
     return render(request,'profile.html',context)
 
 
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------:: ADD POST function ::---------------------------------------------
 
 @login_required(login_url='login')
 def add_post(request):
@@ -461,10 +471,8 @@ def add_post(request):
         else:
             post_caption = request.POST['post_caption']
 
+        # creating a new post 
         new_post = Post.objects.create(user = user, image = post_img, caption = post_caption)
-        
-        # user_post.image = post_img
-        # user_post.caption = post_caption
 
         new_post.save()
         messages.success(request, "Post Added Succesfully!")
@@ -472,47 +480,20 @@ def add_post(request):
     else:    
         return redirect('public') # this helps to go the the view public_page ,as it is using the name of the url
 
-# ------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------:: LIKING A POST function ::---------------------------------------------
     
-@login_required(login_url='login')
-def like_post(request):
-
-        post_id = request.GET.get('post_id') ; # if only GET request , using <a></a>
-        # if request.method =='POST':
-        user = request.user
-        # user_id = request.POST['user_id']
-        # post_id = request.POST['post_id'] # getting the post id which was just  liked 
-
-        post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
-
-        like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
-
-        if like_filter == None:
-            # new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-            # new_like.save()
-            # post.no_of_likes=post.no_of_likes +1
-            # post.save()
-            messages.success(request, 'You just liked a post')
-            return redirect('public')
-        else:
-            # like_filter.delete()
-            # post.no_of_likes=post.no_of_likes -1
-            # post.save()
-            messages.success(request, 'You Unliked a post')
-            return redirect('public')
+#  done by using WebSocket in the consumer.py 
         
 
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------:: FOLLOW AND UNFOLLOW USER function ::---------------------------------------------
 
-    
 @login_required(login_url='login')
 def follow(request):
     if request.method =='POST':
         #getting the information from the 'form'
         follower = request.POST['follower'] # Viewer : currently logged in user
         user = request.POST['user'] # view : user which the viewer is viewing
-
-        print(user)
 
         # checking whether or not the currerently logged in user is already followeing this user
         # if already followed case :
@@ -529,14 +510,12 @@ def follow(request):
     else:
         return redirect('public')
     
+# -----------------------------------------:: DELETING THE POST (only their post) function ::---------------------------------------------
 @login_required(login_url='login')
 def delete_post(request,post_id):
     user = request.user.username
     if request.method == 'POST':
         user = request.user # user object 
-
-        # post_id = request.GET.get('post_id') # getting the post id which was just clicked for deleting
-        # post = Post.objects.get(id=post_id) # getting the post object which was clicked by comparing the id
 
         post_to_delete = Post.objects.get(id=post_id, user=user)
         post_to_delete.delete()
@@ -548,7 +527,7 @@ def delete_post(request,post_id):
 
 
 
-# comment part
+# -----------------------------------------:: COMMENTING A POST function ::---------------------------------------------
 
 @login_required(login_url='login')
 def comment(request):
@@ -583,7 +562,7 @@ def comment(request):
     else:
         return redirect('public')  # Redirect to public page if not a POST request
 
-#  Deketing comment part :
+# -----------------------------------------:: DELETING THE COMMENTS function ::---------------------------------------------
     
 @login_required(login_url='login')
 def delete_comment(request, comment_id):
@@ -600,8 +579,7 @@ def delete_comment(request, comment_id):
     return redirect('public')  # Redirect to the public page after deletion
 
 
-
-#********************************* generating and sending otp in gmail ****************************************************
+# -----------------------------------------:: Generating and sending OTP to emails ::---------------------------------------------
     
 def forgot_pas(request):
     if request.method == 'POST':
@@ -609,7 +587,7 @@ def forgot_pas(request):
         email = request.POST.get('email')
 
         if len(email) != 0: # this prevents the empty email box sending
-            
+
             user = User.objects.filter(email=email).first() # check there is a user with that email
 
             if user:
@@ -634,14 +612,16 @@ def forgot_pas(request):
                 messages.success(request, 'OTP was just send to your email.')
                 return render(request, 'forgot_pas.html',{'email':email})
             else:
-                messages.error(request, 'That email does not have an account.')
+                messages.error(request, 'That email does not have an account!')
                 return redirect('forgot_pas')
         else:
-            messages.error(request, 'Must enter email before sending')
+            messages.error(request, 'Must enter email before sending !')
             return redirect('forgot_pas')
     else:
         return render(request, 'forgot_pas.html')
 
+# -----------------------------------------:: VERYFYING OTP and also email before changing password ::-------------------------------------
+    
 def verify_otp(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -659,7 +639,7 @@ def verify_otp(request):
         return render(request, 'forgot_pas.html')
 
 
-# chnanging the forgot password part :
+# -----------------------------------------:: CHANGING FORGOTTON PASSWORD part  ::-------------------------------------
 
 def change_forgot_password(request):
 
@@ -690,7 +670,7 @@ def change_forgot_password(request):
         return redirect('login')
     
 
-
+# -----------------------------------------:: PRIVATE CHAT PAGE ::-------------------------------------
 
 @login_required(login_url='login')
 def private_chat(request,current_user_id, friend_user_id):
@@ -713,14 +693,10 @@ def private_chat(request,current_user_id, friend_user_id):
     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
 
-
-    # Handellig the situation when users tries to use a random user form the URL
-    
-    
-
     # print(type(friend_user_id))
     # print(type(request.user.id))
 
+    # Handellig the situation when users tries to use a random user form the URL
     # converting the str type to int for comparing  
     friend_user_id_int= int(friend_user_id)
     try:
@@ -776,6 +752,9 @@ def private_chat(request,current_user_id, friend_user_id):
     }
 
     return render(request,'chat_room.html',context)
+
+# -----------------------------------------:: YULE ::-------------------------------------
+# -----------------------------------------:: YULE ::-------------------------------------
 
 
     

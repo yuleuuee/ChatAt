@@ -14,22 +14,30 @@
     {% endblock %}
     <audio id="click-sound" src="{% static 'audios/click.mp3' %}" preload="auto"></audio>
 </head>
-<body class="white">
 
-    <!-- ------------------------------------------------ -->
-    {% if messages %}
-            {% for message in messages %}
-                {% if message.tags == 'error' %}
-                    <div class="notifymessage error_msg" id="error_msg"> 
-                        <span><i class="fa fa-times danger "></i> {{ message }}</span>
-                    </div> 
-                {% else %}
-                    <div class="notifymessage success_msg" id="success_msg"> 
-                        <span><i class="fa fa-times danger "></i> {{ message }}</span>
-                    </div>    
-                {% endif %}
-            {% endfor %}
+{% if user.userprofile.dark_mode %}
+    <body class="black">
+{% else %}
+    <body class="white">
+{% endif %}
+
+<!-------------------- :: Notifymessage message :: ------------------->
+
+{% if messages %}
+{% for message in messages %}
+    {% if message.tags == 'error' %}
+        <div class="notifymessage error_msg" id="error_msg"> 
+            <i class="fa fa-times" id="cross_mark"></i>
+            <p>{{ message }}</p>
+        </div> 
+    {% else %}
+        <div class="notifymessage success_msg" id="success_msg"> 
+            <i class="fa fa-times" id="cross_mark"></i>
+            <p>{{ message }} <i class="fa-solid fa-check"></i></p>
+        </div>    
     {% endif %}
+{% endfor %}
+{% endif %}
 
     <!-- ------------------------------------------------ -->
     {% if user.is_authenticated %}

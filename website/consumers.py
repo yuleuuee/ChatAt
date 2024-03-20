@@ -184,78 +184,118 @@ class MyAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             'message': message,
         }))
 
-# ********************************* :: Public page : WebsocketConsumer :(wsc) , For like and Comment Part :: **************************************************** #
-class Public_WebsocketConsumer(WebsocketConsumer):
+# # ********************************* :: Public page : WebsocketConsumer :(wsc) , For like and Comment Part :: **************************************************** #
 
     
-    # This function get called when client opens the connection and is about to do handshake
+class Public_WebsocketConsumer(WebsocketConsumer):
+
     def connect(self):
         print('------------------------------------------------ Public_page_WebsocketConsumer ::: connect function ::: Websocket Connected ...')
         self.group_name = 'public_page'
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name,
-            self.channel_name
-        )
-        self.accept() # this keeps hendshanke(connected)
-        
+        async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
+        self.accept()
 
-    # This function get called when the connetion is cut off 
     def disconnect(self, close_code):
         print('------------------------------------------------ Public_page_WebsocketConsumer ::: disconnect function ::: Websocket Disconnected ...')
-        print('Websocket Disconnected ...',close_code)
-        async_to_sync(self.channel_layer.group_discard)(
-            self.group_name,
-            self.channel_name
-        )
+        print('Websocket Disconnected ...', close_code)
+        async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
 
-
-    # This function get called when data is received form client
     def receive(self, text_data=None, bytes_data=None):
         print('------------------------------------------------ Public_page_WebsocketConsumer::: receive function')
-        print('Message received from client ...',text_data)
-        data = json.loads(text_data)
+        print('Message received from client ...', text_data)
+        try:
+            data = json.loads(text_data)
+            user = self.scope['user']
+            user_id = user.id
+            
+            if 'po_id' in data:
+                # For handling 'po_id'
+                post_id = data.get('po_id')
+                post = Post.objects.get(id=post_id)
+                like_filter = Like.objects.filter(post_id=post_id, user_id=user_id).first()
 
-        post_id = data.get('po_id')
-        print("post id ...::: ",post_id)
-        user = self.scope['user']
+                if like_filter is None:
+                    self.create_like(post, user)
+                else:
+                    self.delete_like(like_filter, post)
+                
+                no_of_likes = post.no_of_likes
 
+                async_to_sync(self.channel_layer.group_send)(
+                    self.group_name,
+                    {
+                        'type': 'public.data',
+                        'no_of_likes': no_of_likes,
+                        'like_post_id': post_id,
+                        'user_liked_id': user_id,
+                    }
+                )
 
-        post = Post.objects.get(id=post_id) # getting the post object which was liked by comparing the id
+            if 'post_id' in data:
+                # For handling 'post_id'
+                post_id = data.get('post_id')
+                post_for_cmt = Post.objects.get(id=post_id)
 
-        like_filter = Like.objects.filter(post_id=post_id,user_id = user.id).first()
+                cmt_content = data.get('cmt_content')
+                self.create_comment(post_for_cmt, user_id, cmt_content)
 
-        if like_filter == None:
-            new_like =Like.objects.create(post_id=post_id,user_id= user.id)
-            new_like.save()
-            post.no_of_likes=post.no_of_likes +1
-            post.save()
-        else:
-            like_filter.delete()
-            post.no_of_likes=post.no_of_likes -1
-            post.save()
+                no_of_comments = post_for_cmt.no_of_comments
+                
+                async_to_sync(self.channel_layer.group_send)(
+                    self.group_name,
+                    {
+                        'type': 'public.data',
+                        'no_of_comments': no_of_comments,
+                        'cmt_post_id': post_id,
+                        'user_comented_id': user_id,
+                        'cmt_content': cmt_content,
+                    }
+                )
 
-        no_of_likes = post.no_of_likes
-        print('Type of data ... :::',type(no_of_likes))
-        # self.send({'no_of_likes':str(no_of_likes)})
+        except json.JSONDecodeError:
+            print("Invalid JSON data received.")
+        except Post.DoesNotExist:
+            print("Post does not exist.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-         # Send message to the group
-        async_to_sync(self.channel_layer.group_send)(
-            self.group_name,
-            {
-                'type': 'chat.message',
+    def create_like(self, post, user):
+        new_like = Like.objects.create(post=post, user=user)
+        post.no_of_likes += 1
+        post.save()
+        new_like.save()
+
+    def delete_like(self, like_filter, post):
+        like_filter.delete()
+        post.no_of_likes -= 1
+        post.save()
+
+    def create_comment(self, post_for_cmt, user_id, cmt_content):
+        new_comment = Comment.objects.create(post=post_for_cmt, user_id=user_id, content=cmt_content)
+        post_for_cmt.no_of_comments += 1
+        post_for_cmt.save()
+        new_comment.save()
+
+    def public_data(self, event):
+        try:
+            no_of_likes = event.get('no_of_likes')
+            like_post_id = event.get('like_post_id')
+            user_liked_id = event.get('user_liked_id')
+
+            no_of_comments = event.get('no_of_comments')
+            cmt_post_id = event.get('cmt_post_id')
+            user_comented_id = event.get('user_comented_id')
+            cmt_content = event.get('cmt_content')
+
+            self.send(text_data=json.dumps({
                 'no_of_likes': no_of_likes,
-                'post_id':post_id,
-            }
-        )
+                'like_post_id': like_post_id,
+                 'user_liked_id': user_liked_id,
 
-    def chat_message(self, event):
-        no_of_likes = event['no_of_likes'],
-        post_id = event['post_id']
-        # print('Type of data....:::::',type(message))
-        
-        self.send(text_data=json.dumps({'no_of_likes': no_of_likes,'post_id':post_id}))
-
-        
-
-    
-
+                'no_of_comments': no_of_comments,
+                'cmt_post_id': cmt_post_id,
+                'user_comented_id': user_comented_id,
+                'cmt_content': cmt_content,
+            }))
+        except Exception as e:
+            print(f"An error occurred while sending data: {e}")
