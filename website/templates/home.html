@@ -36,8 +36,8 @@
             
             <div class="if_already_loggedin">
                 {% if user.is_authenticated %}
-                    <p>Hey {{user.username|title}}! Looks like you're still logged in from last time.</p>
-                    <p>No worries, just click the link to access your account again.</p>
+                    <p>Hey <strong>{{user.username|title}}</strong> ! Looks like you're still logged in from last time.</p>
+                    <p>No worries, just click <strong>Continue</strong> to access your account again.</p>
                     <a href="{% url 'public' %}" id="enter_btn">Continue</a><br><br>
                 {% else %}
                     <p>Your virtual space for sharing and chatting.</p><br>

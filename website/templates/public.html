@@ -26,7 +26,7 @@
     <!-- addpost container -->
     <div class="addpost-box">
             <div class="container" >
-                <button onclick="defaultBtnActive()" id="custom-btn" >Choose a Photo to  Make Post</button>
+                <button onclick="defaultBtnActive()" id="custom-btn" >Choose a Picture to  Make Post</button>
                 <div class="wrapper">
                     <div class="image">
                         <img id="upload_img" src=" " alt="">
@@ -115,7 +115,7 @@
                         <div id="like_cmt_only"><span id="post-{{post.id}}" >{{post.no_of_likes}}</span>
                                 <span id="heart_span-{{user.id}}-{{post.id}}">
                                     {% if post.user_has_liked %}
-                                        <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" style="color:red;" ></i>
+                                        <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" onclick="playAudio()" style="color:red;" ></i>
                                     {% else %}
                                         <i class="fa-regular fa-heart heart_icon" id="heart-{{user.id}}-{{post.id}}" onclick="playAudio()" style="color:inherit;"></i>
                                     {% endif %}
@@ -135,6 +135,7 @@
                     <!------------- comment section of post ------------>
 
                     <div id="cmt_box">
+                        <!-- using normal rendering method -->
                         <!-- <form action="{% url 'comment' %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="po_usr" value="{{ post.user}}">  
@@ -145,12 +146,13 @@
                             <button class="comment_post_btn">Add <i class="fa-solid fa-paper-plane"></i></button>
                         </form> -->
 
+                        <!-- using websocket method -->
                         <div class="comment-form">
                             <form class="comment-form" data-post-id="{{ post.id }}">
                                 {% csrf_token %}
                                 <img src="{{ user_profile.profile_picture.url }}" alt="img">
                                 <input type="text" name="cmt_content" placeholder="Write your comments..." autocomplete="off">
-                                <button class="comment_post_btn"><i class="fa-solid fa-paper-plane"></i></button>
+                                <button class="comment_post_btn" id="plane_btn-{{post.id}}"><i class="fa-solid fa-paper-plane" id="paper_plane-{{post.id}}"></i></button>
                             </form>
                         </div>
 
@@ -198,11 +200,9 @@
         );
 
 
-         //  whan connection happens this function get called 
+         // when connection happens this function get called 
          ws.onopen = function(){
-            console.log('Websocket connection open form public page...')
-            // var message = 'hello'
-            // ws.send(JSON.stringify({'msg': message}));
+            console.log('Websocket connection open from public page...')
         }
 
         let alreadyLiked = false;
@@ -268,9 +268,6 @@
                     </li>
                 `;
                 }
-                
-                
-
             }
 
         }
@@ -331,8 +328,21 @@
                 console.log('post_id...::: ',postId)
                 console.log('CommentContent...::: ',commentContent)
 
+                // if the message is not empty
                 if (commentContent !== '') { 
-                    // Check if the message is not empty
+
+                    // ------ plane animations while creating comments-----
+                    const button = document.getElementById(`plane_btn-${postId}`);
+                    const paperPlane = document.getElementById(`paper_plane-${postId}`);
+
+                    paperPlane.classList.add('lets_fly');
+
+                    // After the animation completes, removing the class
+                    setTimeout(function() {
+                        paperPlane.classList.remove('lets_fly');
+                    }, 1000); // after 1s again removing the class name
+
+
                     // Send WebSocket message with comment data
                     ws.send(JSON.stringify({'post_id':postId,'cmt_content':commentContent}));
                     event.target.querySelector('input[name="cmt_content"]').value = '';

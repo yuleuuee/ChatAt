@@ -83,14 +83,43 @@
         <nav>
             {% if user.is_authenticated %}
                 <ul class="nav_list">
-                    <a href="{% url 'public' %}"><li><i class="fa-solid fa-house-chimney"></i> Public Page</li></a>
-                    <a href="{% url 'profile' pk=user %}"><li><i class="fa-solid fa-user"></i> Your Profile</li></a>
-                    <a href="{% url 'settings' %}"><li><i class="fa-solid fa-gears"></i> Settings</li></a>
-                    <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}"><li><i class="fa-regular fa-comments"></i>Solo-Chat</li></a>
-        
-                    <li id="chat_btn"><i class="fa-solid fa-comments"></i>Duo-Chat</li>
-        
-                    <!-- chat list -->
+
+                    {% if active_public %}
+                        <a href="{% url 'public' %}"><li class="active_nav_list"><i class="fa-solid fa-house-chimney"></i> <p>Public Page</p></li></a>
+                    {% else %}
+                        <a href="{% url 'public' %}"><li><i class="fa-solid fa-house-chimney"></i> <p>Public Page</p></li></a>
+                    {% endif %}
+
+
+                    {% if active_profile %}
+                        <a href="{% url 'profile' pk=user %}"><li class="active_nav_list"><i class="fa-solid fa-user"></i> <p>Your Profile</p></li></a>
+                    {% else %}
+                        <a href="{% url 'profile' pk=user %}"><li><i class="fa-solid fa-user"></i> <p>Your Profile</p></li></a>
+                    {% endif %}
+
+
+                    {% if active_setting %}
+                        <a href="{% url 'settings' %}"><li class="active_nav_list"><i class="fa-solid fa-gears"></i> <p>Settings</p></li></a>
+                    {% else %}
+                        <a href="{% url 'settings' %}"><li><i class="fa-solid fa-gears"></i> <p>Settings</p></li></a>
+                    {% endif %}
+
+
+                    {% if active_solo_chat %}
+                        <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}"><li class="active_nav_list"><i class="fa-regular fa-comments"></i> <p>Solo-Chat</p></li></a>
+                        
+                    {% else %}
+                        <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}"><li><i class="fa-regular fa-comments"></i> <p>Solo-Chat</p></li></a>
+                    {% endif %}
+
+                    {% if active_duo_chat %}
+                        <a><li id="chat_btn" class="active_nav_list"><i class="fa-solid fa-comments"></i> <p>Duo-Chat</p></li></a>
+                    {% else %}
+                        <a><li id="chat_btn"><i class="fa-solid fa-comments"></i> <p>Duo-Chat</p></li></a>
+                    {% endif %}
+                    
+    
+                    <!-- mutual friend for duo chat -->
                     {% if mutual_following_profiles %}  
                     <div id="users_to_chat" >
                         {% for mutual_flr in mutual_following_profiles %}
@@ -116,6 +145,60 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+
+{% if not group_name %}
+        <script>
+
+        var ws = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/wsc/'
+        );
+
+         // when connection happens this function get called 
+         ws.onopen = function(){
+            console.log('Websocket connection open from Base page ...')
+        }
+
+        // this gets called when client receives message from server
+        ws.onmessage = function(event){
+            console.log('Message received form server ...',event.data)
+            const data = JSON.parse(event.data);
+            
+            if(data.is_dark){
+                console.log('Dark mode is ...:::',data.is_dark)
+            }
+        }
+
+        // this get callled when the connection get lost
+        ws.onclosed = function(){
+            console.log('Websocket connection closed ...')
+        }
+
+        // dark_light mode:  sun_moon :------------------------------
+
+        const dark_light = document.getElementById('dark_light');
+        let body = document.querySelector("body");
+        let sun_moon_icon = document.querySelector("#dark_light>i");
+        dark_light.addEventListener('click',()=>{
+            if (body.className == "black") {
+                ws.send(JSON.stringify({'is_dark':false}));
+                body.className = "white";
+                dark_light.innerHTML='<i class="fa-solid fa-moon"></i>';
+                sun_moon_icon.style.transform = 'scale(1.2)';
+            } else if (body.className == "white") {
+                ws.send(JSON.stringify({'is_dark':true}));
+                body.className = "black";
+                sun_moon_icon.style.transform = 'scale(1.2)';
+                dark_light.innerHTML='<i class="fa-solid fa-sun"></i>';
+            }
+            // ws.send(JSON.stringify({'is_dark':true}));
+        });
+
+    </script>
+    
+{% endif %}
+
 
     <script src="{% static 'js/base.js' %}"></script>
 

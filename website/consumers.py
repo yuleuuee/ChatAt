@@ -5,7 +5,7 @@ import json
 from channels.db import database_sync_to_async
 from . models import ChatMessage
 
-from . models import Post,Like,Comment
+from . models import Post,Like,Comment,UserProfile
 
 
 # ********************************* :: WebsocketConsumer :(wsc), for Real time Chat :: **************************************************** #
@@ -207,7 +207,8 @@ class Public_WebsocketConsumer(WebsocketConsumer):
             data = json.loads(text_data)
             user = self.scope['user']
             user_id = user.id
-            
+
+            # like part :
             if 'po_id' in data:
                 # For handling 'po_id'
                 post_id = data.get('po_id')
@@ -231,6 +232,7 @@ class Public_WebsocketConsumer(WebsocketConsumer):
                     }
                 )
 
+            # comment part :
             if 'post_id' in data:
                 # For handling 'post_id'
                 post_id = data.get('post_id')
@@ -251,6 +253,20 @@ class Public_WebsocketConsumer(WebsocketConsumer):
                         'cmt_content': cmt_content,
                     }
                 )
+            
+            # Dark mode part :
+            if 'is_dark' in data:
+                user_profile = UserProfile.objects.get(user=self.scope['user'])
+                user_profile.dark_mode = data.get('is_dark')
+                user_profile.save()
+                async_to_sync(self.channel_layer.group_send)(
+                    self.group_name,
+                    {
+                        'type': 'public.data',
+                        'is_dark':data.get('is_dark'),
+                    }
+                )
+
 
         except json.JSONDecodeError:
             print("Invalid JSON data received.")
@@ -287,6 +303,8 @@ class Public_WebsocketConsumer(WebsocketConsumer):
             user_comented_id = event.get('user_comented_id')
             cmt_content = event.get('cmt_content')
 
+            is_dark = event.get('is_dark')
+
             self.send(text_data=json.dumps({
                 'no_of_likes': no_of_likes,
                 'like_post_id': like_post_id,
@@ -296,6 +314,8 @@ class Public_WebsocketConsumer(WebsocketConsumer):
                 'cmt_post_id': cmt_post_id,
                 'user_comented_id': user_comented_id,
                 'cmt_content': cmt_content,
+                
+                'is_dark':is_dark,
             }))
         except Exception as e:
             print(f"An error occurred while sending data: {e}")

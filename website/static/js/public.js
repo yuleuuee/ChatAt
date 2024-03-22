@@ -122,4 +122,3 @@ document.addEventListener("DOMContentLoaded", function() {
         element.textContent = time;
     });
 });
-

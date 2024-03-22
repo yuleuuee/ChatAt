@@ -425,11 +425,18 @@
 #cmt_box form input{
     /* border: 1px solid black; */
     border: none;
-    box-shadow: 0 0 10px 5px rgba(239, 207, 140, 0.5); 
+    /* box-shadow: 0 0 2px 2px rgba(239, 207, 140, 0.5);  */
+    box-shadow: 0 0 2px 2px rgba(201, 140, 239, 0.33); 
     padding: 5px 10px;
     outline: none;
     border-radius: 5px;
 }
+
+#cmt_box form input:hover,#cmt_box form input:focus{
+    box-shadow: 0 0 2px 2px rgba(140, 175, 239, 0.33); 
+}
+
+/*---- comment sending button part---- */
 
 .comment_post_btn{
     padding: 4px;
@@ -443,8 +450,29 @@
 
 }
 
-.comment_post_btn i:hover {
-    color: green;
+.comment_post_btn i{
+    transition: 1s ease;
+}
+
+.comment_post_btn i:hover{
+    transition: 0s;
+    color:rgb(128, 0, 119);
+}
+
+.lets_fly {
+    animation: fly_plane 1s 1 ease;
+}
+
+@keyframes fly_plane {
+    0%{
+        opacity: 1;
+    }
+
+    100%{
+        
+        transform: translate(40px, -40px);
+        opacity: 0;
+    }
 }
 
 
@@ -494,9 +522,8 @@
     border: none;
     background-color: transparent;
     padding: 0 5px;
-    color: #3f0e1f;
+    color: gray;
     cursor: pointer;
-
 
 }
 

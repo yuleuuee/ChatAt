@@ -288,6 +288,7 @@ def public_page(request):
         post.user_has_liked = post.likes.filter(user=request.user).exists()
     
     context={
+        'active_public':True,
         'current_user': current_user, 
         'greeting': greeting ,
         'user_profile':user_profile,
@@ -302,22 +303,20 @@ def public_page(request):
 
     # *******************: Searching Users :******************
 
-    if request.method =='POST':
-        # query = request.GET.get('query')
-        query = request.POST['query']
+    if request.method == 'POST':
+        query = request.POST.get('query', '').strip()  # Get the query from the POST data
 
         if query:
-            search_results = User.objects.filter(username__icontains=query).exclude(is_superuser=True)
+            # filtering the username by form the user that starts with the queary
+            search_results = User.objects.filter(username__istartswith=query).exclude(is_superuser=True)
             if search_results.exists():
-                # messages.success(request, 'Username was found successfully!')
                 pass
             else:
-                print('came here last')
                 messages.error(request, 'Username does not match any existing user.')
         else:
             search_results = None
 
-        context['search_results'] = search_results # apanding the search result to the context dictanaries
+        context['search_results'] = search_results
         return render(request, 'public.html', context)
     else:
         return render(request, 'public.html', context)
@@ -386,7 +385,7 @@ def settings(request):
         messages.success(request, "Save Change Success!")
         return redirect('profile')
     else:
-        return render(request,'settings.html',{'user_profile':user_profile,'mutual_following_profiles':mutual_following_profiles})
+        return render(request,'settings.html',{'active_setting':True,'user_profile':user_profile,'mutual_following_profiles':mutual_following_profiles})
 
     
 # -----------------------------------------:: PROFILE PAGE ::---------------------------------------------
@@ -432,6 +431,7 @@ def profile(request,pk):
     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
     context={
+        'active_profile':True,
         'user_object':user_object,
         'user_profile':user_profile,
         'user_posts':user_posts,
@@ -741,15 +741,28 @@ def private_chat(request,current_user_id, friend_user_id):
     # all_messages = ChatMessage.objects.filter(group=group_name).order_by('timestamp')
     chat_messages = ChatMessage.objects.filter(group=group)
 
-    context={
-        'group_name':group_name,
-        'current_user':current_user,
-        'friend_user':friend_user,
-        'mutual_following_profiles':mutual_following_profiles,
-        'user_profile':user_profile,
-        'friend_user_profile':friend_user_profile,
-        'chat_messages':chat_messages,
-    }
+    if friend_user_id_int == request.user.id:
+        context={
+            'active_solo_chat':True,
+            'group_name':group_name,
+            'current_user':current_user,
+            'friend_user':friend_user,
+            'mutual_following_profiles':mutual_following_profiles,
+            'user_profile':user_profile,
+            'friend_user_profile':friend_user_profile,
+            'chat_messages':chat_messages,
+        }
+    else:
+        context={
+            'active_duo_chat':True,
+            'group_name':group_name,
+            'current_user':current_user,
+            'friend_user':friend_user,
+            'mutual_following_profiles':mutual_following_profiles,
+            'user_profile':user_profile,
+            'friend_user_profile':friend_user_profile,
+            'chat_messages':chat_messages,
+        }
 
     return render(request,'chat_room.html',context)
 

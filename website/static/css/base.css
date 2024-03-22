@@ -154,6 +154,7 @@ nav{
 
 }
 
+
 .nav_list a{
     text-decoration: none;
     color:inherit;
@@ -197,6 +198,13 @@ nav{
     margin-top: 40px;
     border-radius: 0 15px;
     cursor: pointer;
+
+    display: flex;
+    justify-content: first baseline;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    
 }
 
 
@@ -217,10 +225,24 @@ nav{
     background: linear-gradient(to right,transparent,rgba(193, 96, 242, 0.343));
 }
 
+
 .nav_list li:hover::before{
     left:100%;
     transform: translateX(-50%); /*horizontally center an element within its container */
 }
+
+/* ------ active nav list setting ----- */
+
+.active_nav_list{
+    background: linear-gradient(to right,transparent,rgba(193, 96, 242, 0.343));
+}
+
+.nav_list .active_nav_list::before{
+    left:100%;
+    transform: translateX(-50%); 
+}
+
+/* ---------------------------------- */
 
 /* bottom gradient line */
 .nav_list li::after {
@@ -280,21 +302,43 @@ nav{
 
 }
 
+/*  ***************************************************************************************** */
+/* *************************** RESPONSIVE DESIGN TRY ************************************* */
+/*  ***************************************************************************************** */
 
-/* **************************************************************** */
-/* css for small screens */
+/* if the width of the screen is less than 1000px and is greater than 600px */
+@media only screen and (max-width :1000px) {
+    aside{
+        border-right: 2px solid grey;
+        height:100vh;
+        width: 12rem;  /* 1 rem = is the relative font size of root element */
+        position: fixed;
+    }
+    
+    main{
+        border-left: 1px dashed grey;
+        margin-left: 12.5rem;
+        padding: 1rem;
+    
+    }
+}
+
+/* if the width of the screen is less 600px */
 @media only screen and (max-width :600px) {
     aside{
-        height:110px;
+        height:180px;
         width: 100%;  
         position: fixed;
         top: 0;
         background-color: white;
+        z-index: 100;
+        border: none;
+        border-bottom: 4px double purple;
     }
 
     main{
         margin: 5px;
-        margin-top: 110px;
+        margin-top: 185px;
     }
 
     /* nav{
@@ -321,17 +365,25 @@ nav{
     .nav_list li{
         border: none;
         padding: 2px;
-        padding-top: 5px;
+        padding-bottom: 10px;
         font-weight: bold;
         margin-top: 25px;
-        font-size: 12px;
-        border-radius: 0;
         text-transform:none;
         text-shadow: none;
+        font-size: 1.5rem;
+
+    }
+
+    .nav_list li p{
+        display: none;
 
     }
 
     .nav_list li::after{
+        display: none;
+    }
+
+    .nav_list li::before{
         display: none;
     }
 
@@ -340,17 +392,41 @@ nav{
     }
 
 
-    #light_bulb {
+    #dark_light {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
         height: 25px;
         width: 25px;
+        
+        position: fixed;
+        top: 15px;
+        right: 400px;
+        z-index: 101;
     }
 
-    #light_bulb > i {
-        font-size: 1.1em;
+
+    #logout_btn{
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        gap: 5px;
+
+        position: fixed;
+        top: 10px;
+        left: 500px;
+        height: 25px;
+        width: 25px;
+        z-index: 101;
     }
 
     
 }
+
+
 
 /* for less height screen */
 @media only screen and (max-height :600px) {
