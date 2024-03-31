@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from .models import OTPModel
 from chat_app.settings import EMAIL_HOST_USER
+
+import random 
 # from django.utils.html import escape
 
 
@@ -32,11 +34,32 @@ def user_login(request):
         input_value = request.POST['username_or_email']
         password = request.POST['password']
 
-        if len(input_value)== 0:
+        if len(input_value.strip())== 0:
             messages.error(request, "Must enter Email or Username !")
             return redirect('home')
-        elif len(password) == 0:
+        elif input_value.isnumeric():
+            messages.error(request, "Username must contain english Letters!")
+            return redirect('home')
+        # elif  len(input_value)< 4:
+        #     messages.error(request, "Username Length can't be less then 4 characters!")
+        #     return redirect('home')
+        elif  len(input_value)> 15:
+            messages.error(request, "Username Length can't be greater then 15 characters!")
+            return redirect('home')
+        
+        
+
+        if len(password.strip()) == 0:
             messages.error(request, "Password field can't be empty !")
+            return redirect('home')
+        elif password.isnumeric():
+            messages.error(request, "Password can't just be numbers!")
+            return redirect('home')
+        # elif len(password.strip()) < 4:
+        #     messages.error(request, "Password Length can't be less than 4 characters !")
+        #     return redirect('home')
+        elif len(password.strip()) > 15:
+            messages.error(request, "Password Length can't be greater than 15 characters !")
             return redirect('home')
         
         #User.objects.filter(username=u_name).first()
@@ -44,16 +67,19 @@ def user_login(request):
             user = authenticate(request,username=input_value, password=password)
         elif User.objects.filter(email=input_value).exists(): 
             user = authenticate(request,email=input_value,password=password)
-            messages.error(request, "Email login is encountering problem, Try with your Username !")
-            return redirect('home')
+            if user is None:
+                messages.error(request, "Email login currently Unavilable !")
+                return redirect('home')
         else:
             messages.error(request, "User Doesn't Exist")
             return redirect('home')
+        
+        
 
         if user: # if there is user with  provided password matches the stored password
             login(request, user)
             # Update user's profile to set is_active to True
-            user.userprofile.is_active = True
+            user.userprofile.is_online = True
             user.userprofile.save()
             messages.success(request, "Successfully logged in!")
             return redirect('public') #,{'user_profile':user_profile}
@@ -74,19 +100,43 @@ def user_signup(request):
         pass2 = request.POST['password2']
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists ! Try another one")
+            messages.error(request, "Username already exists ! Try another one ")
             return redirect('home')
-        elif len(email.strip())==0:
+        elif len(username.strip()) == 0:
+            messages.error(request, "Must enter username !")
+            return redirect('home')
+        elif len(username.strip()) < 4:
+            messages.error(request, "Username must contain at least 4 characters! ")
+            return redirect('home')
+        elif len(username.strip()) > 15:
+            messages.error(request, "Username can't contain more than 15 characters! ")
+            return redirect('home')
+        elif username.isnumeric():
+            messages.error(request, "Username can't just contain numbers! ")
+            return redirect('home')
+        
+
+        import re
+        if len(email.strip())==0:
             messages.error(request, "Must enter email ! Try again !")
             return redirect('home')
         elif User.objects.filter(email=email).exists():
             messages.error(request, "Email already exists ! Try again !")
             return redirect('home')
-        elif len(pass1.strip())==0 or len(pass2.strip())==0:
+        elif not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            messages.error(request, "That is not a valid email ! Try again ! ")
+            return redirect('home')
+
+        
+
+        if len(pass1.strip())==0 or len(pass2.strip())==0:
             messages.error(request, "Must enter Password ! Try again !")
             return redirect('home')
         elif len(pass1.strip())<4 or len(pass2.strip())<4:
             messages.error(request, "Password too Short ! Try again !")
+            return redirect('home')
+        elif len(pass1.strip())<4 or len(pass2.strip())>15:
+            messages.error(request, "Password too Long ! Try again !")
             return redirect('home')
         elif pass1 != pass2:
             messages.error(request, "Password dosn't match! Try again !")
@@ -98,13 +148,14 @@ def user_signup(request):
 
             #creating a UserProfile object for the New User: 
             # this means a row will be created for the 'New_user' in the 'UserProfile' table
+
             user_model = User.objects.get(username=username)
             new_UserProfile = UserProfile.objects.create(user =user_model) 
-            new_UserProfile.save()
+            # new_UserProfile.save()
 
-            login(request, user) # making the user logged in 
-            user.userprofile.is_active = True
-            user.userprofile.save()
+            # login(request, user) 
+            # user.userprofile.is_online = True
+            # user.userprofile.save()
 
             messages.success(request, "Successfully registered")
             return redirect('settings') # after succesful account creation users are sent to account settings page   
@@ -115,7 +166,7 @@ def user_signup(request):
 @login_required(login_url='login')
 def user_logout(request):
     # Update user's profile to set is_active to False
-    request.user.userprofile.is_active = False
+    request.user.userprofile.is_online = False
     request.user.userprofile.save()
 
     logout(request)
@@ -232,7 +283,7 @@ def public_page(request):
 
 
     # **************  User suggestions ********************
-    import random 
+
 
     # Get all users except the current user and the admin user
     all_users = User.objects.exclude(username=request.user.username).exclude(is_superuser=True)
@@ -398,7 +449,9 @@ def profile(request,pk):
     user_post_no = len(user_posts)
 
 
-     # Retrieve following and followers data for the current user
+    # --------- for  getting the followers and following of current user --------#
+    
+    # Retrieve following and followers data for the current user
     following_usernames = FollowersCount.objects.filter(follower=request.user.username).values_list('user', flat=True)
     followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
 
@@ -430,6 +483,15 @@ def profile(request,pk):
     mutual_following_usernames = set(following_usernames).intersection(set(followers_usernames))
     mutual_following_profiles = UserProfile.objects.filter(user__username__in=mutual_following_usernames)
 
+
+    # *****************: Only my followers :**********************
+
+    # Retrieve the usernames of users who follow you
+    followers_usernames = FollowersCount.objects.filter(user=request.user.username).values_list('follower', flat=True)
+
+    # Find users who follow you but you don't follow them back
+    followers_without_following_back = set(followers_usernames) - set(following_usernames)
+
     context={
         'active_profile':True,
         'user_object':user_object,
@@ -442,6 +504,7 @@ def profile(request,pk):
         'following_profiles':following_profiles,
         'followers_profiles':followers_profiles,
         'mutual_following_profiles':mutual_following_profiles,
+        'followers_without_following_back':followers_without_following_back,
 
     }
 
@@ -529,6 +592,8 @@ def delete_post(request,post_id):
 
 # -----------------------------------------:: COMMENTING A POST function ::---------------------------------------------
 
+#  done by using WebSocket in the consumer.py 
+    
 @login_required(login_url='login')
 def comment(request):
     if request.method == 'POST':

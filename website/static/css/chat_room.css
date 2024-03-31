@@ -99,6 +99,7 @@ h1{
 
 }
 
+
 #all_users a span img{
     width: 35px; 
     height: 35px; 
@@ -135,6 +136,10 @@ h1{
 
 #all_users a:hover{
     background-color: rgba(100, 96, 101, 0.11);
+}
+
+.now_chat{
+    background-color: rgba(77, 73, 78, 0.11);
 }
 
 /* ------ right box of the chat page----- */

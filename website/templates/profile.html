@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Profile Page{% endblock %}
+{% block title %}Profile - ChatAt{% endblock %}
 
 
 {% block head %}
@@ -44,7 +44,12 @@
                         {% if user_object.username == user.username %} <!--  if the 'view page' is of the 'user who is viewing'  -->
                             <a href="{% url 'settings' %}" class="profile_settings" ><i class="fa-solid fa-gear"></i> Profile Settings </a>
                         {% else %}
-                            <div  id="follow_unfollow_btn"><button type="submit">{{button_text}}</button></div>
+                            <!-- <div  id="follow_unfollow_btn"><button type="submit">{{button_text}}</button></div> -->
+                            {% if user_object.username in followers_without_following_back %}
+                                <div  id="follow_unfollow_btn"><button type="submit">Follow Back</button></div>
+                            {% else %}
+                                <div  id="follow_unfollow_btn"><button type="submit">{{button_text}}</button></div>
+                            {% endif %}
                         {% endif %}
                     </form>
                 </div>

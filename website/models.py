@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', default='dummy.png') # must install : pip3 install Pillow
 
     # New field to track active status
-    is_active = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False)
     dark_mode = models.BooleanField(default=False)
 
     # helps to see the username in the admin pannel insted of object 1 or object2
@@ -46,8 +46,8 @@ class Like(models.Model):
         return f"Liked by {self.user.username} on {self.post}"
     
 class FollowersCount(models.Model):
-    follower =models.CharField(max_length=100) # stores the 'username' of a user who is following other user
-    user = models.CharField(max_length=100)   # stores the 'username' of a user who is followed other user
+    follower =models.CharField(max_length=100) # stores the 'username' of user who follow
+    user = models.CharField(max_length=100)   # stores the 'username' of a user who is being followed
 
     def __str__(self):
         return f"{self.follower} just followed {self.user}"
@@ -56,7 +56,7 @@ class FollowersCount(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments') # id of the post which was commented
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # id of the user who wrote comment
-    content = models.TextField()
+    content = models.TextField(max_length = 200)
     commented_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

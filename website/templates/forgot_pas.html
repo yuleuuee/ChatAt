@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password</title>
+    <title>Forgot Password - ChatAt</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/forgot_pas.css' %}"> 
 
@@ -54,7 +54,7 @@
                 <input type="text" placeholder="Enter your Email" value="{{email}}" name="email" autocomplete="off">
             {% else %}
                 <!-- at 1st this input works , in which we have to emter email for sending otp -->
-                <input list="email_list" type="text" placeholder="Enter your Email" name="email" autocomplete="off">  
+                <input list="email_list" type="text" placeholder="Your Account Email..." name="email" autocomplete="off">  
                 <datalist id="email_list">
                     <option value="yuleuuee@gmail.com"></option>
                     <option value="rain@gmail.com"></option>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Chat Page{% endblock %}
+{% block title %}Chat - ChatAt{% endblock %}
 
 {% block head %}
 
@@ -26,21 +26,41 @@
         </div>
         <div id="all_users">
             <!-- always showing current user on top (solo-chat)-->
-            <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}">
-                <span class="chat_user_online"><img src="{{ user.userprofile.profile_picture.url }}" alt=""></span>
-                <span>{{user.first_name|title}} {{user.last_name|title}}</span>
-            </a>
+            {% if friend_user_profile.user == user %}
+                <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}" class="now_chat">
+                    <span class="chat_user_online"><img src="{{ user.userprofile.profile_picture.url }}" alt=""></span>
+                    <span>{{user.first_name|title}} {{user.last_name|title}}</span>
+                </a>
+            {% else %}
+                <a href="{% url 'chat' current_user_id=user.id friend_user_id=user.id %}">
+                    <span class="chat_user_online"><img src="{{ user.userprofile.profile_picture.url }}" alt=""></span>
+                    <span>{{user.first_name|title}} {{user.last_name|title}}</span>
+                </a>
+            {% endif %}
+            
             {% for mutual_flr in mutual_following_profiles %}
-            <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
-                <!-- <img src="{{ mutual_flr.profile_picture.url }}" alt=""> -->
-                {% if mutual_flr.user.userprofile.is_active %}
-                    <span class="chat_user_online"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+
+                {% if friend_user_profile.user == mutual_flr.user %}
+                    <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}" class="now_chat">
+                        {% if mutual_flr.user.userprofile.is_online %}
+                            <span class="chat_user_online"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                        {% else %}
+                            <span class="chat_user_offline"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                        {% endif %}
+
+                        <span>{{mutual_flr.user.first_name|title}} {{mutual_flr.user.last_name|title}}</span>
+                    </a>    
                 {% else %}
-                    <span class="chat_user_offline"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                    <a href="{% url 'chat' current_user_id=user.id friend_user_id=mutual_flr.id %}">
+                        {% if mutual_flr.user.userprofile.is_online %}
+                            <span class="chat_user_online"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                        {% else %}
+                            <span class="chat_user_offline"><img src="{{ mutual_flr.profile_picture.url }}" alt=""></span>
+                        {% endif %}
+
+                        <span>{{mutual_flr.user.first_name|title}} {{mutual_flr.user.last_name|title}}</span>
+                    </a>    
                 {% endif %}
-                    <span>{{mutual_flr.user.first_name|title}} {{mutual_flr.user.last_name|title}}</span>
-                <!-- <i class="fa-regular fa-comment" style="color: green; font-size: 0.9em;"></i> -->
-            </a>    
             {% endfor %}
             
         </div>
