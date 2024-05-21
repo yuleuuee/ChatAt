@@ -64,7 +64,7 @@
         </form>
    
         <!-------- verify otp form -------->
-        <form action="{% url 'verify_otp' %}"  method="POST" id="verify_otp">
+        <form action="{% url 'verify_otp' %}"  method="POST" id="verify_otp" onkeypress="preventdefault(this);">
             {% csrf_token %}
 
             {% if email %}

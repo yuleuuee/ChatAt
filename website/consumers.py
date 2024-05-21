@@ -7,6 +7,8 @@ from . models import ChatMessage
 
 from . models import Post,Like,Comment,UserProfile
 
+from asgiref.sync import sync_to_async
+
 
 # ********************************* :: WebsocketConsumer :(wsc), for Real time Chat :: **************************************************** #
 
@@ -44,11 +46,7 @@ class MyWebsocketConsumer(WebsocketConsumer):
         print('Message received from client ...',text_data)
         # print('User ::: ',self.scope['user'])
 
-        # text_data_json = json.loads(text_data) # converting string to python dict. is before using it ,  what we received is string : {'msg': 'hello'}
-        # message = text_data_json['msg']
-
-
-        data = json.loads(text_data)
+        data = json.loads(text_data) # converting string to python dict. is before using it ,  what we received is string : {'msg': 'hello'}
         # Extract the message and sender's username
         message = data.get('msg')
         sender_username = self.scope['user'].username
@@ -116,76 +114,75 @@ class MyAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print('------------------------------------------------ AsyncWebsocketConsumer ::: connect function')
         print('Websocket Connected ...')
-        self.group_name = self.scope['url_route']['kwargs']['groupko_name']
 
+        self.group_name = self.scope['url_route']['kwargs']['groupko_name']
+        print('Grpup name :::', self.group_name)
+        # making a group and adding channels(users) to the group
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
         )
-        await self.accept()
-
-    async def receive(self, text_data=None, bytes_data=None):
-        print('------------------------------------------------ AsyncWebsocketConsumer ::: receive function')
-        print('Message received from client ...',text_data)
-        
-        text_data_json = json.loads(text_data)
-        message = text_data_json['msg']
-
-        # -------------------------------------- #
-        # Split the group name by underscores (groupname eg: ChatGroup_of_userX_userY)
-        parts = self.group_name.split("_")
-
-        # Extract the numbers after "userX" and "userY"
-        numX = int(parts[2].replace("user", ""))
-        numY = int(parts[3].replace("user", ""))
-
-        sender_id = self.scope['user'].id
-        receiver_id = numY if numX == sender_id else numX
-
-        print("Sender id:", sender_id)
-        print("Receiver id:", receiver_id)
-
-        # Get the sender and receiver's user objects
-        sender = self.scope['user']
-        receiver = await database_sync_to_async(User.objects.get)(id=receiver_id)
-
-        # -------------------------------------- #
-
-        group = await database_sync_to_async(Group.objects.get)(group_name=self.group_name)
-
-        # Save the message to the database
-        new_chat = ChatMessage(sender=sender, receiver=receiver, message=message, group=group)
-        await database_sync_to_async(new_chat.save)()
-
-        # Send message to the group
-        await self.channel_layer.group_send(
-            self.group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-            }
-        )
+        await self.accept()  # this keeps handshake(connected)
 
     async def disconnect(self, close_code):
         print('------------------------------------------------ AsyncWebsocketConsumer ::: disconnect function')
         print('Websocket Disconnected ...', close_code)
-        
-        # Leave chat group
+        # Leave room group
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
         )
 
+    async def receive(self, text_data=None, bytes_data=None):
+        print('------------------------------------------------ AsyncWebsocketConsumer ::: receive function')
+        print('Message received from client ...', text_data)
+
+        data = json.loads(text_data)
+        message = data.get('msg')
+        sender_username = self.scope['user'].username
+
+        parts = self.group_name.split("_")
+        numX = int(parts[2].replace("user", ""))
+        numY = int(parts[3].replace("user", ""))
+        if numX == self.scope['user'].id:
+            receiver_id = numY
+        else:
+            receiver_id = numX
+
+        print("Sender id:", self.scope['user'].id)
+        print("Receiver id:", receiver_id)
+
+        receiver = await sync_to_async(User.objects.get)(id=receiver_id)
+        sender = self.scope['user']
+
+        data['user'] = sender_username
+
+        group = await sync_to_async(Group.objects.get)(group_name=self.group_name)
+
+        # saving the message to the database
+        # new_chat = ChatMessage(sender=sender,receiver=receiver,message=message,group=group)
+        # new_chat.save()
+
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'chat.message',
+                'message': message,
+                'sender_username': sender_username,
+            }
+        )
+
     async def chat_message(self, event):
         message = event['message']
+        sender_username = event['sender_username']
+        print('Type of data....:::::', type(message))
 
-        # Send message data to the client
-        await self.send(text_data=json.dumps({
-            'message': message,
-        }))
+        await self.send(text_data=json.dumps({'message': message, 'sender_username': sender_username}))
 
+
+# ******************************************************************************************************************************************************************
 # # ********************************* :: Public page : WebsocketConsumer :(wsc) , For like and Comment Part :: **************************************************** #
-
+# ******************************************************************************************************************************************************************
     
 class Public_WebsocketConsumer(WebsocketConsumer):
 
@@ -266,7 +263,6 @@ class Public_WebsocketConsumer(WebsocketConsumer):
                         'is_dark':data.get('is_dark'),
                     }
                 )
-
 
         except json.JSONDecodeError:
             print("Invalid JSON data received.")

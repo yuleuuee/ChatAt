@@ -41,3 +41,9 @@ document.body.addEventListener('click', (event) => {
         hideBothDivs();
     }
 });
+
+
+// particular post display :
+
+// const post_id = document.getElementById('that_post_id').value
+// const post_image = document.getElementById('post_image')

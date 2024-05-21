@@ -60,7 +60,7 @@
 
                 <form class="searchBox" action="{% url 'search_users' %}" method="POST">
                     {% csrf_token %}
-                    <input class="searchInput" type="text"  name="query" placeholder="Search Users.." autocomplete="off" required >
+                    <input class="searchInput" type="text"  name="query" placeholder="Search Users.." autocomplete="off" required>
                     <button type="submit"><i class="fa fa-search"></i></button>
                 </form>
 

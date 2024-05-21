@@ -11,20 +11,45 @@ function getImagePreview(event){
   var image = URL.createObjectURL(event.target.files[0]);
   var profile_img_div = document.getElementById('profile_img_div');
   var new_img = document.createElement('img');
+  
   new_img.src = image;
   new_img.width='100';
   new_img.height='100';
   profile_img_div.innerHTML = '';
   profile_img_div.appendChild(new_img);
+
+
+  // new_update 0.1
+  var new_span = document.createElement('span');
+  new_span.className='change_btn';
+  new_span.innerHTML='Change';
+  profile_img_div.appendChild(new_span);
 }
 
-// const default_img = document.getElementById('custom_img_btn')
-// const preview_img_div = document.getElementById('preview_img_div')
-// const profile_image_cross = document.getElementById('profile_image_cross')
-// profile_image_cross.addEventListener('click',()=>{
-//   default_img.style.display='block'
-// })
 
+// ----------- new_update 0.1 -------------
+
+// let imageRemoved = false; // Flag to track if the image has been removed
+var profile_image_cross = document.getElementById('profile_image_cross');
+var profile_img_div = document.getElementById('profile_img_div');
+profile_image_cross.addEventListener('click',()=>{
+  profile_img_div.innerHTML = '';
+  profile_img_div.innerHTML = "<img id='default_img' src='{{user_profile.profile_picture.url }}'  style='width: 100px; height: 100p'><span class='change_btn'>Change</span>";
+  // imageRemoved = true; // Flag to track if the image has been removed
+  location.reload();  // reloding the page when clicke the cross
+});
+
+
+// defaultBtn.addEventListener('change', ()=>{
+//   document.getElementById('profile_detail_form').addEventListener('submit', function(event) {
+//     // Prevent form submission if the image has been removed
+//     if (imageRemoved) {
+//         event.preventDefault();
+//     }
+//   })
+// });
+
+// ------------------------------------
 
 
 //*********** Password cahnge and delete acc part ***************///

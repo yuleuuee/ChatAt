@@ -9,13 +9,13 @@ const success_msg = document.getElementById('success_msg');
 if (error_msg) {
   setTimeout(() => {
     error_msg.style.display = 'none';
-  }, 6000); 
+  }, 9000); 
 }
 
 if (success_msg) {
   setTimeout(() => {
     success_msg.style.display = 'none';
-  }, 6000); 
+  }, 9000); 
 }
 
 // cross mark hide message
@@ -31,6 +31,15 @@ cross_mark.addEventListener('click',()=>{
 
 // *********************** :: OTP Green Tick mark hide and show with Number restrictions :: ***********************
 
+// const verify_otp = document.getElementById('verify_otp')
+
+// verify_otp.addEventListener('keypress', ()=>{
+//   if (key === 'Enter') {
+//     preventDefault();
+//   }
+// });
+
+
 
 const verify_otp_btn = document.getElementById('verify_otp_btn')
 const check_mark = document.getElementById("check_mark");
@@ -44,3 +53,5 @@ function CheckmarkVisibility(input) {
     }
     input.value = input.value.replace(/[^0-9]/g, ''); // Restrict to numbers only(replaces any characters that are not numbers with an empty string)
 }
+
+

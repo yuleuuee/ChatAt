@@ -70,7 +70,10 @@ TEMPLATES = [
     },
 ]
 
+# WSGI (Web Server Gateway Interface) is designed for synchronous HTTP connections.
 # WSGI_APPLICATION = 'chat_app.wsgi.application'
+
+# ASGI (Asynchronous Server Gateway Interface) is specifically designed to handle asynchronous HTTP and WebSocket connections
 ASGI_APPLICATION = 'chat_app.asgi.application'
 
 
@@ -92,6 +95,9 @@ DATABASES = {
         'PASSWORD': 'rabhav1120',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 

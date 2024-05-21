@@ -98,7 +98,8 @@
         <div class="all_posts_collections">
             {% for post in user_posts reversed%}
                 <div class="each_post">
-                    <img src="{{ post.image.url }}" alt="" >
+                    <img id="post_id_{{post.id}}" src="{{ post.image.url }}" alt="" >
+                    <!-- <input id="that_post_id" type="hidden" value="{{post.id}}"> -->
                     <div>
                         <p>{{post.no_of_likes}} <i class="fa-regular fa-heart"></i></p>
                         <p>{{post.no_of_comments}} <i class="fa-regular fa-comment"></i></p>
@@ -115,6 +116,10 @@
                 </div>
             {% endfor %}
         </div>
+        <!-- <div id="selected_post">
+            <div id="post_image">img</div>
+            <div id="post_info">info</div>
+        </div> -->
     </div>
     
 <script src="{% static 'js/profile.js' %}"></script>

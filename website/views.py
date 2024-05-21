@@ -5,18 +5,17 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
-from .models import UserProfile,Post,Like,FollowersCount,Comment,ChatMessage,Group
+from .models import UserProfile,Post,Like,FollowersCount,Comment,ChatMessage,Group,OTPModel
 
 from datetime import datetime
 
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
-from .models import OTPModel
+# from .models import OTPModel
 from chat_app.settings import EMAIL_HOST_USER
 
 import random 
-# from django.utils.html import escape
-
+import re # regular expression
 
 
 # Create your views here.
@@ -43,10 +42,12 @@ def user_login(request):
         # elif  len(input_value)< 4:
         #     messages.error(request, "Username Length can't be less then 4 characters!")
         #     return redirect('home')
-        elif  len(input_value)> 15:
+        elif len(input_value.strip())> 15:
             messages.error(request, "Username Length can't be greater then 15 characters!")
             return redirect('home')
-        
+        elif (not re.match(r'^[a-zA-Z0-9]{2,}$', input_value.strip())):
+            messages.error(request, "Username can only contain english alphabets and numbers!")
+            return redirect('home')     
         
 
         if len(password.strip()) == 0:
@@ -60,6 +61,9 @@ def user_login(request):
         #     return redirect('home')
         elif len(password.strip()) > 15:
             messages.error(request, "Password Length can't be greater than 15 characters !")
+            return redirect('home')
+        elif (not re.match(r'^[a-zA-Z0-9]{2,}$', password.strip())):
+            messages.error(request, "Password can only contain english alphabets and numbers!")
             return redirect('home')
         
         #User.objects.filter(username=u_name).first()
@@ -90,8 +94,9 @@ def user_login(request):
         return render(request, 'home.html')
     
 # ----------------------------------- SIGNUP -------------------------------------------------------------------
-    
+
 def user_signup(request):
+    import re
 
     if request.method == 'POST':
         username = request.POST['username']
@@ -114,14 +119,23 @@ def user_signup(request):
         elif username.isnumeric():
             messages.error(request, "Username can't just contain numbers! ")
             return redirect('home')
+        elif not re.match(r'^[a-zA-Z0-9]{2,}$', username):
+            messages.error(request, "Username can only contain english alphabets and numbers!")
+            return redirect('home') 
         
 
-        import re
+        
         if len(email.strip())==0:
             messages.error(request, "Must enter email ! Try again !")
             return redirect('home')
         elif User.objects.filter(email=email).exists():
             messages.error(request, "Email already exists ! Try again !")
+            return redirect('home')
+        if len(email.strip())<4:
+            messages.error(request, "Email too small ! Try again !")
+            return redirect('home')
+        if len(email.strip())>30:
+            messages.error(request, "Email too Large ! Try again !")
             return redirect('home')
         elif not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
             messages.error(request, "That is not a valid email ! Try again ! ")
@@ -138,6 +152,9 @@ def user_signup(request):
         elif len(pass1.strip())<4 or len(pass2.strip())>15:
             messages.error(request, "Password too Long ! Try again !")
             return redirect('home')
+        elif not re.match(r'^[a-zA-Z0-9]{2,}$', pass1) or re.match(r'^[a-zA-Z0-9]{2,}$', pass2):
+            messages.error(request, "Password can only contain english alphabets and numbers !")
+            return redirect('home')
         elif pass1 != pass2:
             messages.error(request, "Password dosn't match! Try again !")
             return redirect('home')
@@ -151,11 +168,11 @@ def user_signup(request):
 
             user_model = User.objects.get(username=username)
             new_UserProfile = UserProfile.objects.create(user =user_model) 
-            # new_UserProfile.save()
+            new_UserProfile.save()
 
-            # login(request, user) 
-            # user.userprofile.is_online = True
-            # user.userprofile.save()
+            login(request, user) 
+            user.userprofile.is_online = True
+            user.userprofile.save()
 
             messages.success(request, "Successfully registered")
             return redirect('settings') # after succesful account creation users are sent to account settings page   
@@ -217,7 +234,13 @@ def change_password(request):
                 messages.error(request, "Password fields can't be empty!")
                 return redirect('settings')
             elif len(new_password1) < 4 or len(new_password2) < 4:
-                messages.error(request, "Password must be at least 4 characters long!")
+                messages.error(request, "Password must contain 4 characters !")
+                return redirect('settings')
+            elif len(new_password1) > 15 or len(new_password2) >15:
+                messages.error(request, "Password shoould be less than 15 characters !")
+                return redirect('settings')
+            elif not re.match(r'^[a-zA-Z0-9]{2,}$', new_password1) or not re.match(r'^[a-zA-Z0-9]{2,}$', new_password2):
+                messages.error(request, "Password can only contain english alphabet and numbers !")
                 return redirect('settings')
             elif new_password1 != new_password2:
                 messages.error(request, "New passwords don't match!")
@@ -355,20 +378,26 @@ def public_page(request):
     # *******************: Searching Users :******************
 
     if request.method == 'POST':
-        query = request.POST.get('query', '').strip()  # Get the query from the POST data
 
-        if query:
-            # filtering the username by form the user that starts with the queary
-            search_results = User.objects.filter(username__istartswith=query).exclude(is_superuser=True)
-            if search_results.exists():
-                pass
-            else:
-                messages.error(request, 'Username does not match any existing user.')
+        query = request.POST.get('query','')  # Get the query from the POST data
+
+        if len(query.strip())==0:
+            messages.error(request, 'Must Enter some text before searching!')
+            return render(request, 'public.html', context)
+        elif len(query.strip())<2 or len(query.strip())>15 or query.isnumeric():
+            messages.error(request, 'Invalid search input !')
+            return render(request, 'public.html', context)
+
+        # filtering the username by form the user that starts with the queary
+        search_results = User.objects.filter(username__istartswith=query).exclude(is_superuser=True)
+
+        if search_results.exists():
+            context['search_results'] = search_results
+            messages.success(request, 'Users found successfully')
+            return render(request, 'public.html', context)
         else:
-            search_results = None
-
-        context['search_results'] = search_results
-        return render(request, 'public.html', context)
+            messages.error(request, 'Username does not match any existing user.')
+            return render(request, 'public.html', context)
     else:
         return render(request, 'public.html', context)
 
@@ -397,17 +426,53 @@ def settings(request):
 
         email = request.POST.get('email', '').strip()
         phone_no = request.POST.get('phone_no', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
 
 
-        # Check if email is already in use(exceot the current user)
+        # first name
+        if len(first_name) == 0:
+            pass
+        elif first_name.isnumeric() or len(first_name) > 15:
+            messages.error(request, "Invalid First name !")
+            return redirect('settings')
+        
+        # last name
+        if len(last_name) == 0:
+            pass
+        elif last_name.isnumeric() or len(last_name) > 15:
+            messages.error(request, "Invalid Last name !")
+            return redirect('settings')
+
+
+        # email 
+        import re
+        # Check if email is already in use(without including the current user)
         existing_email_user = User.objects.filter(email=email).exclude(username=user.username).first()
+
+        if len(email.strip())==0:
+            messages.error(request, "Email field Can't be empty !")
+            return redirect('settings')
         if existing_email_user:
             messages.error(request, f"Email '{email}' is already in use.")
             return redirect('settings')
+        if len(email.strip())<4:
+            messages.error(request, "Email too small ! Try again !")
+            return redirect('settings')
+        if len(email.strip())>30:
+            messages.error(request, "Email too Large ! Try again !")
+            return redirect('settings')
+        elif not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            messages.error(request, "That is not a valid email ! Try again ! ")
+            return redirect('settings')
         
 
+        # phone number
         if len(phone_no.strip())== 0:
             pass
+        elif (not (phone_no.strip()).isnumeric())  or len(phone_no.strip())>15: #or len(phone_no.strip())<10
+            messages.error(request, "Invalid Phone number !")
+            return redirect('settings')
         else:
             # Check if phone number is already in use(exceot the current user)
             existing_phone_user = UserProfile.objects.filter(phone=phone_no).exclude(user=user).first()
@@ -416,8 +481,8 @@ def settings(request):
                 return redirect('settings')
         
         new_profile_pic = request.FILES.get('profile_picture', user_profile.profile_picture)
-        new_first_name = request.POST.get('first_name', '').strip() or user.first_name
-        new_last_name = request.POST.get('last_name', '').strip()
+        new_first_name = first_name # if exixts then ok , but if not, an empty string will be taken
+        new_last_name = last_name
         new_email = email or user.email
         new_phone_no = phone_no 
         new_bio = request.POST.get('new_bio', '').strip() or user_profile.bio
@@ -434,7 +499,7 @@ def settings(request):
         user_profile.save()  # Saving the changes in UserProfile
 
         messages.success(request, "Save Change Success!")
-        return redirect('profile')
+        return redirect('/profile/'+user.username)
     else:
         return render(request,'settings.html',{'active_setting':True,'user_profile':user_profile,'mutual_following_profiles':mutual_following_profiles})
 
@@ -443,6 +508,8 @@ def settings(request):
     
 @login_required(login_url='login')
 def profile(request,pk):
+    current_user_profile = UserProfile.objects.get(user=request.user)
+
     user_object = User.objects.get(username =pk)
     user_profile = UserProfile.objects.get(user=user_object)
     user_posts = Post.objects.filter(user =user_profile.id) #getting the user_post info by using user_profile.id
@@ -493,6 +560,7 @@ def profile(request,pk):
     followers_without_following_back = set(followers_usernames) - set(following_usernames)
 
     context={
+        'current_user_profile':current_user_profile,
         'active_profile':True,
         'user_object':user_object,
         'user_profile':user_profile,
@@ -529,8 +597,11 @@ def add_post(request):
         else:
            post_img =request.FILES.get('post_img')
 
-        if len(request.POST['post_caption']) == 0:
+        if len((request.POST['post_caption']).strip()) == 0:
             post_caption = 'No Caption'
+        elif len((request.POST['post_caption']).strip()) >250:
+            messages.error(request, "Caption too long!")
+            return redirect('public')
         else:
             post_caption = request.POST['post_caption']
 
@@ -645,13 +716,18 @@ def delete_comment(request, comment_id):
 
 
 # -----------------------------------------:: Generating and sending OTP to emails ::---------------------------------------------
-    
+# import re
+
 def forgot_pas(request):
     if request.method == 'POST':
 
         email = request.POST.get('email')
 
         if len(email) != 0: # this prevents the empty email box sending
+
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+                messages.error(request, "That is not a valid email ! Try again ! ")
+                return redirect('forgot_pas')
 
             user = User.objects.filter(email=email).first() # check there is a user with that email
 
@@ -691,6 +767,15 @@ def verify_otp(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         otp_entered = request.POST.get('otp')
+
+        # if len(email)==0:
+        #     messages.error(request, 'OTP has not been created yet !')
+        #     return redirect('forgot_pas')
+
+        if len(otp_entered.strip())==0 or len(otp_entered.strip())<6 or (not (otp_entered.strip().isnumeric())):
+            messages.error(request, 'Invalid OTP format')
+            return redirect('forgot_pas')
+
         otp_obj = OTPModel.objects.filter(user__email=email, otp=otp_entered).first()
         
         if otp_obj:
@@ -717,8 +802,17 @@ def change_forgot_password(request):
         user = User.objects.filter(email=email).first() # if email field is empty then this will give admin 
         if user.username != 'admin':
 
-            if len(new_password1.strip()) < 0 or len(new_password1.strip()) <0:
+            if len(new_password1.strip()) == 0 or len(new_password2.strip()) == 0:
                 messages.error(request, "Must enter password!")
+                return redirect('forgot_pas')
+            elif len(new_password1.strip())<4 or len(new_password2.strip())<4:
+                messages.error(request, "Password too Short ! Try again !")
+                return redirect('forgot_pas')
+            elif len(new_password1.strip())>15 or len(new_password2.strip())>15:
+                messages.error(request, "Password too Long ! Try again !")
+                return redirect('forgot_pas')
+            elif re.match(r'^[a-zA-Z0-9]{2,}$', new_password1) or re.match(r'^[a-zA-Z0-9]{2,}$', new_password2):
+                messages.error(request, "Password can only contain english alphabets and numbers !")
                 return redirect('forgot_pas')
             elif new_password1 != new_password2:
                 messages.error(request, "New Passwords dosn't match!")

@@ -4,18 +4,18 @@
 const error_msg = document.getElementById('error_msg');
 const success_msg = document.getElementById('success_msg');
 
-// Function to hide the message after 6s ( 6000ms = 6s )
+// Function to hide the message after 6s ( 9000ms = 9s )
 
 if (error_msg) {
   setTimeout(() => {
     error_msg.style.display = 'none';
-  }, 6000); 
+  }, 9000); 
 }
 
 if (success_msg) {
   setTimeout(() => {
     success_msg.style.display = 'none';
-  }, 6000); 
+  }, 9000); 
 }
 
 // cross mark hide message

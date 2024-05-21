@@ -25,15 +25,19 @@
 <i class="fa-solid fa-xmark" id="profile_image_cross"></i> -->
 <!-- ------------------------------------------------------------------ -->
 <div class="edit_profile_div">
-    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data"> 
+    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data" id="profile_detail_form"> 
         {% csrf_token %}
 
         <div>
             <h3>Profile Picture : </h3>
-            <div id="profile_img_div" onclick="defaultBtnActive()" >
+            <div id="profile_img_div" onclick="defaultBtnActive()" style="width: 100px; height: 100px" >
                 <img id="default_img" src="{{ user_profile.profile_picture.url }}" alt="" style="width: 100px; height: 100px">
                 <span class="change_btn">Change</span>
             </div>
+            
+            <!-- new_update 0.1 -->
+            <i class="fa-solid fa-circle-xmark" id="profile_image_cross" style="z-index: 100;"></i>
+            
             <input type="file" id="default_btn" onchange="getImagePreview(event)" name="profile_picture"  accept="image/*,video/*" hidden>
         </div>
         
