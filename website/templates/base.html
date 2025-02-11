@@ -91,7 +91,7 @@
                     {% endif %}
 
 
-                    {% if active_profile %}
+                    {% if active_profile and user_object.id == user.id %}
                         <a href="{% url 'profile' pk=user %}"><li class="active_nav_list"><i class="fa-solid fa-user"></i> <p>Your Profile</p></li></a>
                     {% else %}
                         <a href="{% url 'profile' pk=user %}"><li><i class="fa-solid fa-user"></i> <p>Your Profile</p></li></a>

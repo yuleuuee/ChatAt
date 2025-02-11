@@ -134,6 +134,7 @@
     
         //  whan connection happens this function get called 
         ws.onopen = function(){
+            // console.log('here--->')
             console.log('Websocket connection open ...')
         }
 
@@ -178,6 +179,7 @@
             const inputBox =document.getElementById('chat-message-input')
             const message = inputBox.value.trim(); // trim() removes leading and trailing white spaces
             if (message !== '') { // Check if the message is not empty
+                console.log('came here--->')
                 ws.send(JSON.stringify({'msg': message}));
                 inputBox.value = ''; // making the input field empty after the message is sent
             } else {
